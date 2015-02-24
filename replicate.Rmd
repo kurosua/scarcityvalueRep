@@ -1,0 +1,12 @@
+---
+title: "replication"
+author: "Nick F & Aaron K"
+date: "February 24, 2015"
+output: html_document
+---
+
+test
+
+```{r}
+print("happiness")
+```
