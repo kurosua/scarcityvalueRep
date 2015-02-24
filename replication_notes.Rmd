@@ -8,3 +8,7 @@ output: html_document
 NF 2/24/15
 Here's a new rmd file for notes - I figure we can use the replicate.rmd file for finished product, and this
 for work in progress?
+
+to do - rename .sav files to not have spaces
+read .sav files into R data frames
+double check that data read into R matches SPSS output.

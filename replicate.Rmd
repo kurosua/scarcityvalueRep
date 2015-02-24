@@ -17,3 +17,6 @@ NF: test 2
 print("Hello World!")
 ```
 
+library(dplyr)
+library(ggplot2)
+
