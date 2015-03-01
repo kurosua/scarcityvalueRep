@@ -5,18 +5,65 @@ date: "February 24, 2015"
 output: html_document
 ---
 
-test
+2/28/15 - NF - Starting at study 1a.
 
-```{r}
-print("happiness")
-```
 
-NF: test 2
-
-```{r}
-print("Hello World!")
-```
-
+```{r echo = FALSE}
 library(dplyr)
+library(broom)
 library(ggplot2)
+library(foreign)
+library(aod)
 
+setwd("C:/Users/Nick/Documents/Github/scarcityvalueRep/framing")
+raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)
+#read in the data for 1a using the spss file - the warning that comes up is okay - the data imports cleanly.
+
+clean_1a <- raw_1a_spss %>%
+  filter(filter_. != "Not Selected")
+#removes the 1 removed observation for being 3 SDs away from the mean.
+
+```
+
+#Study 1a
+-----
+In this study, there were 103 participants (median household size = 3 people, median household income = $35,000).  We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
+
+```{r echo = FALSE}
+raw_1a_spss %>%
+  summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
+```
+
+***Results***
+-----
+One participant was excluded as an outlier on income (more than 3 SD from the mean).  Binary logistic regressions were conducted to compare how frequently participants cided each of the two considerations of interest (trade-offs vs location) as a function of income.
+
+
+sidenote: of the 102 participants, only 58 cited either trade-off or location.  Presumably, the other 44 participants cited another response that was not analyzed.
+
+
+
+```{r echo = FALSE}
+raw_1a_spss  %>%
+  summarise(total.tradeoff = sum(tradeoff), total.location = sum(location))
+#count number of participants who answered either 'tradeoff' or 'location' for the 1a prompt.
+```
+
+Higher-income participants were more likely than lower-income participants to name location as their main consideration, beta = 2.52, Wald-test chi squared(1, N = 102) = 5.5, p < 0.05.
+
+```{r echo = FALSE}
+
+logit1logses <- glm(location ~ logses, data = clean_1a, family = "binomial")
+summary(logit1logses)
+
+wald.test(b = coef(logit1logses), Sigma = vcov(logit1logses), Terms = 2)
+
+```
+
+Lower-income participants were more likely than higher-income participants to name trade-offs as the main consideration, beta = -1.62, Wald-test chi squared(1, N = 102) = 4.7, p < 0.05.
+
+```{r echo = FALSE}
+logit2logses <- glm(tradeoff ~ logses, data = clean_1a, family = "binomial")
+summary(logit2logses)
+
+wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)
