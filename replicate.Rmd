@@ -22,13 +22,11 @@ library(aod)
 In this study, there were 103 participants (median household size = 3 people, median household income = $35,000).  We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
 
 ```{r echo = FALSE}
+
 setwd("C:/Users/Nick/Documents/Github/scarcityvalueRep/framing")
 raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)
 #read in the data for 1a using the spss file - the warning that comes up is okay - the data imports cleanly.
 
-clean_1a <- raw_1a_spss %>%
-  filter(filter_. != "Not Selected")
-#removes the 1 removed observation for being 3 SDs away from the mean.
 raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
 ```
@@ -43,6 +41,10 @@ sidenote: of the 102 participants, only 58 cited either trade-off or location.  
 
 
 ```{r echo = FALSE}
+clean_1a <- raw_1a_spss %>%
+  filter(filter_. != "Not Selected")
+#removes the 1 removed observation for being 3 SDs away from the mean.
+
 raw_1a_spss  %>%
   summarise(total.tradeoff = sum(tradeoff), total.location = sum(location))
 #count number of participants who answered either 'tradeoff' or 'location' for the 1a prompt.
@@ -85,4 +87,14 @@ clean_1a %>%
 ------
 ------
 #Study 1b
------
+
+In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
+
+```{r echo = FALSE}
+
+setwd("C:/Users/Nick/Documents/Github/scarcityvalueRep/framing")
+raw_1b_spss <- read.spss("study_1b.sav", to.data.frame = TRUE)
+#read in the data for 1b using the spss file - the warning that comes up is okay - the data imports cleanly.
+
+raw_1b_spss %>%
+  summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
