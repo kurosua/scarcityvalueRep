@@ -15,6 +15,9 @@ library(ggplot2)
 library(foreign)
 library(aod)
 
+sem <- function(x) sqrt(var(x) / length(x))
+#creates the function to calculate standard error of the mean
+
 ```
 
 #Study 1a
@@ -98,3 +101,28 @@ raw_1b_spss <- read.spss("study_1b.sav", to.data.frame = TRUE)
 
 raw_1b_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
+```
+
+***Results***
+In Study 1b, 2 participants were excluded whose Willing-to-pay (WTP) was more than 3 standard deviations from the mean.
+
+Higher-income participants showed the classic effect, offering a higher price for beer from the resort
+
+```{r echo = FALSE}
+
+clean_1b <- raw_1b_spss %>%
+  filter(filter_. != "Not Selected")
+
+clean_1b %>%
+  filter(split == 1, resort == 1) %>%
+  summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * sem(beer)), ci.high = mean(beer) + (1.96 * sem(beer)))
+#1.96 * standard error gives 95% CI in one direction
+#this calculates high-income WTP beer price at resort
+
+clean_1b %>%
+  filter(split == 1, resort == 0) %>%
+  summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * sem(beer)), ci.high = mean(beer) + (1.96 * sem(beer)))
+#1.96 * standard error gives 95% CI in one direction
+#this calculates high-income WTP beer price at grocer
+
+```
