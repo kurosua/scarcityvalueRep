@@ -118,7 +118,10 @@ clean_1b %>%
   summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * sem(beer)), ci.high = mean(beer) + (1.96 * sem(beer)))
 #1.96 * standard error gives 95% CI in one direction
 #this calculates high-income WTP beer price at resort
+```
+compared to the grocery store.
 
+```{r echo = FALSE}
 clean_1b %>%
   filter(split == 1, resort == 0) %>%
   summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * sem(beer)), ci.high = mean(beer) + (1.96 * sem(beer)))
@@ -126,3 +129,28 @@ clean_1b %>%
 #this calculates high-income WTP beer price at grocer
 
 ```
+But lower income participants' WTP did not differ significantly between beer from the resort
+
+```{r echo = FALSE}
+clean_1b %>%
+  filter(split == 0, resort == 1) %>%
+  summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * sem(beer)), ci.high = mean(beer) + (1.96 * sem(beer)))
+#1.96 * standard error gives 95% CI in one direction
+#this calculates low income WTP beer price at resort
+
+```
+ and beer from the store.
+ 
+```{r echo = FALSE}
+clean_1b %>%
+  filter(split == 0, resort == 0) %>%
+  summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * sem(beer)), ci.high = mean(beer) + (1.96 * sem(beer)))
+#1.96 * standard error gives 95% CI in one direction
+#this calculates low income WTP beer price at grocery store
+
+```
+
+
+```{r}
+aov_1b <- aov(beer ~ resort * Zlogses, data = clean_1b)
+summary(aov_1b)

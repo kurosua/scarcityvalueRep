@@ -169,11 +169,27 @@ img {
 <pre><code>##   sample.size median.household.income median.household.size
 ## 1         151                   45000                     3</code></pre>
 <p><strong><em>Results</em></strong> In Study 1b, 2 participants were excluded whose Willing-to-pay (WTP) was more than 3 standard deviations from the mean.</p>
-<p>Higher-income participants showed the classic effect, offering a higher price for beer from the resort(M = ‘r clean_1b %&gt;% filter(split == 1, resort == 1) %&gt;% summarise(mean.beer = mean(beer))’)</p>
-<pre><code>##   mean.beer
-## 1  6.094595</code></pre>
-<pre><code>##   mean.beer
-## 1  4.214286</code></pre>
+<p>Higher-income participants showed the classic effect, offering a higher price for beer from the resort</p>
+<pre><code>##   mean.beer   ci.low  ci.high
+## 1  6.094595 5.210653 6.978536</code></pre>
+<p>compared to the grocery store.</p>
+<pre><code>##   mean.beer   ci.low  ci.high
+## 1  4.214286 3.640055 4.788517</code></pre>
+<p>But lower income participants’ WTP did not differ significantly between beer from the resort</p>
+<pre><code>##   mean.beer   ci.low  ci.high
+## 1  4.444444 3.810319 5.078569</code></pre>
+<p>and beer from the store.</p>
+<pre><code>##   mean.beer   ci.low  ci.high
+## 1  5.371951 4.351965 6.391937</code></pre>
+<pre class="r"><code>aov_1b &lt;- aov(beer ~ resort * Zlogses, data = clean_1b)
+summary(aov_1b)</code></pre>
+<pre><code>##                 Df Sum Sq Mean Sq F value Pr(&gt;F)  
+## resort           1    7.3    7.27   1.065 0.3038  
+## Zlogses          1    1.5    1.50   0.220 0.6400  
+## resort:Zlogses   1   32.2   32.22   4.718 0.0315 *
+## Residuals      145  990.4    6.83                 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 
 
