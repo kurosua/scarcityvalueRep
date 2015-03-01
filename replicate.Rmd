@@ -15,14 +15,6 @@ library(ggplot2)
 library(foreign)
 library(aod)
 
-setwd("C:/Users/Nick/Documents/Github/scarcityvalueRep/framing")
-raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)
-#read in the data for 1a using the spss file - the warning that comes up is okay - the data imports cleanly.
-
-clean_1a <- raw_1a_spss %>%
-  filter(filter_. != "Not Selected")
-#removes the 1 removed observation for being 3 SDs away from the mean.
-
 ```
 
 #Study 1a
@@ -30,6 +22,13 @@ clean_1a <- raw_1a_spss %>%
 In this study, there were 103 participants (median household size = 3 people, median household income = $35,000).  We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
 
 ```{r echo = FALSE}
+setwd("C:/Users/Nick/Documents/Github/scarcityvalueRep/framing")
+raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)
+#read in the data for 1a using the spss file - the warning that comes up is okay - the data imports cleanly.
+
+clean_1a <- raw_1a_spss %>%
+  filter(filter_. != "Not Selected")
+#removes the 1 removed observation for being 3 SDs away from the mean.
 raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
 ```
@@ -67,3 +66,23 @@ logit2logses <- glm(tradeoff ~ logses, data = clean_1a, family = "binomial")
 summary(logit2logses)
 
 wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)
+```
+------
+------
+Below are the numbers for figure 1a - currently figuring out how to make them into a histogram.
+```{r echo = FALSE}
+clean_1a %>%
+  filter(income2 <= 35000) %>%
+  summarise(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n())
+#produces numbers for the low income bars
+
+clean_1a %>%
+  filter(income2 > 35000) %>%
+  summarise(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n())
+#produces numbers for the high income bars
+
+```
+------
+------
+#Study 1b
+-----
