@@ -5,9 +5,7 @@ date: "February 24, 2015"
 output: html_document
 ---
 
-2/28/15 - NF - Starting at study 1a.
-
-
+2/28/15 - NF - Starting at 1a
 ```{r echo = FALSE}
 library(dplyr)
 library(broom)
@@ -16,24 +14,27 @@ library(foreign)
 library(aod)
 library(lsr)
 
-sem <- function(x) sqrt(var(x) / length(x))
-#creates the function to calculate standard error of the mean
+Sem <- function(x) {
+  #creates the function to calculate standard error of the mean
+  sqrt(var(x)/length(x))
+  }
 
 ```
 
-
+---
 #Study 1a
-------
 In this study, there were 103 participants (median household size = 3 people, median household income = $35,000).  We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
-
 ```{r echo = FALSE}
-
 setwd("C:/Users/Nick/Documents/Github/scarcityvalueRep/framing")
 raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)
 #read in the data for 1a using the spss file - the warning that comes up is okay - the data imports cleanly.
 
 raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
+
+# OR 
+getwd() #check it's in "replicate" folder
+
 ```
 
 ***Results***
