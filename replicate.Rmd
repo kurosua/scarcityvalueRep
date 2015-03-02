@@ -21,8 +21,9 @@ sem <- function(x) sqrt(var(x) / length(x))
 
 ```
 
+
 #Study 1a
------
+------
 In this study, there were 103 participants (median household size = 3 people, median household income = $35,000).  We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
 
 ```{r echo = FALSE}
@@ -36,7 +37,7 @@ raw_1a_spss %>%
 ```
 
 ***Results***
------
+------
 One participant was excluded as an outlier on income (more than 3 SD from the mean).  Binary logistic regressions were conducted to compare how frequently participants cided each of the two considerations of interest (trade-offs vs location) as a function of income.
 
 
@@ -88,8 +89,9 @@ clean_1a %>%
 #produces numbers for the high income bars
 
 ```
-------
-------
+-----
+-----
+
 #Study 1b
 
 In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
@@ -105,6 +107,7 @@ raw_1b_spss %>%
 ```
 
 ***Results***
+-----
 In Study 1b, 2 participants were excluded whose Willing-to-pay (WTP) was more than 3 standard deviations from the mean.
 
 Higher-income participants showed the classic effect, offering a higher price for beer from the resort
@@ -164,4 +167,60 @@ The interaction was also significant when income was treated as a continuous var
 ```{r echo = FALSE}
 lm1 <- lm(beer ~ resort * logses, data = clean_1b)
 summary(lm1)
+```
+-----
+-----
+#Study 1c
+
+
+We replicated the results of 1b with larger samples in studies 1c and 1d.  In study 1c, we excluded 2 participants with missing responses, 5 with unreasonably high WTPs (over $100), and 19 additional outliers on WTP, which left 578 participants.
+
+```{r echo = FALSE}
+setwd("C:/Users/Nick/Documents/Github/scarcityvalueRep/framing")
+raw_1c_spss <- read.spss("study_1c.sav", to.data.frame = TRUE)
+#read in the data for 1c using the spss file - the warning that comes up is okay - the data imports cleanly.
+
+clean_1c <- raw_1c_spss %>%
+  filter(filter_. != "Not Selected")
+```
+***Results***
+-----
+
+Dividing participants according to a median split on income, we found that higher-income participants offered a higher price for beer from the resort
+
+```{r echo = FALSE}
+clean_1c %>%
+  filter(split == 1, resort == 1) %>%
+  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * sem(pay)), ci.high = mean(pay) + (1.96 * sem(pay)))
+```
+than for beer from the grocery store:
+```{r echo = FALSE}
+clean_1c %>%
+  filter(split == 1, resort == 0) %>%
+  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * sem(pay)), ci.high = mean(pay) + (1.96 * sem(pay)))
+```
+
+Lower-income participants' WTP did not differ significantly between beer from the resort,
+
+```{r echo = FALSE}
+clean_1c %>%
+  filter(split == 0, resort == 1) %>%
+  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * sem(pay)), ci.high = mean(pay) + (1.96 * sem(pay)))
+```
+and beer from the store.
+
+```{r echo = FALSE}
+clean_1c %>%
+  filter(split == 0, resort == 0) %>%
+  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * sem(pay)), ci.high = mean(pay) + (1.96 * sem(pay)))
+```
+
+The interaction between income and context was significant, F(1,574) = 5.68, p < 0.05, eta squared partial = 0.01.
+
+```{r echo = FALSE}
+aov_1c <- aov(pay ~ resort * split, data = clean_1c)
+summary(aov_1c)
+#they ran this anova on the binary 'split' column?
+
+etaSquared(aov_1c, type = 2, anova = FALSE)
 ```

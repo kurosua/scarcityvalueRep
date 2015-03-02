@@ -159,7 +159,7 @@ img {
 ## 1      49             15     0.3061224             13     0.2653061</code></pre>
 </div>
 <div id="section-1" class="section level2">
-<h2>——</h2>
+<h2>—–</h2>
 </div>
 <div id="study-1b" class="section level1">
 <h1>Study 1b</h1>
@@ -168,7 +168,9 @@ img {
 ## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
 <pre><code>##   sample.size median.household.income median.household.size
 ## 1         151                   45000                     3</code></pre>
-<p><strong><em>Results</em></strong> In Study 1b, 2 participants were excluded whose Willing-to-pay (WTP) was more than 3 standard deviations from the mean.</p>
+<div id="results-1" class="section level2">
+<h2><strong><em>Results</em></strong></h2>
+<p>In Study 1b, 2 participants were excluded whose Willing-to-pay (WTP) was more than 3 standard deviations from the mean.</p>
 <p>Higher-income participants showed the classic effect, offering a higher price for beer from the resort</p>
 <pre><code>##   mean.beer   ci.low  ci.high
 ## 1  6.094595 5.210653 6.978536</code></pre>
@@ -214,6 +216,43 @@ img {
 ## Residual standard error: 2.613 on 145 degrees of freedom
 ## Multiple R-squared:  0.03975,    Adjusted R-squared:  0.01988 
 ## F-statistic: 2.001 on 3 and 145 DF,  p-value: 0.1165</code></pre>
+</div>
+<div id="section-2" class="section level2">
+<h2>—–</h2>
+</div>
+</div>
+<div id="study-1c" class="section level1">
+<h1>Study 1c</h1>
+<p>We replicated the results of 1b with larger samples in studies 1c and 1d. In study 1c, we excluded 2 participants with missing responses, 5 with unreasonably high WTPs (over $100), and 19 additional outliers on WTP, which left 578 participants.</p>
+<pre><code>## Warning in read.spss(&quot;study_1c.sav&quot;, to.data.frame = TRUE): study_1c.sav:
+## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
+<div id="results-2" class="section level2">
+<h2><strong><em>Results</em></strong></h2>
+<p>Dividing participants according to a median split on income, we found that higher-income participants offered a higher price for beer from the resort</p>
+<pre><code>##   mean.beer   ci.low  ci.high
+## 1  6.806452 6.337838 7.275065</code></pre>
+<p>than for beer from the grocery store:</p>
+<pre><code>##   mean.beer   ci.low  ci.high
+## 1  5.413522 5.043781 5.783263</code></pre>
+<p>Lower-income participants’ WTP did not differ significantly between beer from the resort,</p>
+<pre><code>##   mean.beer   ci.low  ci.high
+## 1   5.89097 5.475666 6.306273</code></pre>
+<p>and beer from the store.</p>
+<pre><code>##   mean.beer   ci.low  ci.high
+## 1  5.559615 5.063869 6.055361</code></pre>
+<p>The interaction between income and context was significant, F(1,574) = 5.68, p &lt; 0.05, eta squared partial = 0.01.</p>
+<pre><code>##               Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## resort         1     94   93.53  13.244 0.000298 ***
+## split          1     21   20.77   2.940 0.086924 .  
+## resort:split   1     40   40.10   5.678 0.017508 *  
+## Residuals    574   4054    7.06                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<pre><code>##                   eta.sq eta.sq.part
+## resort       0.024491741 0.024794186
+## split        0.004934856 0.005096702
+## resort:split 0.009528267 0.009794297</code></pre>
+</div>
 </div>
 
 
