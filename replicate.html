@@ -181,7 +181,7 @@ img {
 <p>and beer from the store.</p>
 <pre><code>##   mean.beer   ci.low  ci.high
 ## 1  5.371951 4.351965 6.391937</code></pre>
-<p>The interaction between income and context was significant F(1,145) = 11.18, p &lt; 0.01, eta squared = 0.07.</p>
+<p>The interaction between income and context was significant F(1,145) = 11.18, p &lt; 0.01, eta squared partial = 0.07.</p>
 <pre><code>##               Df Sum Sq Mean Sq F value  Pr(&gt;F)   
 ## resort         1    7.3    7.27   1.111 0.29353   
 ## split          1    1.8    1.83   0.280 0.59742   
@@ -189,16 +189,31 @@ img {
 ## Residuals    145  949.1    6.55                   
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<pre><code>##                   eta.sq eta.sq.part         SS  df        MS          F
-## resort       0.006714223 0.007243346   6.924752   1  6.924752  1.0579483
-## split        0.001777891 0.001928269   1.833638   1  1.833638  0.2801392
-## resort:split 0.070932460 0.071564466  73.156597   1 73.156597 11.1767023
-## Residuals    0.920236253          NA 949.090909 145  6.545455         NA
-##                        p
-## resort       0.305396313
-## split        0.597419383
-## resort:split 0.001054099
-## Residuals             NA</code></pre>
+<pre><code>##                   eta.sq eta.sq.part
+## resort       0.006714223 0.007243346
+## split        0.001777891 0.001928269
+## resort:split 0.070932460 0.071564466</code></pre>
+<p>The interaction was also significant when income was treated as a continuous variable beta = 2.27 (the closest I could replicate from the data was 2.67), t(145) = 2.17, p &lt; 0.05.</p>
+<pre><code>## 
+## Call:
+## lm(formula = beer ~ resort * logses, data = clean_1b)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -4.688 -1.625 -0.554  1.118 10.080 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)     8.8781     3.6730   2.417   0.0169 *
+## resort        -11.4355     5.4864  -2.084   0.0389 *
+## logses         -0.9095     0.8243  -1.103   0.2717  
+## resort:logses   2.6781     1.2330   2.172   0.0315 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.613 on 145 degrees of freedom
+## Multiple R-squared:  0.03975,    Adjusted R-squared:  0.01988 
+## F-statistic: 2.001 on 3 and 145 DF,  p-value: 0.1165</code></pre>
 </div>
 
 
