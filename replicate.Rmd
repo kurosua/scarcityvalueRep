@@ -14,6 +14,7 @@ library(broom)
 library(ggplot2)
 library(foreign)
 library(aod)
+library(lsr)
 
 sem <- function(x) sqrt(var(x) / length(x))
 #creates the function to calculate standard error of the mean
@@ -150,7 +151,11 @@ clean_1b %>%
 
 ```
 
-
-```{r}
-aov_1b <- aov(beer ~ resort * Zlogses, data = clean_1b)
+The interaction between income and context was significant F(1,145) = 11.18, p < 0.01, eta squared = 0.07.
+```{r echo = FALSE}
+aov_1b <- aov(beer ~ resort * split, data = clean_1b)
 summary(aov_1b)
+#they ran this anova on the binary 'split' column?
+
+etaSquared(aov_1b, type = 2, anova = TRUE)
+```

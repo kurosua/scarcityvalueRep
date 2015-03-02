@@ -181,15 +181,24 @@ img {
 <p>and beer from the store.</p>
 <pre><code>##   mean.beer   ci.low  ci.high
 ## 1  5.371951 4.351965 6.391937</code></pre>
-<pre class="r"><code>aov_1b &lt;- aov(beer ~ resort * Zlogses, data = clean_1b)
-summary(aov_1b)</code></pre>
-<pre><code>##                 Df Sum Sq Mean Sq F value Pr(&gt;F)  
-## resort           1    7.3    7.27   1.065 0.3038  
-## Zlogses          1    1.5    1.50   0.220 0.6400  
-## resort:Zlogses   1   32.2   32.22   4.718 0.0315 *
-## Residuals      145  990.4    6.83                 
+<p>The interaction between income and context was significant F(1,145) = 11.18, p &lt; 0.01, eta squared = 0.07.</p>
+<pre><code>##               Df Sum Sq Mean Sq F value  Pr(&gt;F)   
+## resort         1    7.3    7.27   1.111 0.29353   
+## split          1    1.8    1.83   0.280 0.59742   
+## resort:split   1   73.2   73.16  11.177 0.00105 **
+## Residuals    145  949.1    6.55                   
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<pre><code>##                   eta.sq eta.sq.part         SS  df        MS          F
+## resort       0.006714223 0.007243346   6.924752   1  6.924752  1.0579483
+## split        0.001777891 0.001928269   1.833638   1  1.833638  0.2801392
+## resort:split 0.070932460 0.071564466  73.156597   1 73.156597 11.1767023
+## Residuals    0.920236253          NA 949.090909 145  6.545455         NA
+##                        p
+## resort       0.305396313
+## split        0.597419383
+## resort:split 0.001054099
+## Residuals             NA</code></pre>
 </div>
 
 
