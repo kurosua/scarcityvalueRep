@@ -68,7 +68,7 @@ img {
 </div>
 
 
-<p>2/28/15 - NF - Starting at study 1a.</p>
+<p>2/28/15 - NF - Starting at 1a</p>
 <pre><code>## 
 ## Attaching package: 'dplyr'
 ## 
@@ -79,96 +79,80 @@ img {
 ## The following objects are masked from 'package:base':
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
-<div id="study-1a" class="section level2">
-<h2>#Study 1a</h2>
-<p>In this study, there were 103 participants (median household size = 3 people, median household income = $35,000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.</p>
-<pre><code>## Warning in read.spss(&quot;study_1a.sav&quot;, to.data.frame = TRUE): study_1a.sav:
-## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
-<pre><code>##   sample.size median.household.income median.household.size
-## 1         103                   35000                     3</code></pre>
-</div>
-<div id="results" class="section level2">
-<h2><strong><em>Results</em></strong></h2>
-<p>One participant was excluded as an outlier on income (more than 3 SD from the mean). Binary logistic regressions were conducted to compare how frequently participants cided each of the two considerations of interest (trade-offs vs location) as a function of income.</p>
-<p>sidenote: of the 102 participants, only 58 cited either trade-off or location. Presumably, the other 44 participants cited another response that was not analyzed.</p>
-<pre><code>##   total.tradeoff total.location
-## 1             38             20</code></pre>
-<p>Higher-income participants were more likely than lower-income participants to name location as their main consideration, beta = 2.52, Wald-test chi squared(1, N = 102) = 5.5, p &lt; 0.05.</p>
-<pre><code>## 
-## Call:
-## glm(formula = location ~ logses, family = &quot;binomial&quot;, data = clean_1a)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -1.0494  -0.7104  -0.5302  -0.3656   2.4029  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)   
-## (Intercept)  -12.597      4.814  -2.617  0.00888 **
-## logses         2.521      1.071   2.353  0.01860 * 
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 100.963  on 101  degrees of freedom
-## Residual deviance:  94.434  on 100  degrees of freedom
-## AIC: 98.434
-## 
-## Number of Fisher Scoring iterations: 5</code></pre>
-<pre><code>## Wald test:
-## ----------
-## 
-## Chi-squared test:
-## X2 = 5.5, df = 1, P(&gt; X2) = 0.019</code></pre>
-<p>Lower-income participants were more likely than higher-income participants to name trade-offs as the main consideration, beta = -1.62, Wald-test chi squared(1, N = 102) = 4.7, p &lt; 0.05.</p>
-<pre><code>## 
-## Call:
-## glm(formula = tradeoff ~ logses, family = &quot;binomial&quot;, data = clean_1a)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -1.4225  -0.9481  -0.7979   1.3170   1.6672  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)  
-## (Intercept)   6.5589     3.2745   2.003   0.0452 *
-## logses       -1.6218     0.7505  -2.161   0.0307 *
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 134.70  on 101  degrees of freedom
-## Residual deviance: 129.77  on 100  degrees of freedom
-## AIC: 133.77
-## 
-## Number of Fisher Scoring iterations: 4</code></pre>
-<pre><code>## Wald test:
-## ----------
-## 
-## Chi-squared test:
-## X2 = 4.7, df = 1, P(&gt; X2) = 0.031</code></pre>
-</div>
-<div id="section" class="section level2">
-<h2>——</h2>
-<p>Below are the numbers for figure 1a - currently figuring out how to make them into a histogram.</p>
-<pre><code>##   total.n total.tradeoff prop.tradeoff total.location prop.location
-## 1      53             23     0.4339623              7     0.1320755</code></pre>
-<pre><code>##   total.n total.tradeoff prop.tradeoff total.location prop.location
-## 1      49             15     0.3061224             13     0.2653061</code></pre>
-</div>
-<div id="section-1" class="section level2">
-<h2>—–</h2>
-</div>
+<table>
+<colgroup>
+<col width="4%"></col>
+</colgroup>
+<tbody>
+<tr class="odd">
+<td align="left">#Study 1a</td>
+</tr>
+<tr class="even">
+<td align="left">&gt; In this study, there were 103 participants (mean age = 29.3 years; median household size = 3 people; median household income = $35,000). … One participant was excluded as an outlier on income (more than 3 SD from the mean). We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income. Higher- income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p &lt; .05, but lower-income participants were more likely than higher- income participants to name trade-offs as the main con- sideration, β = −1.62, Wald-test χ2(1, N = 102) = 4.67, p &lt;.05 (see Fig. 1a). …</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>italics</em> We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset. <em>italics</em></td>
+</tr>
+<tr class="even">
+<td align="left"><code>## Warning in read.spss(&quot;study_1a.sav&quot;, to.data.frame = TRUE): study_1a.sav: ## Unrecognized record type 7, subtype 18 encountered in system file</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>## re-encoding from CP1252</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>##   sample.size median.household.income median.household.size ## 1         103                   35000                     3</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>##   total.tradeoff total.location ## 1             38             20</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>## [1] &quot;/Users/air/Dropbox/SOC504/replicate/framing&quot;</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Higher-income participants were more likely than lower-income participants to name location as their main consideration, beta = 2.52, Wald-test chi squared(1, N = 102) = 5.5, p &lt; 0.05.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>r logit1logses &lt;- glm(location ~ logses, data = clean_1a, family = &quot;binomial&quot;) summary(logit1logses)</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>## ## Call: ## glm(formula = location ~ logses, family = &quot;binomial&quot;, data = clean_1a) ## ## Deviance Residuals: ##     Min       1Q   Median       3Q      Max ## -1.0494  -0.7104  -0.5302  -0.3656   2.4029 ## ## Coefficients: ##             Estimate Std. Error z value Pr(&gt;|z|) ## (Intercept)  -12.597      4.814  -2.617  0.00888 ** ## logses         2.521      1.071   2.353  0.01860 * ## --- ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 ## ## (Dispersion parameter for binomial family taken to be 1) ## ##     Null deviance: 100.963  on 101  degrees of freedom ## Residual deviance:  94.434  on 100  degrees of freedom ## AIC: 98.434 ## ## Number of Fisher Scoring iterations: 5</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>r wald.test(b = coef(logit1logses), Sigma = vcov(logit1logses), Terms = 2)</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>## Wald test: ## ---------- ## ## Chi-squared test: ## X2 = 5.5, df = 1, P(&gt; X2) = 0.019</code></td>
+</tr>
+<tr class="even">
+<td align="left">Lower-income participants were more likely than higher-income participants to name trade-offs as the main consideration, beta = -1.62, Wald-test chi squared(1, N = 102) = 4.7, p &lt; 0.05.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>## ## Call: ## glm(formula = tradeoff ~ logses, family = &quot;binomial&quot;, data = clean_1a) ## ## Deviance Residuals: ##     Min       1Q   Median       3Q      Max ## -1.4225  -0.9481  -0.7979   1.3170   1.6672 ## ## Coefficients: ##             Estimate Std. Error z value Pr(&gt;|z|) ## (Intercept)   6.5589     3.2745   2.003   0.0452 * ## logses       -1.6218     0.7505  -2.161   0.0307 * ## --- ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 ## ## (Dispersion parameter for binomial family taken to be 1) ## ##     Null deviance: 134.70  on 101  degrees of freedom ## Residual deviance: 129.77  on 100  degrees of freedom ## AIC: 133.77 ## ## Number of Fisher Scoring iterations: 4</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>## Wald test: ## ---------- ## ## Chi-squared test: ## X2 = 4.7, df = 1, P(&gt; X2) = 0.031</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Below are the numbers for figure 1a : <em>italics</em> currently figuring out how to make them into a histogram. <em>italics</em></td>
+</tr>
+<tr class="even">
+<td align="left"><code>##   total.n total.tradeoff prop.tradeoff total.location prop.location ## 1      53             23     0.4339623              7     0.1320755</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>##   total.n total.tradeoff prop.tradeoff total.location prop.location ## 1      49             15     0.3061224             13     0.2653061</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
 <div id="study-1b" class="section level1">
 <h1>Study 1b</h1>
 <p>In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.</p>
 <pre><code>## Warning in read.spss(&quot;study_1b.sav&quot;, to.data.frame = TRUE): study_1b.sav:
 ## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
+<pre><code>## re-encoding from CP1252</code></pre>
 <pre><code>##   sample.size median.household.income median.household.size
 ## 1         151                   45000                     3</code></pre>
-<div id="results-1" class="section level2">
+<div id="results" class="section level2">
 <h2><strong><em>Results</em></strong></h2>
 <p>In Study 1b, 2 participants were excluded whose Willing-to-pay (WTP) was more than 3 standard deviations from the mean.</p>
 <p>Higher-income participants showed the classic effect, offering a higher price for beer from the resort</p>
@@ -217,7 +201,7 @@ img {
 ## Multiple R-squared:  0.03975,    Adjusted R-squared:  0.01988 
 ## F-statistic: 2.001 on 3 and 145 DF,  p-value: 0.1165</code></pre>
 </div>
-<div id="section-2" class="section level2">
+<div id="section" class="section level2">
 <h2>—–</h2>
 </div>
 </div>
@@ -226,7 +210,8 @@ img {
 <p>We replicated the results of 1b with larger samples in studies 1c and 1d. In study 1c, we excluded 2 participants with missing responses, 5 with unreasonably high WTPs (over $100), and 19 additional outliers on WTP, which left 578 participants.</p>
 <pre><code>## Warning in read.spss(&quot;study_1c.sav&quot;, to.data.frame = TRUE): study_1c.sav:
 ## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
-<div id="results-2" class="section level2">
+<pre><code>## re-encoding from CP1252</code></pre>
+<div id="results-1" class="section level2">
 <h2><strong><em>Results</em></strong></h2>
 <p>Dividing participants according to a median split on income, we found that higher-income participants offered a higher price for beer from the resort</p>
 <pre><code>##   mean.beer   ci.low  ci.high
