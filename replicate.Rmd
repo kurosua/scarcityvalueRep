@@ -7,12 +7,12 @@ output: html_document
 
 2/28/15 - NF - Starting at 1a
 ```{r echo = FALSE}
-library(dplyr)
-library(broom)
-library(ggplot2)
-library(foreign)
-library(aod)
-library(lsr)
+suppressPackageStartupMessages(require(dplyr))
+suppressPackageStartupMessages(require(broom))
+suppressPackageStartupMessages(require(ggplot2))
+suppressPackageStartupMessages(require(foreign))
+suppressPackageStartupMessages(require(aod))
+suppressPackageStartupMessages(require(lsr))
 
 Sem <- function(x) {
   #creates the function to calculate standard error of the mean
@@ -21,42 +21,40 @@ Sem <- function(x) {
 
 ```
 
----
-#Study 1a
+# Study 1a
+> In this study, there were 103 participants (mean age = 29.3 years; median household size = 3 people; median household income = $35,000)...One participant was excluded as an outlier on income (more than 3 SD from the mean). We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income...
 
-> In this study, there were 103 participants (mean age = 29.3 years; median household size = 3 people; median household income = $35,000). ...
-One participant was excluded as an outlier on income (more than 3 SD from the mean). We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income. Higher- income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05, but lower-income participants were more likely than higher- income participants to name trade-offs as the main con- sideration, β = −1.62, Wald-test χ2(1, N = 102) = 4.67, p <.05 (see Fig. 1a). ...
+*We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.*
 
-*italics* We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
-_italics_
-
-("C:/Users/Nick/Documents/Github/scarcityvalueRep/framing")
 ```{r echo = FALSE}
+# Data import
+
 # detect the user's directory:
 directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
 if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
 setwd(directory)
 
-setwd("framing")
-raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)
-#read in the data for 1a using the spss file - the warning that comes up is okay - the data imports cleanly.
+# read in the data for 1a using the spss file
+# the warning/messages suppressed; the data imports cleanly.
+suppressMessages(suppressWarnings(raw_1a_spss <- read.spss("framing/study_1a.sav", to.data.frame = TRUE)))
 
 raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
-
+# removes the 1 removed observation for being 3 SDs away from the mean.
 clean_1a <- raw_1a_spss %>%
   filter(filter_. != "Not Selected")
-#removes the 1 removed observation for being 3 SDs away from the mean.
-
+# count number of participants who answered 'tradeoff' or 'location' for 1a.
 raw_1a_spss  %>%
   summarise(total.tradeoff = sum(tradeoff), total.location = sum(location))
-#count number of participants who answered either 'tradeoff' or 'location' for the 1a prompt.
 
-# OR 
-getwd() #check it's in "replicate" folder
+# OR
+# Note: google style reserve underscore for file names, not variables
+# Note: csv files were altered from raw, adding headers to 1a_2
+# & editing 1a_3 to make string variables identical when appropriate. 
+df.1a.1 <- read.csv(file = "csv_files/1a_1.csv", header = T)
 ```
 
-Higher-income participants were more likely than lower-income participants to name location as their main consideration, beta = 2.52, Wald-test chi squared(1, N = 102) = 5.5, p < 0.05.
+> Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,...
 
 ```{r}
 logit1logses <- glm(location ~ logses, data = clean_1a, family = "binomial")
@@ -65,7 +63,7 @@ summary(logit1logses)
 wald.test(b = coef(logit1logses), Sigma = vcov(logit1logses), Terms = 2)
 ```
 
-Lower-income participants were more likely than higher-income participants to name trade-offs as the main consideration, beta = -1.62, Wald-test chi squared(1, N = 102) = 4.7, p < 0.05.
+> but lower-income participants were more likely than higher- income participants to name trade-offs as the main con- sideration, β = −1.62, Wald-test χ2(1, N = 102) = 4.67, p <.05...
 
 ```{r echo = FALSE}
 logit2logses <- glm(tradeoff ~ logses, data = clean_1a, family = "binomial")
@@ -74,9 +72,10 @@ summary(logit2logses)
 wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)
 ```
 
-Below are the numbers for figure 1a :
-*italics* currently figuring out how to make them into a histogram.
-_italics_
+> (see Fig. 1a)...
+
+*currently figuring out how to make them into a histogram.*
+
 ```{r echo = FALSE}
 clean_1a %>%
   filter(income2 <= 35000) %>%
@@ -89,10 +88,9 @@ clean_1a %>%
 #produces numbers for the high income bars
 
 ```
------
------
 
-#Study 1b
+
+# Study 1b
 
 In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
 
