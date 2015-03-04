@@ -32,7 +32,12 @@ _italics_
 
 ("C:/Users/Nick/Documents/Github/scarcityvalueRep/framing")
 ```{r echo = FALSE}
-setwd("~/replicate/framing")
+# detect the user's directory:
+directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
+if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
+setwd(directory)
+
+setwd("framing")
 raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)
 #read in the data for 1a using the spss file - the warning that comes up is okay - the data imports cleanly.
 
