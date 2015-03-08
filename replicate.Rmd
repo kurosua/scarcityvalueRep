@@ -29,14 +29,18 @@ Sem <- function(x) {
 ```{r echo = FALSE}
 # Data import
 
-# detect the user's directory:
-directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
-if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
-setwd(directory)
+###### detect the user's directory:
+#directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
+#if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
+#setwd(directory)
+######NF 3/8/15 - couldn't get this to work
+
+setwd("C:/Users/Nick/Documents/GitHub/scarcityvalueRep/framing")
 
 # read in the data for 1a using the spss file
 # the warning/messages suppressed; the data imports cleanly.
-suppressMessages(suppressWarnings(raw_1a_spss <- read.spss("framing/study_1a.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)))
+
 
 raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
@@ -51,7 +55,7 @@ raw_1a_spss  %>%
 # Note: google style reserve underscore for file names, not variables
 # Note: csv files were altered from raw, adding headers to 1a_2
 # & editing 1a_3 to make string variables identical when appropriate. 
-df.1a.1 <- read.csv(file = "csv_files/1a_1.csv", header = T)
+#df.1a.1 <- read.csv(file = "csv_files/1a_1.csv", header = T)
 ```
 
 > Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,...
@@ -95,7 +99,6 @@ clean_1a %>%
 In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
 
 ```{r echo = FALSE}
-
 setwd("framing")
 raw_1b_spss <- read.spss("study_1b.sav", to.data.frame = TRUE)
 #read in the data for 1b using the spss file - the warning that comes up is okay - the data imports cleanly.
@@ -152,7 +155,7 @@ clean_1b %>%
 
 ```
 
-The interaction between income and context was significant F(1,145) = 11.18, p < 0.01, eta squared partial = 0.07.
+The interaction between income and context was significant F(1,145) = 11.18, p < 0.01, eta squared partial = 0.07. (SEE FIGURE 1b)
 ```{r echo = FALSE}
 aov_1b <- aov(beer ~ resort * split, data = clean_1b)
 summary(aov_1b)
@@ -160,7 +163,7 @@ summary(aov_1b)
 
 etaSquared(aov_1b, type = 2, anova = FALSE)
 ```
-The interaction was also significant when income was treated as a continuous variable beta = 2.27 (the closest I could replicate from the data was 2.67), t(145) = 2.17, p < 0.05.
+The interaction was also significant when income was treated as a continuous variable beta = 2.27 **(the closest I could replicate from the data was 2.67)**, t(145) = 2.17, p < 0.05.
 
 ```{r echo = FALSE}
 lm1 <- lm(beer ~ resort * logses, data = clean_1b)
@@ -189,13 +192,13 @@ Dividing participants according to a median split on income, we found that highe
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 1, resort == 1) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.pay = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
 ```
 than for beer from the grocery store:
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 1, resort == 0) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.pay = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
 ```
 
 Lower-income participants' WTP did not differ significantly between beer from the resort,
@@ -203,17 +206,17 @@ Lower-income participants' WTP did not differ significantly between beer from th
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 0, resort == 1) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.pay = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
 ```
 and beer from the store.
 
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.pay = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
 ```
 
-The interaction between income and context was significant, F(1,574) = 5.68, p < 0.05, eta squared partial = 0.01.
+The interaction between income and context was significant, F(1,574) = 5.68, p < 0.05, eta squared partial = 0.01. (SEE FIGURE 1c)
 
 ```{r echo = FALSE}
 aov_1c <- aov(pay ~ resort * split, data = clean_1c)
@@ -222,3 +225,74 @@ summary(aov_1c)
 
 etaSquared(aov_1c, type = 2, anova = FALSE)
 ```
+
+The interaction was also significant when income was treated continuously, beta = 1.65 **(the closest I could replicate was 2.03)**, t(574) = 3.27, p < 0.01.
+
+```{r echo = FALSE}
+lm2 <- lm(pay ~ resort * logses, data = clean_1c)
+summary(lm2)
+```
+
+-----
+-----
+#Study 1d
+
+```{r echo = FALSE}
+setwd("framing")
+raw_1d_spss <- read.spss("study_1d.sav", to.data.frame = TRUE)
+#reads the data for study 1d
+
+clean_1d <- raw_1d_spss %>%
+  filter(filter_. != "Not Selected")
+```
+
+In Study 1d (the nationally representative sample), a large number of participants reported unreasonably high WTPs, and exclusions based on the rules set for the smaller samples in previous studies would have left many unreasonable prices in the data set.  We therefore included in our analyses only those participants with a WTP of $20 or less, which seemed like the upper bound of a reasonable price.  This set a cutoff price similar to the cutoff price based on the stand deviations in Studies 1b and 1c. After this exclusion and the exclusion of 4 additional participants who were outlines on income, the final sample included 1,898 participants.  dividing participants according to a median split on eincome, we found that higher-income participants offered a higher price for feer from the resort (M = $6.80, 95% CI [$6.41, $7.18])
+
+```{r echo = FALSE}
+clean_1d %>%
+  filter(split == 1, resort == 1) %>%
+  summarise(mean.wtp = mean(wtp), ci.low = mean(wtp) -  (1.96 * Sem(wtp)), ci.high = mean(wtp) + (1.96 * Sem(wtp)))
+```
+than for beer from the grocery store (M = $5.46, 95% CI [$5.13, $5.79]).
+
+```{r echo = FALSE}
+clean_1d %>%
+  filter(split == 1, resort == 0) %>%
+  summarise(mean.wtp = mean(wtp), ci.low = mean(wtp) -  (1.96 * Sem(wtp)), ci.high = mean(wtp) + (1.96 * Sem(wtp)))
+```
+
+Lower-income participants' WTP did not differ significantly between the resort (M = $6.21, 95% CI [$5.83, $6.60])
+
+```{r echo = FALSE}
+clean_1d %>%
+  filter(split == 0, resort == 1) %>%
+  summarise(mean.wtp = mean(wtp), ci.low = mean(wtp) -  (1.96 * Sem(wtp)), ci.high = mean(wtp) + (1.96 * Sem(wtp)))
+```
+
+and the store (M = %5.71, 95% CI [$5.31, $6.11]).
+
+```{r echo = FALSE}
+clean_1d %>%
+  filter(split == 0, resort == 0) %>%
+  summarise(mean.wtp = mean(wtp), ci.low = mean(wtp) -  (1.96 * Sem(wtp)), ci.high = mean(wtp) + (1.96 * Sem(wtp)))
+```
+
+The interaction between income and context was significant, F(1, 1984) = 4.82, p < 0.05, eta squared partial = 0.003. (SEE FIGURE 1d)
+
+```{r echo = FALSE}
+aov_1d <- aov(wtp ~ resort * split, data = clean_1d)
+summary(aov_1d)
+#they ran this anova on the binary 'split' column?
+
+etaSquared(aov_1d, type = 2, anova = FALSE)
+
+```
+
+This interaction was marginally significant when income was treated continuously, beta = 0.50 **(the closest I could replicate was 0.93)**, t(1894) = 1.85, p < 0.07.
+
+```{r echo = FALSE}
+lm3 <- lm(wtp ~ resort * logses, data = clean_1d)
+summary(lm3)
+```
+
+

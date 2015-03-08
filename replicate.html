@@ -156,7 +156,6 @@ summary(logit1logses)</code></pre>
 <p>In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.</p>
 <pre><code>## Warning in read.spss(&quot;study_1b.sav&quot;, to.data.frame = TRUE): study_1b.sav:
 ## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
-<pre><code>## re-encoding from CP1252</code></pre>
 <pre><code>##   sample.size median.household.income median.household.size
 ## 1         151                   45000                     3</code></pre>
 <div id="results" class="section level2">
@@ -174,7 +173,7 @@ summary(logit1logses)</code></pre>
 <p>and beer from the store.</p>
 <pre><code>##   mean.beer   ci.low  ci.high
 ## 1  5.371951 4.351965 6.391937</code></pre>
-<p>The interaction between income and context was significant F(1,145) = 11.18, p &lt; 0.01, eta squared partial = 0.07.</p>
+<p>The interaction between income and context was significant F(1,145) = 11.18, p &lt; 0.01, eta squared partial = 0.07. (SEE FIGURE 1b)</p>
 <pre><code>##               Df Sum Sq Mean Sq F value  Pr(&gt;F)   
 ## resort         1    7.3    7.27   1.111 0.29353   
 ## split          1    1.8    1.83   0.280 0.59742   
@@ -186,7 +185,7 @@ summary(logit1logses)</code></pre>
 ## resort       0.006714223 0.007243346
 ## split        0.001777891 0.001928269
 ## resort:split 0.070932460 0.071564466</code></pre>
-<p>The interaction was also significant when income was treated as a continuous variable beta = 2.27 (the closest I could replicate from the data was 2.67), t(145) = 2.17, p &lt; 0.05.</p>
+<p>The interaction was also significant when income was treated as a continuous variable beta = 2.27 <strong>(the closest I could replicate from the data was 2.67)</strong>, t(145) = 2.17, p &lt; 0.05.</p>
 <pre><code>## 
 ## Call:
 ## lm(formula = beer ~ resort * logses, data = clean_1b)
@@ -217,22 +216,21 @@ summary(logit1logses)</code></pre>
 <p>We replicated the results of 1b with larger samples in studies 1c and 1d. In study 1c, we excluded 2 participants with missing responses, 5 with unreasonably high WTPs (over $100), and 19 additional outliers on WTP, which left 578 participants.</p>
 <pre><code>## Warning in read.spss(&quot;study_1c.sav&quot;, to.data.frame = TRUE): study_1c.sav:
 ## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
-<pre><code>## re-encoding from CP1252</code></pre>
 <div id="results-1" class="section level2">
 <h2><strong><em>Results</em></strong></h2>
 <p>Dividing participants according to a median split on income, we found that higher-income participants offered a higher price for beer from the resort</p>
-<pre><code>##   mean.beer   ci.low  ci.high
-## 1  6.806452 6.337838 7.275065</code></pre>
+<pre><code>##   mean.pay   ci.low  ci.high
+## 1 6.806452 6.337838 7.275065</code></pre>
 <p>than for beer from the grocery store:</p>
-<pre><code>##   mean.beer   ci.low  ci.high
-## 1  5.413522 5.043781 5.783263</code></pre>
+<pre><code>##   mean.pay   ci.low  ci.high
+## 1 5.413522 5.043781 5.783263</code></pre>
 <p>Lower-income participants’ WTP did not differ significantly between beer from the resort,</p>
-<pre><code>##   mean.beer   ci.low  ci.high
-## 1   5.89097 5.475666 6.306273</code></pre>
+<pre><code>##   mean.pay   ci.low  ci.high
+## 1  5.89097 5.475666 6.306273</code></pre>
 <p>and beer from the store.</p>
-<pre><code>##   mean.beer   ci.low  ci.high
-## 1  5.559615 5.063869 6.055361</code></pre>
-<p>The interaction between income and context was significant, F(1,574) = 5.68, p &lt; 0.05, eta squared partial = 0.01.</p>
+<pre><code>##   mean.pay   ci.low  ci.high
+## 1 5.559615 5.063869 6.055361</code></pre>
+<p>The interaction between income and context was significant, F(1,574) = 5.68, p &lt; 0.05, eta squared partial = 0.01. (SEE FIGURE 1c)</p>
 <pre><code>##               Df Sum Sq Mean Sq F value   Pr(&gt;F)    
 ## resort         1     94   93.53  13.244 0.000298 ***
 ## split          1     21   20.77   2.940 0.086924 .  
@@ -244,7 +242,81 @@ summary(logit1logses)</code></pre>
 ## resort       0.024491741 0.024794186
 ## split        0.004934856 0.005096702
 ## resort:split 0.009528267 0.009794297</code></pre>
+<p>The interaction was also significant when income was treated continuously, beta = 1.65 <strong>(the closest I could replicate was 2.03)</strong>, t(574) = 3.27, p &lt; 0.01.</p>
+<pre><code>## 
+## Call:
+## lm(formula = pay ~ resort * logses, data = clean_1c)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.9622 -1.6369 -0.5121  1.3600  9.4879 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept)     6.3459     1.9400   3.271  0.00114 **
+## resort         -8.0403     2.7305  -2.945  0.00336 **
+## logses         -0.1963     0.4380  -0.448  0.65422   
+## resort:logses   2.0297     0.6209   3.269  0.00114 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.637 on 574 degrees of freedom
+## Multiple R-squared:  0.05124,    Adjusted R-squared:  0.04629 
+## F-statistic: 10.33 on 3 and 574 DF,  p-value: 1.24e-06</code></pre>
 </div>
+<div id="section-1" class="section level2">
+<h2>—–</h2>
+</div>
+</div>
+<div id="study-1d" class="section level1">
+<h1>Study 1d</h1>
+<pre><code>## Warning in read.spss(&quot;study_1d.sav&quot;, to.data.frame = TRUE): study_1d.sav:
+## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
+<p>In Study 1d (the nationally representative sample), a large number of participants reported unreasonably high WTPs, and exclusions based on the rules set for the smaller samples in previous studies would have left many unreasonable prices in the data set. We therefore included in our analyses only those participants with a WTP of $20 or less, which seemed like the upper bound of a reasonable price. This set a cutoff price similar to the cutoff price based on the stand deviations in Studies 1b and 1c. After this exclusion and the exclusion of 4 additional participants who were outlines on income, the final sample included 1,898 participants. dividing participants according to a median split on eincome, we found that higher-income participants offered a higher price for feer from the resort (M = $6.80, 95% CI [$6.41, $7.18])</p>
+<pre><code>##   mean.wtp   ci.low  ci.high
+## 1 6.795246 6.414316 7.176175</code></pre>
+<p>than for beer from the grocery store (M = $5.46, 95% CI [$5.13, $5.79]).</p>
+<pre><code>##   mean.wtp   ci.low  ci.high
+## 1 5.459856 5.132609 5.787103</code></pre>
+<p>Lower-income participants’ WTP did not differ significantly between the resort (M = $6.21, 95% CI [$5.83, $6.60])</p>
+<pre><code>##   mean.wtp   ci.low  ci.high
+## 1 6.210061 5.825056 6.595066</code></pre>
+<p>and the store (M = %5.71, 95% CI [$5.31, $6.11]).</p>
+<pre><code>##   mean.wtp   ci.low ci.high
+## 1 5.711772 5.313305 6.11024</code></pre>
+<p>The interaction between income and context was significant, F(1, 1984) = 4.82, p &lt; 0.05, eta squared partial = 0.003. (SEE FIGURE 1d)</p>
+<pre><code>##                Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## resort          1    389   388.8  22.559 2.19e-06 ***
+## split           1     12    12.3   0.716   0.3975    
+## resort:split    1     83    83.0   4.817   0.0283 *  
+## Residuals    1894  32647    17.2                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<pre><code>##                    eta.sq  eta.sq.part
+## resort       0.0118469662 0.0118798513
+## split        0.0003726649 0.0003780493
+## resort:split 0.0025058998 0.0025366162</code></pre>
+<p>This interaction was marginally significant when income was treated continuously, beta = 0.50 <strong>(the closest I could replicate was 0.93)</strong>, t(1894) = 1.85, p &lt; 0.07.</p>
+<pre><code>## 
+## Call:
+## lm(formula = wtp ~ resort * logses, data = clean_1d)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.8978 -2.5522 -0.7078  1.4564 14.4821 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     6.3053     1.5838   3.981 7.12e-05 ***
+## resort         -3.2483     2.2594  -1.438   0.1507    
+## logses         -0.1615     0.3535  -0.457   0.6478    
+## resort:logses   0.9331     0.5052   1.847   0.0649 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 4.153 on 1894 degrees of freedom
+## Multiple R-squared:  0.01422,    Adjusted R-squared:  0.01266 
+## F-statistic:  9.11 on 3 and 1894 DF,  p-value: 5.5e-06</code></pre>
 </div>
 
 
