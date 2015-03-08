@@ -21,7 +21,7 @@ Sem <- function(x) {
 
 ```
 
-# Study 1a
+# Study 1a - Trade-Off Thinking Under Scarcity
 > In this study, there were 103 participants (mean age = 29.3 years; median household size = 3 people; median household income = $35,000)...One participant was excluded as an outlier on income (more than 3 SD from the mean). We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income...
 
 *We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.*
@@ -94,7 +94,7 @@ clean_1a %>%
 ```
 
 
-# Study 1b
+# Study 1b - Consistent Valuations Under Scarcity
 
 In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
 
@@ -246,7 +246,12 @@ clean_1d <- raw_1d_spss %>%
   filter(filter_. != "Not Selected")
 ```
 
-In Study 1d (the nationally representative sample), a large number of participants reported unreasonably high WTPs, and exclusions based on the rules set for the smaller samples in previous studies would have left many unreasonable prices in the data set.  We therefore included in our analyses only those participants with a WTP of $20 or less, which seemed like the upper bound of a reasonable price.  This set a cutoff price similar to the cutoff price based on the stand deviations in Studies 1b and 1c. After this exclusion and the exclusion of 4 additional participants who were outlines on income, the final sample included 1,898 participants.  dividing participants according to a median split on eincome, we found that higher-income participants offered a higher price for feer from the resort (M = $6.80, 95% CI [$6.41, $7.18])
+In Study 1d (the nationally representative sample), a large number of participants reported unreasonably high WTPs, and exclusions based on the rules set for the smaller samples in previous studies would have left many unreasonable prices in the data set.  We therefore included in our analyses only those participants with a WTP of $20 or less, which seemed like the upper bound of a reasonable price.  This set a cutoff price similar to the cutoff price based on the stand deviations in Studies 1b and 1c. After this exclusion and the exclusion of 4 additional participants who were outlines on income, the final sample included 1,898 participants.  
+
+***Results***
+-----
+
+Dividing participants according to a median split on eincome, we found that higher-income participants offered a higher price for feer from the resort (M = $6.80, 95% CI [$6.41, $7.18])
 
 ```{r echo = FALSE}
 clean_1d %>%
@@ -295,4 +300,9 @@ lm3 <- lm(wtp ~ resort * logses, data = clean_1d)
 summary(lm3)
 ```
 
+The beer-on-the-beach scenario provides a canonical example of the difficulty people have in translating utility into value.  People have a sense of how much they would enjoy the beer, but they have difficulty representing this enjoyment with a price.  However, under conditions of scarcity, people base their price not merely on anticipated enjoyment, but also on anticipated trade-offs, and those are more consistent guides for valuation.  Could scarcity also lead to more consistent baluation of a dollar itself? The next set of studies addressed this question.
 
+-----
+-----
+
+#Study 2a - Proportional Versus Trade-Off Thinking
