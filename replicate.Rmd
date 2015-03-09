@@ -46,12 +46,6 @@ clean_1a <- raw_1a_spss %>%
 # count number of participants who answered 'tradeoff' or 'location' for 1a.
 raw_1a_spss  %>%
   summarise(total.tradeoff = sum(tradeoff), total.location = sum(location))
-
-# OR
-# Note: google style reserve underscore for file names, not variables
-# Note: csv files were altered from raw, adding headers to 1a_2
-# & editing 1a_3 to make string variables identical when appropriate. 
-df.1a.1 <- read.csv(file = "csv_files/1a_1.csv", header = T)
 ```
 
 > Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,...
@@ -222,3 +216,18 @@ summary(aov_1c)
 
 etaSquared(aov_1c, type = 2, anova = FALSE)
 ```
+
+
+
+*AK: I'll work backwards*
+
+---
+
+# Study 6
+> In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
+```{r echo=F}
+df.6.demo <- read.csv("csv_files/6_demo.csv", header=T)
+str(df.6.demo)
+mean(df.6.demo$Age)
+```
+

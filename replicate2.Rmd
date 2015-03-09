@@ -27,15 +27,34 @@ setwd(directory)
 
 
 
-*AK: I'll work backwards*
+*AK: I'll work backwards* 6,5,4,3,2d,2c
 
 ---
 
 # Study 6
 > In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
+
 ```{r echo=F}
 df.6.demo <- read.csv("csv_files/6_demo.csv", header=T)
-str(df.6.demo)
-mean(df.6.demo$Age)
+
+# Number of subjects
+df.6.demo %>%
+  select(Subject) %>%
+  summarise(n())
+
+# Mean age
+df.6.demo %>%
+  summarise(mean(Age, na.rm=T))
+
+# Number of females vs. males
+df.6.demo %>%
+  group_by(Gender) %>%
+  summarise(n())
+```
+
+> One participant was excluded because of a computer malfunction during the game. Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]), whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]). A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p < .05, ηp2 = .07.
+
+```{r}
+
 ```
 
