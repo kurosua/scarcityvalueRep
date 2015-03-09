@@ -91,6 +91,25 @@ clean_1a %>%
   summarise(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n())
 #produces numbers for the high income bars
 
+figure1alow <- clean_1a %>%
+  filter(income2 <= 35000) %>%
+  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n()) %>%
+  distinct(prop.tradeoff, prop.location)
+
+figure1ahigh <- clean_1a %>%
+    filter(income2 > 35000) %>%
+  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n()) %>%
+  distinct(prop.tradeoff, prop.location)
+
+###figure 1a trade-offs
+bin = c(1, 2, 3, 4)
+title = c("lower income tradeoff", "higher income tradeoff", "lower income location", "higher income location")
+values = c(figure1alow$prop.tradeoff, figure1ahigh$prop.tradeoff, figure1alow$prop.location, figure1ahigh$prop.location)
+fig1 <- data.frame(bin, title, values)
+
+
+fig1 %>%
+  ggplot(aes(x = title, y = values)) + geom_bar(stat = "identity")
 ```
 
 
