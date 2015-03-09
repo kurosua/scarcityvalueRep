@@ -328,6 +328,207 @@ summary(logit1logses)</code></pre>
 </div>
 <div id="study-2a---proportional-versus-trade-off-thinking" class="section level1">
 <h1>Study 2a - Proportional Versus Trade-Off Thinking</h1>
+<pre><code>## Warning in read.spss(&quot;study_2a.sav&quot;, to.data.frame = TRUE): study_2a.sav:
+## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
+<p>In Study 2a, there were 238 participants ((we are unable to replicate mean age, gender split, median household size, or median household income due to that data not being in the public dataset)) Median ses (which is income / sqrt(householdsize)):</p>
+<pre><code>##   sample.size median.ses
+## 1         238   25980.76</code></pre>
+<div id="results-3" class="section level2">
+<h2><strong><em>Results</em></strong></h2>
+<p>One participant was excluded as an outlier on income.</p>
+<p>We conducted binary logistic regressions to comepare the frequency with which participants cited each of the two considerations of interest (trade-offs vs proportional discount) as a function of income. Higher-income participants were more likely than lower-income participants to use proportional thinking, beta = 0.87, Wald-test chi square (1, N = 237) = 4.02, p &lt; 0.05.</p>
+<pre><code>## 
+## Call:
+## glm(formula = context ~ lgses, family = &quot;binomial&quot;, data = clean_2a)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.3592  -1.1498  -0.8601   1.1650   1.5669  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept)  -3.9050     1.9242  -2.029   0.0424 *
+## lgses         0.8739     0.4358   2.005   0.0449 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 328.34  on 236  degrees of freedom
+## Residual deviance: 324.19  on 235  degrees of freedom
+## AIC: 328.19
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre><code>## Wald test:
+## ----------
+## 
+## Chi-squared test:
+## X2 = 4.0, df = 1, P(&gt; X2) = 0.045</code></pre>
+<p>but lower-income participants were more likely than higher-income participants to use trade-off thinking, beta = -0.96, Wald-test chi square (1, N = 237) = 4.69, p &lt; 0.05.</p>
+<pre><code>## 
+## Call:
+## glm(formula = tradeoff ~ lgses, family = &quot;binomial&quot;, data = clean_2a)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.2620  -0.8973  -0.8292   1.3924   1.7262  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept)   3.5294     1.9498   1.810   0.0703 .
+## lgses        -0.9631     0.4448  -2.165   0.0304 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 301.71  on 236  degrees of freedom
+## Residual deviance: 296.97  on 235  degrees of freedom
+## AIC: 300.97
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre><code>## Wald test:
+## ----------
+## 
+## Chi-squared test:
+## X2 = 4.7, df = 1, P(&gt; X2) = 0.03</code></pre>
+<p>This again suggests that scarcity leads people to generate their own comparison standards, and Studies 2b through 2d tested whether this leads to more consistent preferences.</p>
+</div>
+</div>
+<div id="study-2b---valuing-discounts" class="section level1">
+<h1>Study 2b - Valuing Discounts</h1>
+<pre><code>## Warning in read.spss(&quot;study_2b.sav&quot;, to.data.frame = TRUE): study_2b.sav:
+## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
+<p>In Study 2b, there were 705 participants ((could not replicate mean age or gender split since that data is not included in the public dataset)), (median household size = 3 people, median household income = $45,000).</p>
+<pre><code>##   sample.size median.household.size median.income
+## 1         705                     3         45000</code></pre>
+<p>The participants in 2c were the same participants as in Study 1d (and analyses were limited to the same participants, but including all participants did not change the results). Note that participants completed Studies 1d and 2c in a counterbalanced order. Participants in Studies 2b and 2c responded to the same scenario as did participants in Study 2a, but they stated whether they would travel for the discount.</p>
+<div id="results-4" class="section level2">
+<h2><strong><em>Results</em></strong></h2>
+<p>In Study 2b, 1 participant was excluded for missing responses, and 2 were excluded as outliers on income.</p>
+<p>The analyses conducted were based on a median split on income. Confirming earlier findings, these analyses revealed that higher-income participants were more willing to travel when the discount was proportionally larger (i.e., the tablet cost less): Specifically, 86%, 75%, and 58% would travel when the tablet cost $300, $500, and $1,000, respectively.</p>
+<pre><code>##   threehundred_go
+## 1        85.95041</code></pre>
+<pre><code>##   fivehundred_go
+## 1        75.4386</code></pre>
+<pre><code>##   onethousand_go
+## 1       58.40708</code></pre>
+<p>Lower-income participants were less sensitive to the proportional size of the discount: The corresponding percentages of lower-income participants willing to travel were 78%, 67%, and 67%.</p>
+<pre><code>##   threehundred_go
+## 1        77.77778</code></pre>
+<pre><code>##   fivehundred_go
+## 1       67.22689</code></pre>
+<pre><code>##   onethousand_go
+## 1       66.94915</code></pre>
+<p>The ineraction between income and context was significant in a binary logistic regression, beta = -0.048, Walt-test chi square (1, N = 702) = 4.93, p &lt; 0.05,</p>
+<pre><code>## 
+## Call:
+## glm(formula = go ~ split * cond, family = &quot;binomial&quot;, data = clean_2b)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.9907  -1.3297   0.7419   0.8305   1.0324  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   1.1496     0.1947   5.904 3.55e-09 ***
+## split         0.6835     0.3015   2.267   0.0234 *  
+## cond         -0.2624     0.1447  -1.814   0.0697 .  
+## split:cond   -0.4786     0.2157  -2.219   0.0265 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 831.45  on 701  degrees of freedom
+## Residual deviance: 804.17  on 698  degrees of freedom
+## AIC: 812.17
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre><code>## Wald test:
+## ----------
+## 
+## Chi-squared test:
+## X2 = 4.9, df = 1, P(&gt; X2) = 0.026</code></pre>
+<p>and was marginally significant when income was treated continuously, beta = -0.57, Wald-test chi square(1, N - 702) = 3.32, p &lt; 0.07.</p>
+<pre><code>## 
+## Call:
+## glm(formula = go ~ logses * cond, family = &quot;binomial&quot;, data = clean_2b)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.0085  -1.3450   0.6908   0.8178   1.0655  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept)  -1.8090     1.8563  -0.974   0.3298  
+## logses        0.7472     0.4244   1.760   0.0783 .
+## cond          2.0248     1.3806   1.467   0.1425  
+## logses:cond  -0.5729     0.3147  -1.821   0.0686 .
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 831.45  on 701  degrees of freedom
+## Residual deviance: 806.28  on 698  degrees of freedom
+## AIC: 814.28
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre><code>## Wald test:
+## ----------
+## 
+## Chi-squared test:
+## X2 = 3.3, df = 1, P(&gt; X2) = 0.069</code></pre>
+<p>Five participants were excluded for missing responses in Study 2c, so 1,893 participants were included in the analyses.</p>
+<pre><code>## Warning in read.spss(&quot;study_1d.sav&quot;, to.data.frame = TRUE): study_1d.sav:
+## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
+<p>Analyses based to a median split on income revealed a more muted trend than in the previous study. Among higher-income participants, 71%, 67%, and 51% were willing to travel when the tablet cost $300, $500, and $1,000, respectively;</p>
+<pre><code>##   threehundred_go
+## 1        71.29909</code></pre>
+<pre><code>##   fivehundred_go
+## 1       67.34007</code></pre>
+<pre><code>##   onethousand_go
+## 1       51.14754</code></pre>
+<p>among lower-income participants, the corresponding percentages were 70%, 69%, and 55%.</p>
+<pre><code>##   threehundred_go
+## 1        70.27027</code></pre>
+<pre><code>##   fivehundred_go
+## 1       68.73156</code></pre>
+<pre><code>##   onethousand_go
+## 1       55.38462</code></pre>
+<p>When income was treated continuously, the interaction between income and context was clear, beta = -0.39, Wald-test chi square(1, N = 1,893) = 6.13, p &lt; 0.05.</p>
+<pre><code>## 
+## Call:
+## glm(formula = go ~ logses * webercond, family = &quot;binomial&quot;, data = clean_2c)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.6561  -1.2955   0.8009   0.9471   1.2669  
+## 
+## Coefficients:
+##                  Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept)        0.3493     0.9543   0.366   0.7144  
+## logses             0.1409     0.2130   0.662   0.5082  
+## webercond          1.3663     0.7110   1.922   0.0547 .
+## logses:webercond  -0.3932     0.1588  -2.476   0.0133 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2472.1  on 1892  degrees of freedom
+## Residual deviance: 2419.1  on 1889  degrees of freedom
+## AIC: 2427.1
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre><code>## Wald test:
+## ----------
+## 
+## Chi-squared test:
+## X2 = 6.1, df = 1, P(&gt; X2) = 0.013</code></pre>
+<p>Perhaps $50 is too large an amount for poorer participants to forgo. If so, floor or ceiling effects would result in illusory consistency among lower-income participants. But notice that higher-income participants, compared with lower-income participants, were actually more willing to travel when the discount was proportionally large, and less willing to travel when the discount was proportionally small, particularly in Study 2b. Floor or ceiling effects therefore cannot explain the consistency among our lower-income participants. Still, to be sure that the effect is robust, we tested it across a range of dollar amounts in Study 2d.</p>
+</div>
 </div>
 
 

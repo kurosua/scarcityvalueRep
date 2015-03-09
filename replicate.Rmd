@@ -30,9 +30,9 @@ Sem <- function(x) {
 # Data import
 
 ###### detect the user's directory:
-#directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
-#if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
-#setwd(directory)
+directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
+if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
+setwd(directory)
 ######NF 3/8/15 - couldn't get this to work
 
 setwd("C:/Users/Nick/Documents/GitHub/scarcityvalueRep/framing")
@@ -306,3 +306,188 @@ The beer-on-the-beach scenario provides a canonical example of the difficulty pe
 -----
 
 #Study 2a - Proportional Versus Trade-Off Thinking
+
+```{r echo = FALSE}
+setwd("framing")
+raw_2a_spss <- read.spss("study_2a.sav", to.data.frame = TRUE)
+#reads the data for study 2a
+```
+
+In Study 2a, there were 238 participants ((we are unable to replicate mean age, gender split, median household size, or median household income due to that data not being in the public dataset)) Median ses (which is income / sqrt(householdsize)):
+
+```{r echo = FALSE}
+raw_2a_spss %>%
+  summarise(sample.size = n(), median.ses = median(ses))
+
+```
+
+***Results***
+-------
+
+One participant was excluded as an outlier on income.
+
+```{r echo = FALSE}
+
+clean_2a <- raw_2a_spss %>%
+  filter(filter_. != "Not Selected")
+```
+
+We conducted binary logistic regressions to comepare the frequency with which participants cited each of the two considerations of interest (trade-offs vs proportional discount) as a function of income.  Higher-income participants were more likely than lower-income participants to use proportional thinking, beta = 0.87, Wald-test chi square (1, N = 237) = 4.02, p < 0.05.
+
+```{r echo = FALSE}
+
+logit3logses <- glm(context ~ lgses, data = clean_2a, family = "binomial")
+summary(logit3logses)
+
+wald.test(b = coef(logit3logses), Sigma = vcov(logit3logses), Terms = 2)
+```
+
+but lower-income participants were more likely than higher-income participants to use trade-off thinking, beta = -0.96, Wald-test chi square (1, N = 237) = 4.69, p < 0.05.
+
+```{r echo = FALSE}
+
+logit4logses <- glm(tradeoff ~ lgses, data = clean_2a, family = "binomial")
+summary(logit4logses)
+
+wald.test(b = coef(logit4logses), Sigma = vcov(logit4logses), Terms = 2)
+```
+
+This again suggests that scarcity leads people to generate their own comparison standards, and Studies 2b through 2d tested whether this leads to more consistent preferences.
+
+#Study 2b - Valuing Discounts
+
+```{r echo = FALSE}
+
+setwd("framing")
+raw_2b_spss <- read.spss("study_2b.sav", to.data.frame = TRUE)
+#reads the data for study 2b
+```
+
+In Study 2b, there were 705 participants ((could not replicate mean age or gender split since that data is not included in the public dataset)), (median household size = 3 people, median household income = $45,000).
+
+```{r echo = FALSE}
+
+raw_2b_spss %>%
+  summarise(sample.size = n(), median.household.size = (median(house)), median.income = median(inc2))
+```
+
+The participants in 2c were the same participants as in Study 1d (and analyses were limited to the same participants, but including all participants did not change the results).  Note that participants completed Studies 1d and 2c in a counterbalanced order.  Participants in Studies 2b and 2c responded to the same scenario as did participants in Study 2a, but they stated whether they would travel for the discount.
+
+***Results***
+-------
+
+In Study 2b, 1 participant was excluded for missing responses, and 2 were excluded as outliers on income.
+
+```{r echo = FALSE}
+
+clean_2b <- raw_2b_spss %>%
+  filter(filter_. != "Not Selected", go != "NA")
+```
+
+The analyses conducted were based on a median split on income.  Confirming earlier findings, these analyses revealed that higher-income participants were more willing to travel when the discount was proportionally larger (i.e., the tablet cost less): Specifically, 86%, 75%, and 58% would travel when the tablet cost $300, $500, and $1,000, respectively.
+
+```{r echo = FALSE}
+clean_2b %>%
+  filter(split == 1, cond == 0) %>%
+  summarise(threehundred_go = (sum(go) / n()) * 100)
+
+clean_2b %>%
+  filter(split == 1, cond == 1) %>%
+  summarise(fivehundred_go = (sum(go) / n()) * 100)
+
+clean_2b %>%
+  filter(split == 1, cond == 2) %>%
+  summarise(onethousand_go = (sum(go) / n()) * 100)
+```
+
+Lower-income participants were less sensitive to the proportional size of the discount: The corresponding percentages of lower-income participants willing to travel were 78%, 67%, and 67%.
+
+```{r echo = FALSE}
+clean_2b %>%
+  filter(split == 0, cond == 0) %>%
+  summarise(threehundred_go = (sum(go) / n()) * 100)
+
+clean_2b %>%
+  filter(split == 0, cond == 1) %>%
+  summarise(fivehundred_go = (sum(go) / n()) * 100)
+
+clean_2b %>%
+  filter(split == 0, cond == 2) %>%
+  summarise(onethousand_go = (sum(go) / n()) * 100)
+```
+
+The ineraction between income and context was significant in a binary logistic regression, beta = -0.048, Walt-test chi square (1, N = 702) = 4.93, p < 0.05,
+
+```{r echo = FALSE}
+
+logit5logses <- glm(go ~ split * cond, data = clean_2b, family = "binomial")
+summary(logit5logses)
+
+wald.test(b = coef(logit5logses), Sigma = vcov(logit5logses), Terms = 4)
+```
+
+and was marginally significant when income was treated continuously, beta = -0.57, Wald-test chi square(1, N - 702) = 3.32, p < 0.07.
+
+```{r echo = FALSE}
+
+logit6logses <- glm(go ~ logses * cond, data = clean_2b, family = "binomial")
+summary(logit6logses)
+
+wald.test(b = coef(logit6logses), Sigma = vcov(logit6logses), Terms = 4)
+```
+
+Five participants were excluded for missing responses in Study 2c, so 1,893 participants were included in the analyses.
+
+```{r echo = FALSE}
+
+setwd("framing")
+raw_2c_spss <- read.spss("study_1d.sav", to.data.frame = TRUE)
+#reads the data for study 2c
+
+clean_2c <- raw_1d_spss %>%
+  filter(filter_. != "Not Selected", go != "NA")
+```
+
+Analyses based to a median split on income revealed a more muted trend than in the previous study.  Among higher-income participants, 71%, 67%, and 51% were willing to travel when the tablet cost $300, $500, and $1,000, respectively;
+
+```{r echo = FALSE}
+clean_2c %>%
+  filter(split == 1, webercond == 0) %>%
+  summarise(threehundred_go = (sum(go) / n()) * 100)
+
+clean_2c %>%
+  filter(split == 1, webercond == 1) %>%
+  summarise(fivehundred_go = (sum(go) / n()) * 100)
+
+clean_2c %>%
+  filter(split == 1, webercond == 2) %>%
+  summarise(onethousand_go = (sum(go) / n()) * 100)
+```
+
+among lower-income participants, the corresponding percentages were 70%, 69%, and 55%.
+
+```{r echo = FALSE}
+clean_2c %>%
+  filter(split == 0, webercond == 0) %>%
+  summarise(threehundred_go = (sum(go) / n()) * 100)
+
+clean_2c %>%
+  filter(split == 0, webercond == 1) %>%
+  summarise(fivehundred_go = (sum(go) / n()) * 100)
+
+clean_2c %>%
+  filter(split == 0, webercond == 2) %>%
+  summarise(onethousand_go = (sum(go) / n()) * 100)
+```
+
+When income was treated continuously, the interaction between income and context was clear, beta = -0.39, Wald-test chi square(1, N = 1,893) = 6.13, p < 0.05.
+
+```{r echo = FALSE}
+
+logit7logses <- glm(go ~ logses * webercond, data = clean_2c, family = "binomial")
+summary(logit7logses)
+
+wald.test(b = coef(logit7logses), Sigma = vcov(logit7logses), Terms = 4)
+```
+
+Perhaps $50 is too large an amount for poorer participants to forgo.  If so, floor or ceiling effects would result in illusory consistency among lower-income participants.  But notice that higher-income participants, compared with lower-income participants, were actually more willing to travel when the discount was proportionally large, and less willing to travel when the discount was proportionally small, particularly in Study 2b.  Floor or ceiling effects therefore cannot explain the consistency among our lower-income participants.  Still, to be sure that the effect is robust, we tested it across a range of dollar amounts in Study 2d.
