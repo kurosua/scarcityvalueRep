@@ -1,0 +1,41 @@
+---
+title: "replication2"
+author: "Nick F & Aaron K"
+date: "February 24, 2015"
+output: html_document
+---
+
+```{r echo = FALSE}
+suppressPackageStartupMessages(require(dplyr))
+suppressPackageStartupMessages(require(broom))
+suppressPackageStartupMessages(require(ggplot2))
+suppressPackageStartupMessages(require(foreign))
+suppressPackageStartupMessages(require(aod))
+suppressPackageStartupMessages(require(lsr))
+
+Sem <- function(x) {
+  #creates the function to calculate standard error of the mean
+  sqrt(var(x)/length(x))
+  }
+
+# detect the user's directory:
+directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
+if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
+setwd(directory)
+
+```
+
+
+
+*AK: I'll work backwards*
+
+---
+
+# Study 6
+> In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
+```{r echo=F}
+df.6.demo <- read.csv("csv_files/6_demo.csv", header=T)
+str(df.6.demo)
+mean(df.6.demo$Age)
+```
+
