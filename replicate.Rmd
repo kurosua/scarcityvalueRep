@@ -78,17 +78,16 @@ wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)
 
 > (see Fig. 1a)...
 
-*currently figuring out how to make them into a histogram.*
 
 ```{r echo = FALSE}
-clean_1a %>%
-  filter(income2 <= 35000) %>%
-  summarise(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n())
+#clean_1a %>%
+ # filter(income2 <= 35000) %>%
+ # summarise(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n())
 #produces numbers for the low income bars
 
-clean_1a %>%
-  filter(income2 > 35000) %>%
-  summarise(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n())
+#clean_1a %>%
+ # filter(income2 > 35000) %>%
+ # summarise(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n())
 #produces numbers for the high income bars
 
 figure1alow <- clean_1a %>%
@@ -103,13 +102,16 @@ figure1ahigh <- clean_1a %>%
 
 ###figure 1a trade-offs
 bin = c(1, 2, 3, 4)
-title = c("lower income tradeoff", "higher income tradeoff", "lower income location", "higher income location")
-values = c(figure1alow$prop.tradeoff, figure1ahigh$prop.tradeoff, figure1alow$prop.location, figure1ahigh$prop.location)
-fig1 <- data.frame(bin, title, values)
+title = factor(c("tradeoff", "location"), levels = c("tradeoff", "location"))
+values = c(figure1alow$prop.tradeoff, figure1alow$prop.location, figure1ahigh$prop.tradeoff, figure1ahigh$prop.location)
+income = c("lower income", "lower income", "higher income", "higher income")
+fig1 <- data.frame(bin, title, values, income)
 
+fig1 <- fig1 %>%
+  ggplot(aes(x = title, y = values, fill = income)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") +  ylab("Proportion Endorsing Reason") + xlab("Reason")
 
-fig1 %>%
-  ggplot(aes(x = title, y = values)) + geom_bar(stat = "identity")
+print(fig1)
+
 ```
 
 
