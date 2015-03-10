@@ -101,14 +101,15 @@ income.factor <- factor(fig1a.table$income, levels = c("lower income", "higher i
 #figure 1a data frame (+ income.factor reverses the default position dodge of the bars)
 
 figure1a <- fig1a.table %>%
-  ggplot(aes(x = title, y = values, fill = income.factor)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a")
+  ggplot(aes(x = title, y = values, fill = income.factor)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a") + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 #produces figure 1a
 
 print(figure1a)
 #displays figure 1a
 ```
 
-
+-----
+-----
 # Study 1b - Consistent Valuations Under Scarcity
 
 In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
@@ -217,7 +218,7 @@ fig1b.table <- data.frame(title, values, location, CIs)
 #figure 1b data frame
 
 figure1b <- fig1b.table %>%
-  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1b - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort")
+  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1b - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1b") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 #produces figure 1b
 
 print(figure1b)
@@ -248,13 +249,25 @@ Dividing participants according to a median split on income, we found that highe
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 1, resort == 1) %>%
-  summarise(mean.pay = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.pay = mean(pay), CI.low = mean(pay) -  (1.96 * Sem(pay)), CI.high = mean(pay) + (1.96 * Sem(pay)))
+
+clean_1c_high_resort <- clean_1c %>%
+  filter(split == 1, resort == 1) %>%
+  mutate(mean.pay = mean(pay), CI = (1.96 * Sem(pay))) %>%
+  distinct(mean.pay, CI)
+#generates mean and CI for high income participants in the resort scenario - to use in figure 1c
 ```
 than for beer from the grocery store:
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 1, resort == 0) %>%
-  summarise(mean.pay = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.pay = mean(pay), CI.low = mean(pay) -  (1.96 * Sem(pay)), CI.high = mean(pay) + (1.96 * Sem(pay)))
+
+clean_1c_high_grocer <- clean_1c %>%
+  filter(split == 1, resort == 0) %>%
+  mutate(mean.pay = mean(pay), CI = (1.96 * Sem(pay))) %>%
+  distinct(mean.pay, CI)
+#generates mean and CI for high income participants in the grocer scenario - to use in figure 1c
 ```
 
 Lower-income participants' WTP did not differ significantly between beer from the resort,
@@ -262,14 +275,26 @@ Lower-income participants' WTP did not differ significantly between beer from th
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 0, resort == 1) %>%
-  summarise(mean.pay = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.pay = mean(pay), CI.low = mean(pay) -  (1.96 * Sem(pay)), CI.high = mean(pay) + (1.96 * Sem(pay)))
+
+clean_1c_low_resort <- clean_1c %>%
+  filter(split == 0, resort == 1) %>%
+  mutate(mean.pay = mean(pay), CI = (1.96 * Sem(pay))) %>%
+  distinct(mean.pay, CI)
+#generates mean and CI for low income participants in the resort scenario - to use in figure 1c
 ```
 and beer from the store.
 
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.pay = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.pay = mean(pay), CI.low = mean(pay) -  (1.96 * Sem(pay)), CI.high = mean(pay) + (1.96 * Sem(pay)))
+
+clean_1c_low_grocer <- clean_1c %>%
+  filter(split == 0, resort == 0) %>%
+  mutate(mean.pay = mean(pay), CI = (1.96 * Sem(pay))) %>%
+  distinct(mean.pay, CI)
+#generates mean and CI for low income participants in the grocer scenario - to use in figure 1c
 ```
 
 The interaction between income and context was significant, F(1,574) = 5.68, p < 0.05, eta squared partial = 0.01. (SEE FIGURE 1c)
@@ -287,6 +312,24 @@ The interaction was also significant when income was treated continuously, beta 
 ```{r echo = FALSE}
 lm2 <- lm(pay ~ resort * logses, data = clean_1c)
 summary(lm2)
+```
+
+```{r echo = FALSE}
+
+title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values = c(clean_1c_low_grocer$mean.pay, clean_1c_high_grocer$mean.pay, clean_1c_low_resort$mean.pay, clean_1c_high_resort$mean.pay)
+location = c("Grocer", "Grocer", "Resort", "Resort")
+CIs = c(clean_1c_low_grocer$CI, clean_1c_high_grocer$CI, clean_1c_low_resort$CI, clean_1c_high_resort$CI)
+fig1c.table <- data.frame(title, values, location, CIs)
+#figure 1c data frame
+
+figure1c <- fig1c.table %>%
+  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1c - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1c") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+#produces figure 1c
+
+print(figure1c)
+#displays figure 1c
+
 ```
 
 -----
@@ -312,14 +355,25 @@ Dividing participants according to a median split on eincome, we found that high
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 1, resort == 1) %>%
-  summarise(mean.wtp = mean(wtp), ci.low = mean(wtp) -  (1.96 * Sem(wtp)), ci.high = mean(wtp) + (1.96 * Sem(wtp)))
+  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp)))
+
+clean_1d_high_resort <- clean_1d %>%
+  filter(split == 1, resort == 1) %>%
+  mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
+  distinct(mean.wtp, CI)
 ```
 than for beer from the grocery store (M = $5.46, 95% CI [$5.13, $5.79]).
 
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 1, resort == 0) %>%
-  summarise(mean.wtp = mean(wtp), ci.low = mean(wtp) -  (1.96 * Sem(wtp)), ci.high = mean(wtp) + (1.96 * Sem(wtp)))
+  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp)))
+
+clean_1d_high_grocer <- clean_1d %>%
+  filter(split == 1, resort == 0) %>%
+  mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
+  distinct(mean.wtp, CI)
+
 ```
 
 Lower-income participants' WTP did not differ significantly between the resort (M = $6.21, 95% CI [$5.83, $6.60])
@@ -327,7 +381,12 @@ Lower-income participants' WTP did not differ significantly between the resort (
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 0, resort == 1) %>%
-  summarise(mean.wtp = mean(wtp), ci.low = mean(wtp) -  (1.96 * Sem(wtp)), ci.high = mean(wtp) + (1.96 * Sem(wtp)))
+  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp)))
+
+clean_1d_low_resort <- clean_1d %>%
+  filter(split == 0, resort == 1) %>%
+  mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
+  distinct(mean.wtp, CI)
 ```
 
 and the store (M = %5.71, 95% CI [$5.31, $6.11]).
@@ -335,7 +394,12 @@ and the store (M = %5.71, 95% CI [$5.31, $6.11]).
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.wtp = mean(wtp), ci.low = mean(wtp) -  (1.96 * Sem(wtp)), ci.high = mean(wtp) + (1.96 * Sem(wtp)))
+  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp)))
+
+clean_1d_low_grocer <- clean_1d %>%
+  filter(split == 0, resort == 0) %>%
+  mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
+  distinct(mean.wtp, CI)
 ```
 
 The interaction between income and context was significant, F(1, 1984) = 4.82, p < 0.05, eta squared partial = 0.003. (SEE FIGURE 1d)
@@ -355,6 +419,26 @@ This interaction was marginally significant when income was treated continuously
 lm3 <- lm(wtp ~ resort * logses, data = clean_1d)
 summary(lm3)
 ```
+
+
+```{r echo = FALSE}
+
+title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values = c(clean_1d_low_grocer$mean.wtp, clean_1d_high_grocer$mean.wtp, clean_1d_low_resort$mean.wtp, clean_1d_high_resort$mean.wtp)
+location = c("Grocer", "Grocer", "Resort", "Resort")
+CIs = c(clean_1d_low_grocer$CI, clean_1d_high_grocer$CI, clean_1d_low_resort$CI, clean_1d_high_resort$CI)
+fig1d.table <- data.frame(title, values, location, CIs)
+#figure 1c data frame
+
+figure1d <- fig1d.table %>%
+  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1d - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1d") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+#produces figure 1d
+
+print(figure1d)
+#displays figure 1d
+
+```
+
 
 The beer-on-the-beach scenario provides a canonical example of the difficulty people have in translating utility into value.  People have a sense of how much they would enjoy the beer, but they have difficulty representing this enjoyment with a price.  However, under conditions of scarcity, people base their price not merely on anticipated enjoyment, but also on anticipated trade-offs, and those are more consistent guides for valuation.  Could scarcity also lead to more consistent baluation of a dollar itself? The next set of studies addressed this question.
 
@@ -491,6 +575,8 @@ summary(logit6logses)
 
 wald.test(b = coef(logit6logses), Sigma = vcov(logit6logses), Terms = 4)
 ```
+
+###Study 2c
 
 Five participants were excluded for missing responses in Study 2c, so 1,893 participants were included in the analyses.
 
