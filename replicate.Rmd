@@ -81,27 +81,27 @@ wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)
 
 figure1alow <- clean_1a %>%
   filter(income2 <= 35000) %>%
-  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n(), SE.tradeoff = sqrt(prop.tradeoff * (1 - prop.tradeoff)/total.n), CI.tradeoff = qnorm(.975) * SE.tradeoff, CI.tradeoff.high = (CI.tradeoff / 2), CI.tradeoff.low = (CI.tradeoff / 2), SE.location = sqrt(prop.location * (1 - prop.location)/total.n), CI.location = qnorm(.975) * SE.location, CI.location.high = (CI.location / 2), CI.location.low = (CI.location / 2)) %>%
+  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n(), SE.tradeoff = sqrt(prop.tradeoff * (1 - prop.tradeoff)/total.n), CI.tradeoff = qnorm(.975) * SE.tradeoff, SE.location = sqrt(prop.location * (1 - prop.location)/total.n), CI.location = qnorm(.975) * SE.location) %>%
   distinct(prop.tradeoff, prop.location, CI.tradeoff, CI.location)
 #computes new variables for proportion of answers, standard errors, and 95% confidence intervals for lower income group
 
 
 figure1ahigh <- clean_1a %>%
     filter(income2 > 35000) %>%
-  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n(), SE.tradeoff = sqrt(prop.tradeoff * (1 - prop.tradeoff)/total.n), CI.tradeoff = qnorm(.975) * SE.tradeoff, CI.tradeoff.high = (CI.tradeoff / 2), CI.tradeoff.low = (CI.tradeoff / 2),  SE.location = sqrt(prop.location * (1 - prop.location)/total.n), CI.location = qnorm(.975) * SE.location, CI.location.high = (CI.location / 2), CI.location.low = (CI.location / 2)) %>%
+  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n(), SE.tradeoff = sqrt(prop.tradeoff * (1 - prop.tradeoff)/total.n), CI.tradeoff = qnorm(.975) * SE.tradeoff,  SE.location = sqrt(prop.location * (1 - prop.location)/total.n), CI.location = qnorm(.975) * SE.location) %>%
   distinct(prop.tradeoff, prop.location, CI.tradeoff, CI.location)
 #computes new variables for proportion of answers, standard errors, and 95% confidence intervals for higher income group
 
 title = factor(c("trade-offs", "location"), levels = c("trade-offs", "location"))
 values = c(figure1alow$prop.tradeoff, figure1alow$prop.location, figure1ahigh$prop.tradeoff, figure1ahigh$prop.location)
 income = c("lower income", "lower income", "higher income", "higher income")
-CI.high = c(figure1alow$CI.tradeoff.high, figure1alow$CI.location.high, figure1ahigh$CI.tradeoff.high, figure1ahigh$CI.location.high)
-CI.low = c(figure1alow$CI.tradeoff.low, figure1alow$CI.location.low, figure1ahigh$CI.tradeoff.low, figure1ahigh$CI.location.low)
-fig1 <- data.frame(title, values, income, CI.high, CI.low)
-#figure 1a data frame
+CIs = c(figure1alow$CI.tradeoff, figure1alow$CI.location, figure1ahigh$CI.tradeoff, figure1ahigh$CI.location)
+fig1a.table <- data.frame(title, values, income, CIs)
+income.factor <- factor(fig1a.table$income, levels = c("lower income", "higher income"))
+#figure 1a data frame (+ income.factor reverses the default position dodge of the bars)
 
-figure1a <- fig1 %>%
-  ggplot(aes(x = title, y = values, fill = income)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab("Reason") + geom_errorbar(aes(ymin = values - CI.low, ymax = values + CI.high), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .85, end = .3) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a")
+figure1a <- fig1a.table %>%
+  ggplot(aes(x = title, y = values, fill = income.factor)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a")
 #produces figure 1a
 
 print(figure1a)
@@ -135,39 +135,61 @@ clean_1b <- raw_1b_spss %>%
 
 clean_1b %>%
   filter(split == 1, resort == 1) %>%
-  summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * Sem(beer)), ci.high = mean(beer) + (1.96 * Sem(beer)))
+  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer)))
 #1.96 * standard error gives 95% CI in one direction
-#this calculates high-income WTP beer price at resort
+#this calculates high-income WTP beer price at resort - summarise to display in print-out
+
+clean_1b_high_resort <- clean_1b %>%
+  filter(split == 1, resort == 1) %>%
+  mutate(mean.beer = mean(beer), CI = (1.96 * Sem(beer))) %>%
+  distinct(mean.beer, CI)
+#generates mean and CI for high income participants in the resort scenario - to use in figure 1b
+
 ```
 compared to the grocery store.
 
 ```{r echo = FALSE}
 clean_1b %>%
   filter(split == 1, resort == 0) %>%
-  summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * Sem(beer)), ci.high = mean(beer) + (1.96 * Sem(beer)))
+  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer)))
 #1.96 * standard error gives 95% CI in one direction
-#this calculates high-income WTP beer price at grocer
+#this calculates high-income WTP beer price at grocer - summarise to display in print-out
 
+clean_1b_high_grocer <- clean_1b %>%
+  filter(split == 1, resort == 0) %>%
+  mutate(mean.beer = mean(beer), CI = (1.96 * Sem(beer))) %>%
+  distinct(mean.beer, CI)
+#generates mean and CI for high income participants in the grocer scenario - to use in figure 1b
 ```
 But lower income participants' WTP did not differ significantly between beer from the resort
 
 ```{r echo = FALSE}
 clean_1b %>%
   filter(split == 0, resort == 1) %>%
-  summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * Sem(beer)), ci.high = mean(beer) + (1.96 * Sem(beer)))
+  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer)))
 #1.96 * standard error gives 95% CI in one direction
 #this calculates low income WTP beer price at resort
 
+clean_1b_low_resort <- clean_1b %>%
+  filter(split == 0, resort == 1) %>%
+  mutate(mean.beer = mean(beer), CI = (1.96 * Sem(beer))) %>%
+  distinct(mean.beer, CI)
+#generates mean and CI for low income participants in the resort scenario - to use in figure 1b
 ```
  and beer from the store.
  
 ```{r echo = FALSE}
 clean_1b %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.beer = mean(beer), ci.low = mean(beer) -  (1.96 * Sem(beer)), ci.high = mean(beer) + (1.96 * Sem(beer)))
+  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer)))
 #1.96 * standard error gives 95% CI in one direction
 #this calculates low income WTP beer price at grocery store
 
+clean_1b_low_grocer <- clean_1b %>%
+  filter(split == 0, resort == 0) %>%
+  mutate(mean.beer = mean(beer), CI = (1.96 * Sem(beer))) %>%
+  distinct(mean.beer, CI)
+#generates mean and CI for low income participants in the grocer scenario - to use in figure 1b
 ```
 
 The interaction between income and context was significant F(1,145) = 11.18, p < 0.01, eta squared partial = 0.07. (SEE FIGURE 1b)
@@ -184,6 +206,25 @@ The interaction was also significant when income was treated as a continuous var
 lm1 <- lm(beer ~ resort * logses, data = clean_1b)
 summary(lm1)
 ```
+
+```{r echo = FALSE}
+
+title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values = c(clean_1b_low_grocer$mean.beer, clean_1b_high_grocer$mean.beer, clean_1b_low_resort$mean.beer, clean_1b_high_resort$mean.beer)
+location = c("Grocer", "Grocer", "Resort", "Resort")
+CIs = c(clean_1b_low_grocer$CI, clean_1b_high_grocer$CI, clean_1b_low_resort$CI, clean_1b_high_resort$CI)
+fig1b.table <- data.frame(title, values, location, CIs)
+#figure 1b data frame
+
+figure1b <- fig1b.table %>%
+  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1b - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort")
+#produces figure 1b
+
+print(figure1b)
+#displays figure 1b
+
+```
+
 -----
 -----
 #Study 1c
