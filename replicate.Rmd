@@ -101,7 +101,7 @@ income.factor <- factor(fig1a.table$income, levels = c("lower income", "higher i
 #figure 1a data frame (+ income.factor reverses the default position dodge of the bars)
 
 figure1a <- fig1a.table %>%
-  ggplot(aes(x = title, y = values, fill = income.factor)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a") + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+  ggplot(aes(x = title, y = values, fill = income.factor)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a\n(error bars represent 95% confidence interval)") + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 #produces figure 1a
 
 print(figure1a)
@@ -218,7 +218,7 @@ fig1b.table <- data.frame(title, values, location, CIs)
 #figure 1b data frame
 
 figure1b <- fig1b.table %>%
-  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1b - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1b") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1b - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1b\n(error bars represent 95% confidence interval)") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 #produces figure 1b
 
 print(figure1b)
@@ -324,7 +324,7 @@ fig1c.table <- data.frame(title, values, location, CIs)
 #figure 1c data frame
 
 figure1c <- fig1c.table %>%
-  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1c - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1c") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1c - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1c\n(error bars represent 95% confidence interval)") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 #produces figure 1c
 
 print(figure1c)
@@ -431,7 +431,7 @@ fig1d.table <- data.frame(title, values, location, CIs)
 #figure 1c data frame
 
 figure1d <- fig1d.table %>%
-  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1d - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1d") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1d - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1d\n(error bars represent 95% confidence interval)") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 #produces figure 1d
 
 print(figure1d)
