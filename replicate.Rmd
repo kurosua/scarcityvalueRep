@@ -76,42 +76,36 @@ summary(logit2logses)
 wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)
 ```
 
-> (see Fig. 1a)...
-
 
 ```{r echo = FALSE}
-#clean_1a %>%
- # filter(income2 <= 35000) %>%
- # summarise(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n())
-#produces numbers for the low income bars
-
-#clean_1a %>%
- # filter(income2 > 35000) %>%
- # summarise(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n())
-#produces numbers for the high income bars
 
 figure1alow <- clean_1a %>%
   filter(income2 <= 35000) %>%
-  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n()) %>%
-  distinct(prop.tradeoff, prop.location)
+  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n(), SE.tradeoff = sqrt(prop.tradeoff * (1 - prop.tradeoff)/total.n), CI.tradeoff = qnorm(.975) * SE.tradeoff, CI.tradeoff.high = (CI.tradeoff / 2), CI.tradeoff.low = (CI.tradeoff / 2), SE.location = sqrt(prop.location * (1 - prop.location)/total.n), CI.location = qnorm(.975) * SE.location, CI.location.high = (CI.location / 2), CI.location.low = (CI.location / 2)) %>%
+  distinct(prop.tradeoff, prop.location, CI.tradeoff, CI.location)
+#computes new variables for proportion of answers, standard errors, and 95% confidence intervals for lower income group
+
 
 figure1ahigh <- clean_1a %>%
     filter(income2 > 35000) %>%
-  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n()) %>%
-  distinct(prop.tradeoff, prop.location)
+  mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n(), SE.tradeoff = sqrt(prop.tradeoff * (1 - prop.tradeoff)/total.n), CI.tradeoff = qnorm(.975) * SE.tradeoff, CI.tradeoff.high = (CI.tradeoff / 2), CI.tradeoff.low = (CI.tradeoff / 2),  SE.location = sqrt(prop.location * (1 - prop.location)/total.n), CI.location = qnorm(.975) * SE.location, CI.location.high = (CI.location / 2), CI.location.low = (CI.location / 2)) %>%
+  distinct(prop.tradeoff, prop.location, CI.tradeoff, CI.location)
+#computes new variables for proportion of answers, standard errors, and 95% confidence intervals for higher income group
 
-###figure 1a trade-offs
-bin = c(1, 2, 3, 4)
-title = factor(c("tradeoff", "location"), levels = c("tradeoff", "location"))
+title = factor(c("trade-offs", "location"), levels = c("trade-offs", "location"))
 values = c(figure1alow$prop.tradeoff, figure1alow$prop.location, figure1ahigh$prop.tradeoff, figure1ahigh$prop.location)
 income = c("lower income", "lower income", "higher income", "higher income")
-fig1 <- data.frame(bin, title, values, income)
+CI.high = c(figure1alow$CI.tradeoff.high, figure1alow$CI.location.high, figure1ahigh$CI.tradeoff.high, figure1ahigh$CI.location.high)
+CI.low = c(figure1alow$CI.tradeoff.low, figure1alow$CI.location.low, figure1ahigh$CI.tradeoff.low, figure1ahigh$CI.location.low)
+fig1 <- data.frame(title, values, income, CI.high, CI.low)
+#figure 1a data frame
 
-fig1 <- fig1 %>%
-  ggplot(aes(x = title, y = values, fill = income)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") +  ylab("Proportion Endorsing Reason") + xlab("Reason")
+figure1a <- fig1 %>%
+  ggplot(aes(x = title, y = values, fill = income)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab("Reason") + geom_errorbar(aes(ymin = values - CI.low, ymax = values + CI.high), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .85, end = .3) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a")
+#produces figure 1a
 
-print(fig1)
-
+print(figure1a)
+#displays figure 1a
 ```
 
 
