@@ -21,35 +21,45 @@ Sem <- function(x) {
 ```
 
 # Study 1a
-> In this study, there were 103 participants (mean age = 29.3 years; median household size = 3 people; median household income = $35,000)...One participant was excluded as an outlier on income (more than 3 SD from the mean). We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income...
-
-*We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.*
+> In this study, there were 103 participants (mean age = 29.3 years; 44 females, 59 males; median household size = 3 people; median household income = $35,000)...One participant was excluded as an outlier on income (more than 3 SD from the mean). 
 
 ```{r echo = FALSE}
 # Data import
 
 # detect the user's directory:
-directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
+directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep"
 if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
 setwd(directory)
 
 # read in the data for 1a using the spss file
 # the warning/messages suppressed; the data imports cleanly.
-suppressMessages(suppressWarnings(raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1a_spss <- read.spss("framing/study_1a.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1a_csv <- read.csv("study_1a_demog.csv", header = FALSE)))
+
+raw_1a_csv %>%
+  summarise(average_age = mean(V3))
+
+raw_1a_csv %>%
+  filter(V4 == "f") %>%
+  summarise(female_count = length(V4))
+
+raw_1a_csv %>%
+  filter(V4 == "m") %>%
+  summarise(male_count = length(V4))
 
 raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
+
+```
+
+> We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income. Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,
+
+```{r}
+
 # removes the 1 removed observation for being 3 SDs away from the mean.
 clean_1a <- raw_1a_spss %>%
   filter(filter_. != "Not Selected")
-# count number of participants who answered 'tradeoff' or 'location' for 1a.
-raw_1a_spss  %>%
-  summarise(total.tradeoff = sum(tradeoff), total.location = sum(location))
-```
 
-> Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,...
-
-```{r}
 logit1logses <- glm(location ~ logses, data = clean_1a, family = "binomial")
 summary(logit1logses)
 
