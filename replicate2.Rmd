@@ -1,0 +1,87 @@
+---
+title: "replication2"
+author: "Nick F & Aaron K"
+date: "February 24, 2015"
+output: html_document
+---
+
+```{r echo = FALSE}
+suppressPackageStartupMessages(require(dplyr))
+suppressPackageStartupMessages(require(broom))
+suppressPackageStartupMessages(require(ggplot2))
+suppressPackageStartupMessages(require(foreign))
+suppressPackageStartupMessages(require(aod))
+suppressPackageStartupMessages(require(lsr))
+
+Sem <- function(x) {
+  #creates the function to calculate standard error of the mean
+  sqrt(var(x)/length(x))
+  }
+
+# detect the user's directory:
+directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
+if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
+setwd(directory)
+
+```
+
+
+
+*AK: I'll work backwards* 6,5,4,3,2d,2c
+
+---
+
+# Study 6
+> In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
+
+```{r echo=F}
+df.6.demo <- read.csv("csv_files/6_demo.csv", header=T)
+
+# Number of subjects
+df.6.demo %>%
+  select(Subject) %>%
+  summarise(n())
+
+# Mean age
+df.6.demo %>%
+  summarise(mean(Age, na.rm=T))
+
+# Number of females vs. males
+df.6.demo %>%
+  group_by(Gender) %>%
+  summarise(n())
+```
+
+> One participant was excluded because of a computer malfunction during the game. Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]), whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]). A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p < .05, ηp2 = .07.
+
+```{r}
+df.6.raw <- read.csv("csv_files/6_raw.csv", header=T)
+
+# Number of subjects, filter our Subject 16 (deduced from spss filter)
+df.6.edit <- df.6.raw %>%
+  filter(Subject!='16')
+df.6.edit %>%
+   summarise(n_distinct(Subject)) 
+
+# Total points per Subject
+df.6.edit <- df.6.edit %>%
+  group_by(Subject) %>%
+  mutate(Total.Points=sum(Points)) %>%
+  select(Subject, Cond, Total.Points) %>%
+  distinct()
+
+# Change variable to factos
+df.6.edit$Subject <- as.factor(df.6.edit$Subject)
+df.6.edit$Cond <- as.factor(df.6.edit$Cond)
+
+# Add columns for different conditions: scarcity/account 
+df.6.edit <- df.6.edit %>%
+  mutate(Account=filter(Cond==2)) # add generic Scarcity
+
+mutate(Account=filter(Cond==2))
+
+aov(Total.Points~scarcity*account)
+
+  
+```
+
