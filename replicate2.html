@@ -10,7 +10,7 @@
 
 <meta name="author" content="Nick F &amp; Aaron K" />
 
-<meta name="date" content="2015-02-24" />
+<meta name="date" content="2015-03-12" />
 
 <title>replication2</title>
 
@@ -64,38 +64,28 @@ img {
 <div id="header">
 <h1 class="title">replication2</h1>
 <h4 class="author"><em>Nick F &amp; Aaron K</em></h4>
-<h4 class="date"><em>February 24, 2015</em></h4>
+<h4 class="date"><em>March 12, 2015</em></h4>
 </div>
 
 
-<p><em>AK: I’ll work backwards 6,5,4,3,2d</em> <em>Note: headlines were added to some sheets, i.e. assumptions made</em></p>
 <hr />
-<div id="study-2d-incomplete" class="section level6">
-<h6>Study 2d : incomplete</h6>
+<p><em>Note: headlines were added to some sheets (csv), i.e. assumptions made</em></p>
+<hr />
+<div id="study-2d" class="section level4">
+<h4>Study 2d :</h4>
 <blockquote>
 <p>In Study 2d, there were 301 participants (mean age = 30.2 years; 120 females, 181 males; median household size = 3 people; median household income = $25,000).</p>
 </blockquote>
-<pre class="r"><code># Number of subjects
-df2d_1 %&gt;%
-  select(subject) %&gt;%
-  summarise(n())</code></pre>
 <pre><code>##   n()
 ## 1 301</code></pre>
-<pre class="r"><code># Mean age
-df2d_2 %&gt;%
-  summarise(mean(age, na.rm=T)) %&gt;%
-  round(digits=1)</code></pre>
 <pre><code>##   mean(age, na.rm = T)
 ## 1                 30.2</code></pre>
-<pre class="r"><code># Number of females vs. males
-df2d_2 %&gt;%
-  group_by(gender) %&gt;%
-  summarise(n())</code></pre>
 <pre><code>## Source: local data frame [2 x 2]
 ## 
 ##   gender n()
 ## 1      f 120
 ## 2      m 181</code></pre>
+<p>Attempt to replicate median household size was complex:</p>
 <pre class="r"><code># Median Household Size
 # calculated using income2 : doesn't match
 df2d_1 %&gt;%
@@ -120,14 +110,64 @@ df2d_1 %&gt;%
   slice(3) # '3' derived from above</code></pre>
 <pre><code>##    inc2
 ## 1 25000</code></pre>
-<pre class="r"><code># Note above: I tried to, but couldn't figure out how to use a variable instead of explicitly using the value 3. Again, I suspected the median was taken from the categorized income and then backward matched to its raw value. I suspect this is erroneous and probably due to disregarding the categorical value of 0 is meaningful.</code></pre>
+<pre class="r"><code># Note above: (technical) I tried to, but couldn't figure out how to use a variable instead of explicitly using the value 3. Again, I suspected the median was taken from the categorized income and then backward matched to its raw value. I suspect this is erroneous and probably due to disregarding the categorical value of 0 is meaningful.</code></pre>
 <blockquote>
-<p>Results: No participants were excluded from analyses. We regressed willingness to travel on income (categorized by a median split), proportional size of the discount (large vs. small), absolute size of the discount ($10 vs. $150), all two-way interaction terms, and the three-way interaction term. Higher-income participants were sig- nificantly more willing to travel for a proportionally larger discount (60%) than for a proportionally smaller discount (41%), but this was not true for lower-income participants (50% vs. 61%). The interaction between pro- portional discount and income was significant, β = −1.90, Wald-test χ2(1, N = 301) = 4.11, p &lt; .05. Note that this interaction did not depend on the absolute amount of the discount, as the three-way interaction was not sig- nificant, β = −0.89, Wald-test χ2(1, N = 301) = 0.28, p &gt; .6. When income was treated continuously, the interaction between proportional discount and income also emerged, but was not significant, β = −2.13, Wald-test χ2(1, N = 301) = 2.21, p &lt; .15. These results replicate an earlier study by Hall (2008), who documented similar effects among participants recruited in a soup kitchen versus a wealthy suburb.</p>
+<p>Results: We regressed willingness to travel on income (categorized by a median split), proportional size of the discount (large vs. small), absolute size of the discount ($10 vs. $150), all two-way interaction terms, and the three-way interaction term.</p>
 </blockquote>
+<pre class="r"><code># Regression
+glm(go ~ split*lgdiscount*lgsavings, data = df2d_1, family = &quot;binomial&quot;)</code></pre>
+<p>Assumptions:</p>
+<ul>
+<li>willingness = ‘go’</li>
+<li>income with median split = ‘split’</li>
+<li>proportionate discount = ‘lgdiscount’</li>
+<li>abs size discount = ‘lgsavings’</li>
+</ul>
+<blockquote>
+<p>Higher-income participants were significantly more willing to travel for a proportionally larger discount (60%) than for a proportionally smaller discount (41%), but this was not true for lower-income participants (50% vs. 61%).</p>
+</blockquote>
+<pre><code>##   high_prop_large
+## 1              60</code></pre>
+<pre><code>##   high_prop_small
+## 1              41</code></pre>
+<pre><code>##   high_prop_large
+## 1              50</code></pre>
+<pre><code>##   high_prop_small
+## 1              61</code></pre>
+<blockquote>
+<p>The interaction between proportional discount and income was significant, β = −1.90, Wald-test χ2(1, N = 301) = 4.11, p &lt; .05.</p>
+</blockquote>
+<pre><code>##               term    β    p
+## 1 split:lgdiscount -1.9 0.04</code></pre>
+<pre><code>## chi2 
+## 4.11</code></pre>
+<blockquote>
+<p>Note that this interaction did not depend on the absolute amount of the discount, as the three-way interaction was not significant, β = −0.89, Wald-test χ2(1, N = 301) = 0.28, p &gt; .6.</p>
+</blockquote>
+<pre><code>##                         term     β      p
+## 1 split:lgdiscount:lgsavings -0.89 0.6003</code></pre>
+<pre><code>##  chi2 
+## 0.275</code></pre>
+<blockquote>
+<p>When income was treated continuously, the interaction between proportional discount and income also emerged, but was not significant, β = −2.13, Wald-test χ2(1, N = 301) = 2.21, p &lt; .15.</p>
+</blockquote>
+<p><strong>^ Failed to replicate</strong></p>
 <hr />
 </div>
-<div id="study-6-incomplete" class="section level6">
-<h6>Study 6 : incomplete</h6>
+<div id="study-3-incomplete" class="section level4">
+<h4>Study 3 : incomplete</h4>
+<hr />
+</div>
+<div id="study-4-incomplete" class="section level4">
+<h4>Study 4 : incomplete</h4>
+<hr />
+</div>
+<div id="study-5-incomplete" class="section level4">
+<h4>Study 5 : incomplete</h4>
+<hr />
+</div>
+<div id="study-6-incomplete" class="section level4">
+<h4>Study 6 : incomplete</h4>
 <blockquote>
 <p>In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were…</p>
 </blockquote>
