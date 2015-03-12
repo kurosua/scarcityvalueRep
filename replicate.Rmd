@@ -5,7 +5,6 @@ date: "February 24, 2015"
 output: html_document
 ---
 
-2/28/15 - NF - Starting at 1a
 ```{r echo = FALSE}
 suppressPackageStartupMessages(require(dplyr))
 suppressPackageStartupMessages(require(broom))
