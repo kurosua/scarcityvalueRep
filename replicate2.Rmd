@@ -9,9 +9,6 @@ output: html_document
 suppressPackageStartupMessages(require(dplyr))
 suppressPackageStartupMessages(require(broom))
 suppressPackageStartupMessages(require(ggplot2))
-suppressPackageStartupMessages(require(foreign))
-suppressPackageStartupMessages(require(aod))
-suppressPackageStartupMessages(require(lsr))
 
 Sem <- function(x) {
   #creates the function to calculate standard error of the mean
@@ -27,7 +24,8 @@ setwd(directory)
 
 
 
-*AK: I'll work backwards* 6,5,4,3,2d,2c
+*AK: I'll work backwards* 6,5,4,3,2d
+*Note: headlines were added to some sheets, i.e. assumptions made*
 
 ---
 
