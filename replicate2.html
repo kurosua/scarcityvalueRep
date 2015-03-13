@@ -10,7 +10,7 @@
 
 <meta name="author" content="Nick F &amp; Aaron K" />
 
-<meta name="date" content="2015-03-12" />
+<meta name="date" content="2015-03-13" />
 
 <title>replication2</title>
 
@@ -64,15 +64,17 @@ img {
 <div id="header">
 <h1 class="title">replication2</h1>
 <h4 class="author"><em>Nick F &amp; Aaron K</em></h4>
-<h4 class="date"><em>March 12, 2015</em></h4>
+<h4 class="date"><em>March 13, 2015</em></h4>
 </div>
 
 
 <hr />
 <p><em>Note: headlines were added to some sheets (csv), i.e. assumptions made</em></p>
 <hr />
-<div id="study-2d" class="section level4">
-<h4>Study 2d :</h4>
+<div id="study-2d" class="section level3">
+<h3>Study 2d</h3>
+<div id="complete-last-part-failed-to-replicate" class="section level6">
+<h6>Complete (last part failed to replicate)</h6>
 <blockquote>
 <p>In Study 2d, there were 301 participants (mean age = 30.2 years; 120 females, 181 males; median household size = 3 people; median household income = $25,000).</p>
 </blockquote>
@@ -154,27 +156,161 @@ glm(go ~ split*lgdiscount*lgsavings, data = df2d_1, family = &quot;binomial&quot
 <p><strong>^ Failed to replicate</strong></p>
 <hr />
 </div>
-<div id="study-3-incomplete" class="section level4">
-<h4>Study 3 : incomplete</h4>
+</div>
+<div id="study-3" class="section level3">
+<h3>Study 3</h3>
+<div id="complete" class="section level6">
+<h6>Complete</h6>
+<blockquote>
+<p>In Study 3, there were 505 participants (mean age = 33.0 years; 208 females, 297 males; median household size = 3 people; median household income = $45,000).</p>
+</blockquote>
+<pre><code>##   n()
+## 1 505</code></pre>
+<pre><code>##   mean(age, na.rm = T)
+## 1                   33</code></pre>
+<pre><code>## Source: local data frame [2 x 2]
+## 
+##   gender n()
+## 1      f 208
+## 2      m 297</code></pre>
+<pre><code>##   median(house)
+## 1             3</code></pre>
+<pre><code>##   median(inc2)
+## 1        45000</code></pre>
+<blockquote>
+<p>One participant was excluded for missing responses, and another was excluded as an outlier on income.</p>
+</blockquote>
+<pre><code>## Source: local data frame [504 x 8]
+## 
+##    Subject cond inc house   inc2       ses split judge
+## 1       14    1  11     1 150000 150000.00     1     4
+## 2      125    0  11     2 150000 106066.02     1    10
+## 3      279    0  11     2 150000 106066.02     1     5
+## 4      295    0  11     2 150000 106066.02     1     7
+## 5       84    1   9     1  95000  95000.00     1    19
+## 6      131    0   9     1  95000  95000.00     1    16
+## 7      322    1   9     1  95000  95000.00     1    14
+## 8       43    0  10     2 125000  88388.35     1     2
+## 9      263    0  10     2 125000  88388.35     1    13
+## 10     378    1  10     2 125000  88388.35     1     2
+## ..     ...  ... ...   ...    ...       ...   ...   ...</code></pre>
+<blockquote>
+<p>Analyses based on a median split on income replicated earlier results. Higher-income individuals rated the loss gamble as significantly more attractive (M = 11.63, 95% CI = [10.56, 12.69]) than the no-loss gamble (M = 8.33, 95% CI = [7.62, 9.04]), but this difference was smaller for lower-income individuals (loss gamble: M = 10.38, 95% CI = [9.38, 11.38], no-loss gamble: M = 9.18, 95% CI = [8.31, 10.05]).</p>
+</blockquote>
+<p>Assumptions:</p>
+<ul>
+<li>Higher-income (via median split) : split==1</li>
+<li>Lower-income (via median split) : split==0</li>
+<li>Loss gamble : cond==1</li>
+<li>No-loss gamble : cond==0</li>
+<li>attractive rating : judge</li>
+</ul>
+<p>Numbers are fractionally different…</p>
+<pre><code>## [1] High-income &amp; Loss gambling : attractive rating
+## [1] M:    11.69
+## [1] CI :  10.61 12.77</code></pre>
+<pre><code>## [1] High-income &amp; No-loss gambling : attractive rating
+## [1] M:   8.33
+## [1] CI :  7.61  9.04</code></pre>
+<pre><code>## [1] Low-income &amp; Loss gambling : attractive rating
+## [1] M:    10.38
+## [1] CI :  9.37  11.39</code></pre>
+<pre><code>## [1] Low-income &amp; No-loss gambling : attractive rating
+## [1] M:   9.21
+## [1] CI :  8.33  10.08</code></pre>
+<blockquote>
+<p>The interaction between gamble and income was significant, F(1, 499) = 5.04, p &lt; .05, ηp2 = .01. The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p &lt; .05.</p>
+</blockquote>
+<pre class="r"><code># ANOVA : interaction effects
+
+# income treated as split : somewhat matches
+summary(aov(judge ~ split*cond, df3_1))</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## split         1      1     1.5   0.054   0.8159    
+## cond          1    640   640.3  23.518 1.66e-06 ***
+## split:cond    1    150   150.5   5.527   0.0191 *  
+## Residuals   499  13587    27.2                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<pre class="r"><code>temp_eta2 &lt;- etaSquared(aov(judge ~ split*cond, df3_1)) %&gt;%
+  .[3,2] %&gt;%
+  round(digit=2)
+print(c(&quot;ηp2:&quot;, temp_eta2), quote=F)</code></pre>
+<pre><code>## [1] ηp2: 0.01</code></pre>
+<pre class="r"><code># when income is treated continuously as inc2 : matches even less
+summary(aov(judge ~ inc2*cond, df3_1))</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value  Pr(&gt;F)    
+## inc2          1      0     0.3   0.013  0.9104    
+## cond          1    641   640.8  23.461 1.7e-06 ***
+## inc2:cond     1    107   107.5   3.934  0.0479 *  
+## Residuals   499  13630    27.3                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<pre class="r"><code>temp_eta2 &lt;- etaSquared(aov(judge ~ inc2*cond, df3_1)) %&gt;%
+  .[3,2] %&gt;%
+  round(digit=2)
+print(c(&quot;ηp2:&quot;, temp_eta2), quote=F)</code></pre>
+<pre><code>## [1] ηp2: 0.01</code></pre>
+<pre class="r"><code>rm(temp_eta2)</code></pre>
+<p><strong>^ replication is close, but off; not different enough to effect significance</strong></p>
 <hr />
 </div>
-<div id="study-4-incomplete" class="section level4">
-<h4>Study 4 : incomplete</h4>
+</div>
+<div id="study-4" class="section level3">
+<h3>Study 4</h3>
+<div id="incomplete" class="section level6">
+<h6>incomplete</h6>
+<blockquote>
+<p>In Study 4, there were 263 participants (mean age = 31.6 years; 102 females, 161 males; median household size = 3 people; median household income = $45,000).</p>
+</blockquote>
+<pre><code>##   n()
+## 1 263</code></pre>
+<pre><code>##   mean(Age, na.rm = T)
+## 1                 31.6</code></pre>
+<pre><code>## Source: local data frame [2 x 2]
+## 
+##   Gender n()
+## 1      f 102
+## 2      m 161</code></pre>
+<pre><code>##   median(House)
+## 1             3</code></pre>
+<pre><code>##   median(Income2)
+## 1           45000</code></pre>
+<blockquote>
+<p>Four participants were excluded for not completing the prime question. When we analyzed the data using a median split based on income, higher-income participants rated the DVD as significantly more expensive when they thought about a small account (M = 5.74, 95% CI = [5.04, 6.44]) rather than a large account (M = 4.47, 95% CI = [3.93, 5.01]), whereas the evaluations of lower-income participants did not differ significantly between the condi- tions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48]). The interaction between income and condition was significant, F(1, 255) = 4.96, p &lt; .05, ηp2 = .02. The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p &lt; .01.</p>
+</blockquote>
 <hr />
 </div>
-<div id="study-5-incomplete" class="section level4">
-<h4>Study 5 : incomplete</h4>
-<hr />
 </div>
-<div id="study-6-incomplete" class="section level4">
-<h4>Study 6 : incomplete</h4>
+<div id="study-5" class="section level3">
+<h3>Study 5</h3>
+<div id="incomplete-1" class="section level6">
+<h6>incomplete</h6>
+<blockquote>
+<p>In Study 5, there were 234 participants (mean age = 31.8 years; 107 females, 127 males)</p>
+</blockquote>
+<pre><code>##   n()
+## 1 234</code></pre>
+<pre><code>## Source: local data frame [2 x 2]
+## 
+##   gender n()
+## 1      f 107
+## 2      m 127</code></pre>
+</div>
+</div>
+<div id="no-participants-were-excluded-from-the-analyses.-we-first-analyzed-responses-using-a-median-split-on-participants-dieting-behavior.-nondieters-rated-the-fries-as-more-fat--tening-when-they-thought-about-a-small-account-m-8.64-95-ci-8.20-9.07-than-when-they-thought-about-a-large-account-m-7.80-95-ci-7.21-8.38-but-this-was-not-true-for-dieters-small-account-m-8.86-95-ci-8.29-9.43-large-account-m-9.13-95-ci-8.66-9.60.-the-interaction-between-dieting-status-and-condi--tion-was-significant-f1-230-4.40-p-.05-p2-.02-and-the-interaction-was-also-found-when-dieting-behav--ior-was-treated-continuously--0.43-t230-2.11-p-.05." class="section level2">
+<h2>&gt; No participants were excluded from the analyses. We first analyzed responses using a median split on participants’ dieting behavior. Nondieters rated the fries as more fat- tening when they thought about a small account (M = 8.64, 95% CI = [8.20, 9.07]) than when they thought about a large account (M = 7.80, 95% CI = [7.21, 8.38]), but this was not true for dieters (small account: M = 8.86, 95% CI = [8.29, 9.43]; large account: M = 9.13, 95% CI = [8.66, 9.60]). The interaction between dieting status and condi- tion was significant, F(1, 230) = 4.40, p &lt; .05, ηp2 = .02, and the interaction was also found when dieting behav- ior was treated continuously, β = 0.43, t(230) = 2.11, p &lt; .05. …</h2>
+<div id="study-6" class="section level3">
+<h3>Study 6</h3>
+<div id="incomplete-2" class="section level6">
+<h6>incomplete</h6>
 <blockquote>
 <p>In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were…</p>
 </blockquote>
 <pre><code>##   n()
 ## 1  74</code></pre>
 <pre><code>##   mean(Age, na.rm = T)
-## 1              32.0411</code></pre>
+## 1                   32</code></pre>
 <pre><code>## Source: local data frame [2 x 2]
 ## 
 ##   Gender n()
@@ -183,25 +319,26 @@ glm(go ~ split*lgdiscount*lgsavings, data = df2d_1, family = &quot;binomial&quot
 <blockquote>
 <p>One participant was excluded because of a computer malfunction during the game. Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]), whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]). A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p &lt; .05, ηp2 = .07.</p>
 </blockquote>
-<pre class="r"><code># Number of subjects, filter our Subject 16 (deduced from spss filter)
-df.6.edit &lt;- df.6.raw %&gt;%
-  filter(Subject!='16')
-df.6.edit %&gt;%
-   summarise(n_distinct(Subject)) </code></pre>
-<pre><code>##   n_distinct(Subject)
-## 1                  73</code></pre>
-<pre class="r"><code># Total points per Subject
-df.6.edit &lt;- df.6.edit %&gt;%
-  group_by(Subject) %&gt;%
-  mutate(Total.Points=sum(Points)) %&gt;%
-  select(Subject, Cond, Total.Points) %&gt;%
-  distinct()
-
-# Change variable to factos
-df.6.edit$Subject &lt;- as.factor(df.6.edit$Subject)
-df.6.edit$Cond &lt;- as.factor(df.6.edit$Cond)
-
-# Add columns for different conditions: scarcity/account </code></pre>
+<pre class="r"><code># # Number of subjects, filter our Subject 16 (deduced from spss filter)
+# df.6.edit &lt;- df.6.raw %&gt;%
+#   filter(Subject!='16')
+# df.6.edit %&gt;%
+#    summarise(n_distinct(Subject)) 
+# 
+# # Total points per Subject
+# df.6.edit &lt;- df.6.edit %&gt;%
+#   group_by(Subject) %&gt;%
+#   mutate(Total.Points=sum(Points)) %&gt;%
+#   select(Subject, Cond, Total.Points) %&gt;%
+#   distinct()
+# 
+# # Change variable to factos
+# df.6.edit$Subject &lt;- as.factor(df.6.edit$Subject)
+# df.6.edit$Cond &lt;- as.factor(df.6.edit$Cond)
+# 
+# # Add columns for different conditions: scarcity/account </code></pre>
+</div>
+</div>
 </div>
 
 

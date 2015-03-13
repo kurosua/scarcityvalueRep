@@ -11,18 +11,13 @@ suppressPackageStartupMessages(require(dplyr))
 suppressPackageStartupMessages(require(tidyr))
 suppressPackageStartupMessages(require(aod)) # wald.test
 suppressPackageStartupMessages(require(broom))
+suppressPackageStartupMessages(require(lsr)) #etaSquared
 suppressPackageStartupMessages(require(ggplot2))
-
-Sem <- function(x) {
-  #creates the function to calculate standard error of the mean
-  sqrt(var(x)/length(x))
-  }
 
 # detect the user's directory:
 directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
 if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
 setwd(directory)
-
 ```
 
 *Note: headlines were added to some sheets (csv), i.e. assumptions made*
@@ -190,7 +185,7 @@ tidy(glm(go ~ inc2:lgdiscount, data = df2d_1, family = "gaussian"))
 ---
 
 ### Study 3
-######incomplete
+######Complete
 
 > In Study 3, there were 505 participants (mean age = 33.0 years; 208 females, 297 males; median household size = 3 people; median household income = $45,000).
 
@@ -225,7 +220,108 @@ df3_1 %>%
   summarize(median(inc2))
 ```
 
-> One participant was excluded for missing responses, and another was excluded as an outlier on income. Analyses based on a median split on income replicated earlier results. Higher-income individuals rated the loss gamble as significantly more attractive (M = 11.63, 95% CI = [10.56, 12.69]) than the no-loss gamble (M = 8.33, 95% CI = [7.62, 9.04]), but this difference was smaller for lower-income individuals (loss gamble: M = 10.38, 95% CI = [9.38, 11.38], no-loss gamble: M = 9.18, 95% CI = [8.31, 10.05]). The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01. The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
+> One participant was excluded for missing responses, and another was excluded as an outlier on income. 
+
+``` {r echo=F}
+# remove participant with missing response
+df3_1 <- df3_1 %>%
+  filter(!is.na(judge))
+
+# look for outlier in income (ses)
+df3_1 %>%
+  arrange(desc(ses)) %>%
+  tbl_df
+
+# remove outlier (subject 14)
+df3_1 <- df3_1 %>%
+  filter(Subject!=14)
+```
+
+> Analyses based on a median split on income replicated earlier results. Higher-income individuals rated the loss gamble as significantly more attractive (M = 11.63, 95% CI = [10.56, 12.69]) than the no-loss gamble (M = 8.33, 95% CI = [7.62, 9.04]), but this difference was smaller for lower-income individuals (loss gamble: M = 10.38, 95% CI = [9.38, 11.38], no-loss gamble: M = 9.18, 95% CI = [8.31, 10.05]).
+
+Assumptions:
+
+* Higher-income (via median split) : split==1
+* Lower-income (via median split) : split==0
+* Loss gamble : cond==1
+* No-loss gamble : cond==0
+* attractive rating : judge
+
+Numbers are fractionally different...
+
+```{r echo=F}
+# Function : to generate mean and confidence interval & name
+Mean_CI <- function(title, x){
+  print(title, quote=F)
+  # print Mean
+  M <- t.test(x) %>%
+    .$estimate %>%
+    round(digits = 2) %>%
+    .[[1]]
+  print(c("M:", M), quote = F)
+  # print Confidence Interval 95%
+  CI <- t.test(x) %>%
+    .$conf.int %>%
+    round(digits = 2) %>%
+    .[1:2]
+  print(c("CI : ", CI), quote = F)
+}
+
+# high-income & loss gambling : attractive rating
+temp_title <- "High-income & Loss gambling : attractive rating"
+temp_x <- df3_1 %>%
+  filter(split==1, cond==1) %>%
+  select(judge)
+Mean_CI(temp_title, temp_x) # print
+
+# high-income & no-loss gambling : attractive rating
+temp_title <- "High-income & No-loss gambling : attractive rating"
+temp_x <- df3_1 %>%
+  filter(split==1, cond==0) %>%
+  select(judge)
+Mean_CI(temp_title, temp_x) # print
+
+# low-income & loss gambling : attractive rating
+temp_title <- "Low-income & Loss gambling : attractive rating"
+temp_x <- df3_1 %>%
+  filter(split==0, cond==1) %>%
+  select(judge)
+Mean_CI(temp_title, temp_x) # print
+
+# low-income & no-loss gambling : attractive rating
+temp_title <- "Low-income & No-loss gambling : attractive rating"
+temp_x <- df3_1 %>%
+  filter(split==0, cond==0) %>%
+  select(judge)
+Mean_CI(temp_title, temp_x) # print
+
+# remove function
+rm(Mean_CI, temp_x, temp_title)
+```
+
+> The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01. The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
+
+```{r}
+# ANOVA : interaction effects
+
+# income treated as split : somewhat matches
+summary(aov(judge ~ split*cond, df3_1))
+temp_eta2 <- etaSquared(aov(judge ~ split*cond, df3_1)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("ηp2:", temp_eta2), quote=F)
+
+# when income is treated continuously as inc2 : matches even less
+summary(aov(judge ~ inc2*cond, df3_1))
+temp_eta2 <- etaSquared(aov(judge ~ inc2*cond, df3_1)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("ηp2:", temp_eta2), quote=F)
+
+rm(temp_eta2)
+```
+
+**^ replication is close, but off; not different enough to effect significance**
 
 ---
 
@@ -324,24 +420,24 @@ df6_demo %>%
 > One participant was excluded because of a computer malfunction during the game. Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]), whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]). A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p < .05, ηp2 = .07.
 
 ```{r}
-# Number of subjects, filter our Subject 16 (deduced from spss filter)
-df.6.edit <- df.6.raw %>%
-  filter(Subject!='16')
-df.6.edit %>%
-   summarise(n_distinct(Subject)) 
-
-# Total points per Subject
-df.6.edit <- df.6.edit %>%
-  group_by(Subject) %>%
-  mutate(Total.Points=sum(Points)) %>%
-  select(Subject, Cond, Total.Points) %>%
-  distinct()
-
-# Change variable to factos
-df.6.edit$Subject <- as.factor(df.6.edit$Subject)
-df.6.edit$Cond <- as.factor(df.6.edit$Cond)
-
-# Add columns for different conditions: scarcity/account 
+# # Number of subjects, filter our Subject 16 (deduced from spss filter)
+# df.6.edit <- df.6.raw %>%
+#   filter(Subject!='16')
+# df.6.edit %>%
+#    summarise(n_distinct(Subject)) 
+# 
+# # Total points per Subject
+# df.6.edit <- df.6.edit %>%
+#   group_by(Subject) %>%
+#   mutate(Total.Points=sum(Points)) %>%
+#   select(Subject, Cond, Total.Points) %>%
+#   distinct()
+# 
+# # Change variable to factos
+# df.6.edit$Subject <- as.factor(df.6.edit$Subject)
+# df.6.edit$Cond <- as.factor(df.6.edit$Cond)
+# 
+# # Add columns for different conditions: scarcity/account 
 
 ```
 
