@@ -6,6 +6,8 @@ output: html_document
 ---
 
 ```{r echo = FALSE}
+
+#load packages
 suppressPackageStartupMessages(require(dplyr))
 suppressPackageStartupMessages(require(broom))
 suppressPackageStartupMessages(require(ggplot2))
@@ -24,104 +26,118 @@ Sem <- function(x) {
 > In this study, there were 103 participants (mean age = 29.3 years; 44 females, 59 males; median household size = 3 people; median household income = $35,000)...One participant was excluded as an outlier on income (more than 3 SD from the mean). 
 
 ```{r echo = FALSE}
-# Data import
 
 # detect the user's directory:
 directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep"
 if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
 setwd(directory)
 
-# read in the data for 1a using the spss file
+# read in the data for 1a using the spss and the csv file
 # the warning/messages suppressed; the data imports cleanly.
 suppressMessages(suppressWarnings(raw_1a_spss <- read.spss("framing/study_1a.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_1a_csv <- read.csv("study_1a_demog.csv", header = FALSE)))
 
+#calculate mean age
 raw_1a_csv %>%
-  summarise(average_age = mean(V3))
+  summarise(average_age = mean(V3)) %>%
+  round(digits = 1)
 
+#calculate sex breakdown
 raw_1a_csv %>%
-  filter(V4 == "f") %>%
-  summarise(female_count = length(V4))
+  group_by(V4) %>%
+  summarise(sex_breakdown = n())
 
-raw_1a_csv %>%
-  filter(V4 == "m") %>%
-  summarise(male_count = length(V4))
-
+#calculate sample size, median household income, median household size
 raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
 
 ```
+***Results***
+-----
 
 > We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income. Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,
 
-```{r}
+```{r echo = FALSE}
 
 # removes the 1 removed observation for being 3 SDs away from the mean.
 clean_1a <- raw_1a_spss %>%
   filter(filter_. != "Not Selected")
 
+#run logistic regression and print summary (location thinking)
 logit1logses <- glm(location ~ logses, data = clean_1a, family = "binomial")
 summary(logit1logses)
 
+#run wald test using the output from logit1logses
 wald.test(b = coef(logit1logses), Sigma = vcov(logit1logses), Terms = 2)
 ```
 
 > but lower-income participants were more likely than higher- income participants to name trade-offs as the main con- sideration, β = −1.62, Wald-test χ2(1, N = 102) = 4.67, p <.05...
 
 ```{r echo = FALSE}
+
+#run logisitic regression and print summary (trade-off thinking)
 logit2logses <- glm(tradeoff ~ logses, data = clean_1a, family = "binomial")
 summary(logit2logses)
 
+#run wald test using the output from logit2logses
 wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)
 ```
 
 
 ```{r echo = FALSE}
 
+#create dataframe with new mutated variables for low income
 figure1alow <- clean_1a %>%
   filter(income2 <= 35000) %>%
   mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n(), SE.tradeoff = sqrt(prop.tradeoff * (1 - prop.tradeoff)/total.n), CI.tradeoff = qnorm(.975) * SE.tradeoff, SE.location = sqrt(prop.location * (1 - prop.location)/total.n), CI.location = qnorm(.975) * SE.location) %>%
   distinct(prop.tradeoff, prop.location, CI.tradeoff, CI.location)
-#computes new variables for proportion of answers, standard errors, and 95% confidence intervals for lower income group
 
-
+#create dataframe with new mutated variables for high income
 figure1ahigh <- clean_1a %>%
     filter(income2 > 35000) %>%
   mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n(), SE.tradeoff = sqrt(prop.tradeoff * (1 - prop.tradeoff)/total.n), CI.tradeoff = qnorm(.975) * SE.tradeoff,  SE.location = sqrt(prop.location * (1 - prop.location)/total.n), CI.location = qnorm(.975) * SE.location) %>%
   distinct(prop.tradeoff, prop.location, CI.tradeoff, CI.location)
-#computes new variables for proportion of answers, standard errors, and 95% confidence intervals for higher income group
 
+#figure 1a data frame
 title = factor(c("trade-offs", "location"), levels = c("trade-offs", "location"))
 values = c(figure1alow$prop.tradeoff, figure1alow$prop.location, figure1ahigh$prop.tradeoff, figure1ahigh$prop.location)
 income = c("lower income", "lower income", "higher income", "higher income")
 CIs = c(figure1alow$CI.tradeoff, figure1alow$CI.location, figure1ahigh$CI.tradeoff, figure1ahigh$CI.location)
 fig1a.table <- data.frame(title, values, income, CIs)
-income.factor <- factor(fig1a.table$income, levels = c("lower income", "higher income"))
-#figure 1a data frame (+ income.factor reverses the default position dodge of the bars)
+income <- factor(fig1a.table$income, levels = c("lower income", "higher income"))
 
-figure1a <- fig1a.table %>%
-  ggplot(aes(x = title, y = values, fill = income.factor)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a\n(error bars represent 95% confidence interval)") + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 #produces figure 1a
+figure1a <- fig1a.table %>%
+  ggplot(aes(x = title, y = values, fill = income)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a\n(error bars represent 95% confidence interval)") + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 
-print(figure1a)
 #displays figure 1a
+print(figure1a)
+
 ```
-
-
-# Study 1b
-=======
 
 
 # Study 1b - Consistent Valuations Under Scarcity
 
 
-In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
+In Study 1b, there were 151 participants (mean age = 32.9 years; 76 females, 75 males; median household size = 3 people, median household income = $45000).  In Study 1c, there were 604 participants (mean age = 29.9 years; 246 females, 358 males; median household size = 2 people; median household income = $45,000).  Study 1d was conducted with a large, representative sample drawn from Survey Sampling International's panel of U.S respondents.  There were 2,015 participants (mean age = 39.1 years; 1,022 females, 993 males; median household size = 3 people; median household income = $55,000).  In Study 1b, participants read the beer-on-the-beach scenario and indicated their WTP for the beer.  Studies 1c and 1d directly replicated Study 1b.  Because WTP was elicited with an open-ended scale, some participants named unreasonably high prices.  We describe our exclusion rules for these responses in the next section.  These rules were determined before we conducted the significance tests.
 
 ```{r echo = FALSE}
 
-setwd("framing")
-raw_1b_spss <- read.spss("study_1b.sav", to.data.frame = TRUE)
 #read in the data for 1b using the spss file - the warning that comes up is okay - the data imports cleanly.
+suppressMessages(suppressWarnings(raw_1b_spss <- read.spss("framing/study_1b.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1b_csv <- read.csv("study_1b_demog.csv", header = TRUE)))
+
+#average age for Study 1b
+raw_1b_csv %>%
+  filter(Age != "NA") %>%
+  summarise(average_age = mean(Age)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown for Study 1b
+raw_1b_csv %>%
+  filter(Gender != 75, Gender != 76) %>%
+  group_by(Gender) %>%
+  summarise(sex_breakdown = n())
 
 raw_1b_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
@@ -238,9 +254,30 @@ print(figure1b)
 We replicated the results of 1b with larger samples in studies 1c and 1d.  In study 1c, we excluded 2 participants with missing responses, 5 with unreasonably high WTPs (over $100), and 19 additional outliers on WTP, which left 578 participants.
 
 ```{r echo = FALSE}
-setwd("framing")
-raw_1c_spss <- read.spss("study_1c.sav", to.data.frame = TRUE)
+
 #read in the data for 1c using the spss file - the warning that comes up is okay - the data imports cleanly.
+suppressMessages(suppressWarnings(raw_1c_spss <- read.spss("framing/study_1c.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1c_csv <- read.csv("study_1c_demog.csv", header = TRUE)))
+
+#average age for Study 1c
+raw_1c_csv %>%
+  filter(age != "NA") %>%
+  summarise(mean.age = mean(age)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown for Study 1c
+raw_1c_csv %>%
+  filter(gender != "NA") %>%
+  group_by(gender) %>%
+  summarise(sex_breakdown = n())
+
+#calculate total sample size for Study 1c
+raw_1c_csv %>%
+  summarise(sample.size = n())
+
+#calculate median household income and size for Study 1c
+raw_1c_spss %>%
+  summarise(median.household.income = median(inc2), median.household.size = median(house))
 
 clean_1c <- raw_1c_spss %>%
   filter(filter_. != "Not Selected")
