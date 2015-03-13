@@ -1,7 +1,7 @@
 ---
 title: "replication2"
 author: "Nick F & Aaron K"
-date: "March 12, 2015"
+date: "March 13, 2015"
 output: html_document
 ---
 
@@ -29,7 +29,8 @@ setwd(directory)
 
 ---
 
-#### Study 2d :
+### Study 2d 
+###### Complete (last part failed to replicate)
 > In Study 2d, there were 301 participants (mean age = 30.2 years; 120 females, 181 males; median household size = 3 people; median household income = $25,000).
 
 ```{r echo=F}
@@ -188,36 +189,134 @@ tidy(glm(go ~ inc2:lgdiscount, data = df2d_1, family = "gaussian"))
 
 ---
 
-#### Study 3 : incomplete
+### Study 3
+######incomplete
 
----
-
-#### Study 4 : incomplete
-
----
-
-#### Study 5 : incomplete
-
----
-
-#### Study 6 : incomplete
-> In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
+> In Study 3, there were 505 participants (mean age = 33.0 years; 208 females, 297 males; median household size = 3 people; median household income = $45,000).
 
 ```{r echo=F}
-df.6.demo <- read.csv("csv_files/6_demo.csv", header=T)
-df.6.raw <- read.csv("csv_files/6_raw.csv", header=T)
+# Read data in
+df3_1 <- read.csv("csv_files/3_Sheet1.csv", header=T)
+df3_2 <- read.csv("csv_files/3_Sheet2.csv", header=T)
+```
 
+```{r echo=F}
 # Number of subjects
-df.6.demo %>%
+df3_1 %>%
   select(Subject) %>%
   summarise(n())
 
 # Mean age
-df.6.demo %>%
-  summarise(mean(Age, na.rm=T))
+df3_2 %>%
+  summarise(mean(age, na.rm=T)) %>%
+  round(digits=1)
 
 # Number of females vs. males
-df.6.demo %>%
+df3_2 %>%
+  group_by(gender) %>%
+  summarise(n())
+
+# Median household size
+df3_1 %>%
+  summarize(median(house))
+
+# Median household income
+df3_1 %>%
+  summarize(median(inc2))
+```
+
+> One participant was excluded for missing responses, and another was excluded as an outlier on income. Analyses based on a median split on income replicated earlier results. Higher-income individuals rated the loss gamble as significantly more attractive (M = 11.63, 95% CI = [10.56, 12.69]) than the no-loss gamble (M = 8.33, 95% CI = [7.62, 9.04]), but this difference was smaller for lower-income individuals (loss gamble: M = 10.38, 95% CI = [9.38, 11.38], no-loss gamble: M = 9.18, 95% CI = [8.31, 10.05]). The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01. The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
+
+---
+
+### Study 4
+######incomplete
+
+> In Study 4, there were 263 participants (mean age = 31.6 years; 102 females, 161 males; median household size = 3 people; median household income = $45,000).
+
+```{r echo=F}
+# Read data in
+df4_1 <- read.csv("csv_files/4_Sheet1.csv", header=T)
+df4_2 <- read.csv("csv_files/4_Sheet2.csv", header=T)
+```
+
+```{r echo=F}
+# Number of subjects
+df4_2 %>%
+  select(Subject) %>%
+  summarise(n())
+
+# Mean age
+df4_2 %>%
+  summarise(mean(Age, na.rm=T)) %>%
+  round(digits=1)
+
+# Number of females vs. males
+df4_2 %>%
+  group_by(Gender) %>%
+  summarise(n())
+
+# Median household size
+df4_2 %>%
+  summarize(median(House))
+
+# Median household income
+df4_1 %>%
+  summarize(median(Income2))
+```
+
+> Four participants were excluded for not completing the prime question. When we analyzed the data using a median split based on income, higher-income participants rated the DVD as significantly more expensive when they thought about a small account (M = 5.74, 95% CI = [5.04, 6.44]) rather than a large account (M = 4.47, 95% CI = [3.93, 5.01]), whereas the evaluations of lower-income participants did not differ significantly between the condi- tions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48]). The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02. The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. 
+
+---
+
+### Study 5
+######incomplete
+
+> In Study 5, there were 234 participants (mean age = 31.8 years; 107 females, 127 males)
+
+```{r echo=F}
+# Read data in
+df5_demo <- read.csv("csv_files/5_demo.csv", header=T)
+df5_1 <- read.csv("csv_files/5_Sheet1.csv", header=T)
+```
+
+```{r echo=F}
+# Number of subjects
+df5_demo %>%
+  select(subject) %>%
+  summarise(n())
+
+# Number of females vs. males
+df5_demo %>%
+  group_by(gender) %>%
+  summarise(n())
+```
+
+> No participants were excluded from the analyses. We first analyzed responses using a median split on participants’ dieting behavior. Nondieters rated the fries as more fat- tening when they thought about a small account (M = 8.64, 95% CI = [8.20, 9.07]) than when they thought about a large account (M = 7.80, 95% CI = [7.21, 8.38]), but this was not true for dieters (small account: M = 8.86, 95% CI = [8.29, 9.43]; large account: M = 9.13, 95% CI = [8.66, 9.60]). The interaction between dieting status and condi- tion was significant, F(1, 230) = 4.40, p < .05, ηp2 = .02, and the interaction was also found when dieting behav- ior was treated continuously, β = 0.43, t(230) = 2.11, p < .05. ...
+---
+
+### Study 6
+######incomplete
+> In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
+
+```{r echo=F}
+df6_demo <- read.csv("csv_files/6_demo.csv", header=T)
+df6_raw <- read.csv("csv_files/6_raw.csv", header=T)
+```
+
+```{r echo=F}
+# Number of subjects
+df6_demo %>%
+  select(Subject) %>%
+  summarise(n())
+
+# Mean age
+df6_demo %>%
+  summarise(mean(Age, na.rm=T)) %>%
+  round(digit=1)
+
+# Number of females vs. males
+df6_demo %>%
   group_by(Gender) %>%
   summarise(n())
 ```
