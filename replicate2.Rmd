@@ -163,7 +163,7 @@ print(wald.test(b = coef(temp.model),
 # instead of split, use income : doesn't match
 tidy(glm(go ~ income*lgdiscount*lgsavings, data = df2d_1, family = "gaussian"))[5,]
 # instead of split, use inc2 : doesn't match
-tidy(glm(go ~ inc2*lgdiscount*lgsavings, data = df2d_1, family = "gaussian"))[5,]
+tidy(glm(go ~ inc2*lgdiscount*lgsavings, data = df2d_1, family = "logses"))[5,]
 # instead of split, use ses : doesn't match
 tidy(glm(go ~ ses*lgdiscount*lgsavings, data = df2d_1, family = "gaussian"))[5,]
 
@@ -301,6 +301,8 @@ rm(Mean_CI, temp_x, temp_title)
 
 > The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01. The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
 
+**^ replication is close; not different enough to effect significance**
+
 ```{r}
 # ANOVA : interaction effects
 
@@ -312,21 +314,15 @@ temp_eta2 <- etaSquared(aov(judge ~ split*cond, df3_1)) %>%
 print(c("ηp2:", temp_eta2), quote=F)
 
 # when income is treated continuously as inc2 : matches even less
-summary(aov(judge ~ inc2*cond, df3_1))
-temp_eta2 <- etaSquared(aov(judge ~ inc2*cond, df3_1)) %>%
-  .[3,2] %>%
-  round(digit=2)
-print(c("ηp2:", temp_eta2), quote=F)
+summary(lm(judge ~ inc2*cond, df3_1))
 
 rm(temp_eta2)
 ```
 
-**^ replication is close, but off; not different enough to effect significance**
-
 ---
 
 ### Study 4
-######incomplete
+######complete
 
 > In Study 4, there were 263 participants (mean age = 31.6 years; 102 females, 161 males; median household size = 3 people; median household income = $45,000).
 
@@ -334,6 +330,7 @@ rm(temp_eta2)
 # Read data in
 df4_1 <- read.csv("csv_files/4_Sheet1.csv", header=T)
 df4_2 <- read.csv("csv_files/4_Sheet2.csv", header=T)
+df4_4 <- read.csv("csv_files/4_Sheet4.csv", header=T)
 ```
 
 ```{r echo=F}
@@ -361,7 +358,104 @@ df4_1 %>%
   summarize(median(Income2))
 ```
 
-> Four participants were excluded for not completing the prime question. When we analyzed the data using a median split based on income, higher-income participants rated the DVD as significantly more expensive when they thought about a small account (M = 5.74, 95% CI = [5.04, 6.44]) rather than a large account (M = 4.47, 95% CI = [3.93, 5.01]), whereas the evaluations of lower-income participants did not differ significantly between the condi- tions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48]). The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02. The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. 
+> Four participants were excluded for not completing the prime question.
+
+```{r echo=F}
+# find the four participants excluded
+df4_4 %>%
+  filter(Prime=="") %>%
+  select(Subject)
+# remove the 4 participants
+df4_1 <- df4_1 %>%
+  filter(Subject!=56, Subject!=75, Subject!=112, Subject!=236)
+```
+
+> When we analyzed the data using a median split based on income, higher-income participants rated the DVD as significantly more expensive when they thought about a small account (M = 5.74, 95% CI = [5.04, 6.44]) rather than a large account (M = 4.47, 95% CI = [3.93, 5.01]), 
+
+Assumptions:
+
+* Higher-income : Split==1
+* Lower-income : Split==0
+* Small Account : Large.Acc=0
+* DVD expensiveness : Expense
+
+```{r echo=F}
+
+# Function : to generate mean and confidence interval & name
+Mean_CI <- function(title, x){
+  print(title, quote=F)
+  # print Mean
+  M <- t.test(x) %>%
+    .$estimate %>%
+    round(digits = 2) %>%
+    .[[1]]
+  print(c("M:", M), quote = F)
+  # print Confidence Interval 95%
+  CI <- t.test(x) %>%
+    .$conf.int %>%
+    round(digits = 2) %>%
+    .[1:2]
+  print(c("CI : ", CI), quote = F)
+}
+
+# high-income & small account : expensiveness
+temp_title <- "High-income & Small account : expensiveness"
+temp_x <- df4_1 %>%
+  filter(Large.Acc==0, Split==1) %>%
+  select(Expense)
+Mean_CI(temp_title, temp_x) # print
+
+# high-income & large account : expensiveness
+temp_title <- "High-income & Large account : expensiveness"
+temp_x <- df4_1 %>%
+  filter(Large.Acc==1, Split==1) %>%
+  select(Expense)
+Mean_CI(temp_title, temp_x) # print
+
+```
+
+> whereas the evaluations of lower-income participants did not differ significantly between the conditions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48]). 
+
+**^ doesn't replicate**
+
+```{r echo=F}
+
+# low-income & small account : expensiveness
+temp_title <- "Low-income & Small account : expensiveness"
+temp_x <- df4_1 %>%
+  filter(Large.Acc=0, Split==0) %>%
+  select(Expense)
+Mean_CI(temp_title, temp_x) # print
+
+temp_title <- "Low-income & Large account : expensiveness"
+temp_x <- df4_1 %>%
+  filter(Large.Acc=1, Split==0) %>%
+  select(Expense)
+Mean_CI(temp_title, temp_x) # print
+
+# remove function
+rm(Mean_CI, temp_x, temp_title)
+```
+
+> The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02. The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. 
+
+```{r}
+# ANOVA : interaction effects
+
+# income treated as split : replicates
+summary(aov(Expense ~ Large.Acc*Split, df4_1))
+temp_eta2 <- etaSquared(aov(Expense ~ Large.Acc*Split, df4_1)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("ηp2:", temp_eta2), quote=F)
+
+# when income is treated continuously as Income : doesn't replicate
+summary(lm(Expense ~ Large.Acc*Income, df4_1))
+
+rm(temp_eta2)
+```
+
+**^ as a continuous variable, failure to replicate**
 
 ---
 
