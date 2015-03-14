@@ -18,6 +18,23 @@ suppressPackageStartupMessages(require(ggplot2))
 directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
 if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
 setwd(directory)
+
+# Function : to generate mean and confidence interval & name
+Mean_CI <- function(title, x){
+  print(title, quote=F)
+  # print Mean
+  M <- t.test(x) %>%
+    .$estimate %>%
+    round(digits = 2) %>%
+    .[[1]]
+  print(c("M:", M), quote = F)
+  # print Confidence Interval 95%
+  CI <- t.test(x) %>%
+    .$conf.int %>%
+    round(digits = 2) %>%
+    .[1:2]
+  print(c("CI : ", CI), quote = F)
+}
 ```
 
 *Note: headlines were added to some sheets (csv), i.e. assumptions made*
@@ -241,32 +258,15 @@ df3_1 <- df3_1 %>%
 
 Assumptions:
 
-* Higher-income (via median split) : split==1
-* Lower-income (via median split) : split==0
-* Loss gamble : cond==1
-* No-loss gamble : cond==0
+* Higher-income (via median split) : split = 1
+* Lower-income (via median split) : split = 0
+* Loss gamble : cond = 1
+* No-loss gamble : cond = 0
 * attractive rating : judge
 
 Numbers are fractionally different...
 
 ```{r echo=F}
-# Function : to generate mean and confidence interval & name
-Mean_CI <- function(title, x){
-  print(title, quote=F)
-  # print Mean
-  M <- t.test(x) %>%
-    .$estimate %>%
-    round(digits = 2) %>%
-    .[[1]]
-  print(c("M:", M), quote = F)
-  # print Confidence Interval 95%
-  CI <- t.test(x) %>%
-    .$conf.int %>%
-    round(digits = 2) %>%
-    .[1:2]
-  print(c("CI : ", CI), quote = F)
-}
-
 # high-income & loss gambling : attractive rating
 temp_title <- "High-income & Loss gambling : attractive rating"
 temp_x <- df3_1 %>%
@@ -294,9 +294,6 @@ temp_x <- df3_1 %>%
   filter(split==0, cond==0) %>%
   select(judge)
 Mean_CI(temp_title, temp_x) # print
-
-# remove function
-rm(Mean_CI, temp_x, temp_title)
 ```
 
 > The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01. The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
@@ -305,7 +302,6 @@ rm(Mean_CI, temp_x, temp_title)
 
 ```{r}
 # ANOVA : interaction effects
-
 # income treated as split : somewhat matches
 summary(aov(judge ~ split*cond, df3_1))
 temp_eta2 <- etaSquared(aov(judge ~ split*cond, df3_1)) %>%
@@ -315,8 +311,6 @@ print(c("ηp2:", temp_eta2), quote=F)
 
 # when income is treated continuously as inc2 : matches even less
 summary(lm(judge ~ inc2*cond, df3_1))
-
-rm(temp_eta2)
 ```
 
 ---
@@ -370,7 +364,7 @@ df4_1 <- df4_1 %>%
   filter(Subject!=56, Subject!=75, Subject!=112, Subject!=236)
 ```
 
-> When we analyzed the data using a median split based on income, higher-income participants rated the DVD as significantly more expensive when they thought about a small account (M = 5.74, 95% CI = [5.04, 6.44]) rather than a large account (M = 4.47, 95% CI = [3.93, 5.01]), 
+> When we analyzed the data using a median split based on income, higher-income participants rated the DVD as significantly more expensive when they thought about a small account (M = 5.74, 95% CI = [5.04, 6.44]) rather than a large account (M = 4.47, 95% CI = [3.93, 5.01]), whereas the evaluations of lower-income participants did not differ significantly between the conditions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48]).
 
 Assumptions:
 
@@ -380,24 +374,6 @@ Assumptions:
 * DVD expensiveness : Expense
 
 ```{r echo=F}
-
-# Function : to generate mean and confidence interval & name
-Mean_CI <- function(title, x){
-  print(title, quote=F)
-  # print Mean
-  M <- t.test(x) %>%
-    .$estimate %>%
-    round(digits = 2) %>%
-    .[[1]]
-  print(c("M:", M), quote = F)
-  # print Confidence Interval 95%
-  CI <- t.test(x) %>%
-    .$conf.int %>%
-    round(digits = 2) %>%
-    .[1:2]
-  print(c("CI : ", CI), quote = F)
-}
-
 # high-income & small account : expensiveness
 temp_title <- "High-income & Small account : expensiveness"
 temp_x <- df4_1 %>%
@@ -412,36 +388,27 @@ temp_x <- df4_1 %>%
   select(Expense)
 Mean_CI(temp_title, temp_x) # print
 
-```
-
-> whereas the evaluations of lower-income participants did not differ significantly between the conditions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48]). 
-
-**^ doesn't replicate**
-
-```{r echo=F}
-
 # low-income & small account : expensiveness
 temp_title <- "Low-income & Small account : expensiveness"
 temp_x <- df4_1 %>%
-  filter(Large.Acc=0, Split==0) %>%
+  filter(Large.Acc==0, Split==0) %>%
   select(Expense)
 Mean_CI(temp_title, temp_x) # print
 
+# low-income & large account : expensiveness
 temp_title <- "Low-income & Large account : expensiveness"
 temp_x <- df4_1 %>%
-  filter(Large.Acc=1, Split==0) %>%
+  filter(Large.Acc==1, Split==0) %>%
   select(Expense)
 Mean_CI(temp_title, temp_x) # print
-
-# remove function
-rm(Mean_CI, temp_x, temp_title)
 ```
 
 > The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02. The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. 
 
+**^ as a continuous variable, failure to replicate**
+
 ```{r}
 # ANOVA : interaction effects
-
 # income treated as split : replicates
 summary(aov(Expense ~ Large.Acc*Split, df4_1))
 temp_eta2 <- etaSquared(aov(Expense ~ Large.Acc*Split, df4_1)) %>%
@@ -451,16 +418,12 @@ print(c("ηp2:", temp_eta2), quote=F)
 
 # when income is treated continuously as Income : doesn't replicate
 summary(lm(Expense ~ Large.Acc*Income, df4_1))
-
-rm(temp_eta2)
 ```
-
-**^ as a continuous variable, failure to replicate**
 
 ---
 
 ### Study 5
-######incomplete
+######complete
 
 > In Study 5, there were 234 participants (mean age = 31.8 years; 107 females, 127 males)
 
@@ -482,7 +445,63 @@ df5_demo %>%
   summarise(n())
 ```
 
-> No participants were excluded from the analyses. We first analyzed responses using a median split on participants’ dieting behavior. Nondieters rated the fries as more fat- tening when they thought about a small account (M = 8.64, 95% CI = [8.20, 9.07]) than when they thought about a large account (M = 7.80, 95% CI = [7.21, 8.38]), but this was not true for dieters (small account: M = 8.86, 95% CI = [8.29, 9.43]; large account: M = 9.13, 95% CI = [8.66, 9.60]). The interaction between dieting status and condi- tion was significant, F(1, 230) = 4.40, p < .05, ηp2 = .02, and the interaction was also found when dieting behav- ior was treated continuously, β = 0.43, t(230) = 2.11, p < .05. ...
+> No participants were excluded from the analyses. We first analyzed responses using a median split on participants’ dieting behavior. Nondieters rated the fries as more fattening when they thought about a small account (M = 8.64, 95% CI = [8.20, 9.07]) than when they thought about a large account (M = 7.80, 95% CI = [7.21, 8.38]), but this was not true for dieters (small account: M = 8.86, 95% CI = [8.29, 9.43]; large account: M = 9.13, 95% CI = [8.66, 9.60]).
+
+Assumptions:
+
+* Dieters : split = 1
+* Nondieters : split = 0
+* Small Account : large = 0
+* Large Account : large = 1
+* Fattening : fat
+
+```{r echo=F}
+# Nondieters & Small account : Fattening
+temp_title <- "Nondieters & Small account : Fattening"
+temp_x <- df5_1 %>%
+  filter(split==0, large==0) %>%
+  select(fat)
+Mean_CI(temp_title, temp_x) # print
+
+# Nondieters & Large account : Fattening
+temp_title <- "Nondieters & Large account : Fattening"
+temp_x <- df5_1 %>%
+  filter(split==0, large==1) %>%
+  select(fat)
+Mean_CI(temp_title, temp_x) # print
+
+# Dieter & Small account : Fattening
+temp_title <- "Dieter & Small account : Fattening"
+temp_x <- df5_1 %>%
+  filter(split==1, large==0) %>%
+  select(fat)
+Mean_CI(temp_title, temp_x) # print
+
+# Dieter & Large account : Fattening
+temp_title <- "Dieter & Large account : Fattening"
+temp_x <- df5_1 %>%
+  filter(split==1, large==1) %>%
+  select(fat)
+Mean_CI(temp_title, temp_x) # print
+```
+
+> The interaction between dieting status and condi- tion was significant, F(1, 230) = 4.40, p < .05, ηp2 = .02, and the interaction was also found when dieting behavior was treated continuously, β = 0.43, t(230) = 2.11, p < .05. ...
+
+```{r}
+# ANOVA : interaction effects
+# income treated as split : somewhat matches
+summary(aov(fat ~ split*large, df5_1))
+temp_eta2 <- etaSquared(aov(fat ~ split*large, df5_1)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("ηp2:", temp_eta2), quote=F)
+
+# when income is treated continuously as inc2 : matches even less
+summary(lm(fat ~ split*large, df5_1))
+```
+
+**^ again failed to replicate continuous perfectly..**
+
 ---
 
 ### Study 6
