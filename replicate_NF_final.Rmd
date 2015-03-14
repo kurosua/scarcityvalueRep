@@ -32,8 +32,8 @@ directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep"
 if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
 setwd(directory)
 
-# read in the data for 1a using the spss and the csv file
-# the warning/messages suppressed; the data imports cleanly.
+# read in the data for 1a using the spss and the csv file - the warning/messages suppressed; the data imports cleanly.
+
 suppressMessages(suppressWarnings(raw_1a_spss <- read.spss("framing/study_1a.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_1a_csv <- read.csv("study_1a_demog.csv", header = FALSE)))
 
@@ -123,7 +123,7 @@ In Study 1b, there were 151 participants (mean age = 32.9 years; 76 females, 75 
 
 ```{r echo = FALSE}
 
-#read in the data for 1b using the spss file - the warning that comes up is okay - the data imports cleanly.
+#read in the data for 1b using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
 suppressMessages(suppressWarnings(raw_1b_spss <- read.spss("framing/study_1b.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_1b_csv <- read.csv("study_1b_demog.csv", header = TRUE)))
 
@@ -255,7 +255,7 @@ We replicated the results of 1b with larger samples in studies 1c and 1d.  In st
 
 ```{r echo = FALSE}
 
-#read in the data for 1c using the spss file - the warning that comes up is okay - the data imports cleanly.
+#read in the data for 1c using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
 suppressMessages(suppressWarnings(raw_1c_spss <- read.spss("framing/study_1c.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_1c_csv <- read.csv("study_1c_demog.csv", header = TRUE)))
 
@@ -382,10 +382,31 @@ print(figure1c)
 -----
 #Study 1d
 
+*note* in our replication, we counted 1,023 females and 992 males - this is a discrepency of +1 female and -1 male.
 ```{r echo = FALSE}
-setwd("framing")
-raw_1d_spss <- read.spss("study_1d.sav", to.data.frame = TRUE)
-#reads the data for study 1d
+#read in the data for 1d using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
+suppressMessages(suppressWarnings(raw_1d_spss <- read.spss("framing/study_1d.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1d_csv <- read.csv("study_1d_2c_demog.csv", header = TRUE)))
+
+#average age for Study 1d
+raw_1d_csv %>%
+  filter(age != "NA") %>%
+  summarise(mean.age = mean(age)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown for Study 1c
+raw_1d_csv %>%
+  filter(gender != "NA") %>%
+  group_by(gender) %>%
+  summarise(sex_breakdown = n())
+
+#calculate total sample size for Study 1c
+raw_1d_csv %>%
+  summarise(sample.size = n())
+
+#calculate median household income and size for Study 1c
+raw_1d_spss %>%
+  summarise(median.household.income = median(inc2), median.household.size = median(house))
 
 clean_1d <- raw_1d_spss %>%
   filter(filter_. != "Not Selected")
@@ -494,9 +515,33 @@ The beer-on-the-beach scenario provides a canonical example of the difficulty pe
 #Study 2a - Proportional Versus Trade-Off Thinking
 
 ```{r echo = FALSE}
-setwd("framing")
-raw_2a_spss <- read.spss("study_2a.sav", to.data.frame = TRUE)
-#reads the data for study 2a
+
+#reads the data for study 2a - spss file, csv file for demographics, and second csv file for income
+suppressMessages(suppressWarnings(raw_2a_spss <- read.spss("framing/study_2a.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_2a_csv <- read.csv("study_2a_demog.csv", header = FALSE)))
+suppressMessages(suppressWarnings(raw_2a_income_csv <- read.csv("study_2a_income.csv", header = TRUE)))
+
+#average age for Study 2a
+raw_2a_csv %>%
+  filter(V3 != "NA") %>%
+  summarise(mean.age = mean(V3)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown for Study 1c
+raw_2a_csv %>%
+  filter(V4 != 142, V4 != 96) %>%
+  group_by(V4) %>%
+  summarise(sex_breakdown = n())
+
+#calculate total sample size for Study 1c
+raw_2a_csv %>%
+  summarise(sample.size = n())
+
+#calculate median household income and size for Study 1c
+raw_2a_income_csv %>%
+  summarise(median.household.income = median(inc2), median.household.size = median(house))
+
+
 ```
 
 In Study 2a, there were 238 participants ((we are unable to replicate mean age, gender split, median household size, or median household income due to that data not being in the public dataset)) Median ses (which is income / sqrt(householdsize)):
@@ -542,7 +587,34 @@ This again suggests that scarcity leads people to generate their own comparison 
 
 #Study 2b - Valuing Discounts
 
+In study 2b there were 705 participants (mean age = 30.0 years; 290 females, 415 males; median household size = 3 people; median household income = $45,000).  The participants in Study 2c were the same participants as in Study 1d (and analyses were limited to the same participants, but including all participants did not change the results).  Note that participants completed Studies 1d and 2c in a counterbalanced order.  Participants in Studies 2b and 2c responded to the same scenario as did participants in Study 2a, but they stated whether they would travel for the discount.
+
+***Results***
+-------
+
+Confirming earlier findings, these analyses revealed that higher-income participants were more willing to travel when the discount was proportionally larger (i.e., the tablet cost less): Specifically, 86%, 75%, and 58% would travel when the tablet cost $300, $500, and $1,000 respectively.
+
 ```{r echo = FALSE}
+clean_2b %>%
+  filter(split == 1, cond == 0) %>%
+  summarise(fivehundred_go = (sum(go) / n()) * 100)
+
+clean_2b %>%
+  filter(split == 1, cond == 1) %>%
+  summarise(fivehundred_go = (sum(go) / n()) * 100)
+
+clean_2b %>%
+  filter(split == 1, cond == 2) %>%
+  summarise(onethousand_go = (sum(go) / n()) * 100)
+
+```
+
+Lower-income participants were less sensitive to the proportional size of the discount:  The corresponding percentages of lower-income participants willing to travel were 78%, 67%, and 67%.  
+
+```{r echo = FALSE}
+clean_2b %>%
+  filter(split == 0, cond == 0) %>%
+  summarise(fivehundred_go = (sum(go) / n()) * 100)
 
 clean_2b %>%
   filter(split == 0, cond == 1) %>%

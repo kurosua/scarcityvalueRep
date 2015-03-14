@@ -282,8 +282,18 @@ img {
 </div>
 <div id="study-1d" class="section level1">
 <h1>Study 1d</h1>
-<pre><code>## Warning in read.spss(&quot;study_1d.sav&quot;, to.data.frame = TRUE): study_1d.sav:
-## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
+<p><em>note</em> in our replication, we counted 1,023 females and 992 males - this is a discrepency of +1 female and -1 male.</p>
+<pre><code>##   mean.age
+## 1     39.1</code></pre>
+<pre><code>## Source: local data frame [2 x 2]
+## 
+##   gender sex_breakdown
+## 1      f          1023
+## 2      m           992</code></pre>
+<pre><code>##   sample.size
+## 1        2015</code></pre>
+<pre><code>##   median.household.income median.household.size
+## 1                   55000                     3</code></pre>
 <p>In Study 1d (the nationally representative sample), a large number of participants reported unreasonably high WTPs, and exclusions based on the rules set for the smaller samples in previous studies would have left many unreasonable prices in the data set. We therefore included in our analyses only those participants with a WTP of $20 or less, which seemed like the upper bound of a reasonable price. This set a cutoff price similar to the cutoff price based on the stand deviations in Studies 1b and 1c. After this exclusion and the exclusion of 4 additional participants who were outlines on income, the final sample included 1,898 participants.</p>
 <div id="results-3" class="section level2">
 <h2><strong><em>Results</em></strong></h2>
@@ -341,8 +351,17 @@ img {
 </div>
 <div id="study-2a---proportional-versus-trade-off-thinking" class="section level1">
 <h1>Study 2a - Proportional Versus Trade-Off Thinking</h1>
-<pre><code>## Warning in read.spss(&quot;study_2a.sav&quot;, to.data.frame = TRUE): study_2a.sav:
-## Unrecognized record type 7, subtype 18 encountered in system file</code></pre>
+<pre><code>##   mean.age
+## 1     30.7</code></pre>
+<pre><code>## Source: local data frame [2 x 2]
+## 
+##   V4 sex_breakdown
+## 1  f            96
+## 2  m           142</code></pre>
+<pre><code>##   sample.size
+## 1         240</code></pre>
+<pre><code>##   median.household.income median.household.size
+## 1                   45000                     2</code></pre>
 <p>In Study 2a, there were 238 participants ((we are unable to replicate mean age, gender split, median household size, or median household income due to that data not being in the public dataset)) Median ses (which is income / sqrt(householdsize)):</p>
 <pre><code>##   sample.size median.ses
 ## 1         238   25980.76</code></pre>
@@ -410,6 +429,19 @@ img {
 </div>
 <div id="study-2b---valuing-discounts" class="section level1">
 <h1>Study 2b - Valuing Discounts</h1>
+<p>In study 2b there were 705 participants (mean age = 30.0 years; 290 females, 415 males; median household size = 3 people; median household income = $45,000). The participants in Study 2c were the same participants as in Study 1d (and analyses were limited to the same participants, but including all participants did not change the results). Note that participants completed Studies 1d and 2c in a counterbalanced order. Participants in Studies 2b and 2c responded to the same scenario as did participants in Study 2a, but they stated whether they would travel for the discount.</p>
+<div id="results-5" class="section level2">
+<h2><strong><em>Results</em></strong></h2>
+<p>Confirming earlier findings, these analyses revealed that higher-income participants were more willing to travel when the discount was proportionally larger (i.e., the tablet cost less): Specifically, 86%, 75%, and 58% would travel when the tablet cost $300, $500, and $1,000 respectively.</p>
+<pre><code>##   fivehundred_go
+## 1       85.95041</code></pre>
+<pre><code>##   fivehundred_go
+## 1        75.4386</code></pre>
+<pre><code>##   onethousand_go
+## 1       58.40708</code></pre>
+<p>Lower-income participants were less sensitive to the proportional size of the discount: The corresponding percentages of lower-income participants willing to travel were 78%, 67%, and 67%.</p>
+<pre><code>##   fivehundred_go
+## 1       77.77778</code></pre>
 <pre><code>##   fivehundred_go
 ## 1       67.22689</code></pre>
 <pre><code>##   onethousand_go
@@ -518,6 +550,7 @@ img {
 ## AIC: 2427.1
 ## 
 ## Number of Fisher Scoring iterations: 4</code></pre>
+</div>
 </div>
 </div>
 <div id="study-6" class="section level1">
