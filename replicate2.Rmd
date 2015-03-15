@@ -5,6 +5,8 @@ date: "March 13, 2015"
 output: html_document
 ---
 
+joined with "replicate" on March 15
+
 ---
 ```{r echo = FALSE}
 suppressPackageStartupMessages(require(dplyr))
@@ -202,7 +204,6 @@ tidy(glm(go ~ inc2:lgdiscount, data = df2d_1, family = "gaussian"))
 ---
 
 ### Study 3
-######Complete
 
 > In Study 3, there were 505 participants (mean age = 33.0 years; 208 females, 297 males; median household size = 3 people; median household income = $45,000).
 
@@ -296,9 +297,7 @@ temp_x <- df3_1 %>%
 Mean_CI(temp_title, temp_x) # print
 ```
 
-> The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01. The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
-
-**^ replication is close; not different enough to effect significance**
+> The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01.
 
 ```{r}
 # ANOVA : interaction effects
@@ -308,15 +307,20 @@ temp_eta2 <- etaSquared(aov(judge ~ split*cond, df3_1)) %>%
   .[3,2] %>%
   round(digit=2)
 print(c("ηp2:", temp_eta2), quote=F)
+```
 
+> The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
+
+**^ replication is close; not different enough to effect significance**
+
+```{r}
 # when income is treated continuously as inc2 : matches even less
-summary(lm(judge ~ inc2*cond, df3_1))
+summary(glm(judge ~ inc2*cond, df3_1, family=gaussian))
 ```
 
 ---
 
 ### Study 4
-######complete
 
 > In Study 4, there were 263 participants (mean age = 31.6 years; 102 females, 161 males; median household size = 3 people; median household income = $45,000).
 
@@ -368,9 +372,9 @@ df4_1 <- df4_1 %>%
 
 Assumptions:
 
-* Higher-income : Split==1
-* Lower-income : Split==0
-* Small Account : Large.Acc=0
+* Higher-income : Split = 1
+* Lower-income : Split = 0
+* Small Account : Large.Acc = 0
 * DVD expensiveness : Expense
 
 ```{r echo=F}
@@ -403,9 +407,7 @@ temp_x <- df4_1 %>%
 Mean_CI(temp_title, temp_x) # print
 ```
 
-> The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02. The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. 
-
-**^ as a continuous variable, failure to replicate**
+> The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02....
 
 ```{r}
 # ANOVA : interaction effects
@@ -415,15 +417,23 @@ temp_eta2 <- etaSquared(aov(Expense ~ Large.Acc*Split, df4_1)) %>%
   .[3,2] %>%
   round(digit=2)
 print(c("ηp2:", temp_eta2), quote=F)
+```
 
-# when income is treated continuously as Income : doesn't replicate
-summary(lm(Expense ~ Large.Acc*Income, df4_1))
+> The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. 
+
+**^ as a continuous variable, failure to replicate**
+
+```{r}
+# when income is treated continuously as Income2 : doesn't replicate
+summary(glm(Expense ~ Large.Acc*Income2, df4_1, family=gaussian))
+
+# Multinomal regression : using package : nnet
+# multinom(Expense ~ Large.Acc*Income2, data = df4_1)
 ```
 
 ---
 
 ### Study 5
-######complete
 
 > In Study 5, there were 234 participants (mean age = 31.8 years; 107 females, 127 males)
 
@@ -485,7 +495,7 @@ temp_x <- df5_1 %>%
 Mean_CI(temp_title, temp_x) # print
 ```
 
-> The interaction between dieting status and condi- tion was significant, F(1, 230) = 4.40, p < .05, ηp2 = .02, and the interaction was also found when dieting behavior was treated continuously, β = 0.43, t(230) = 2.11, p < .05. ...
+> The interaction between dieting status and condi- tion was significant, F(1, 230) = 4.40, p < .05, ηp2 = .02, and the...
 
 ```{r}
 # ANOVA : interaction effects
@@ -495,25 +505,29 @@ temp_eta2 <- etaSquared(aov(fat ~ split*large, df5_1)) %>%
   .[3,2] %>%
   round(digit=2)
 print(c("ηp2:", temp_eta2), quote=F)
-
-# when income is treated continuously as inc2 : matches even less
-summary(lm(fat ~ split*large, df5_1))
 ```
 
-**^ again failed to replicate continuous perfectly..**
+> interaction was also found when dieting behavior was treated continuously, β = 0.43, t(230) = 2.11, p < .05. ...
+
+**^ can't replicate continous because no continous variable provided..**
+
+```{r}
+# when income is treated continuously
+# note: no proper continuous income variable included in open dataset
+# can't replicate
+summary(lm(fat ~ split*large, df5_1))
+```
 
 ---
 
 ### Study 6
-######incomplete
+
 > In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
 
 ```{r echo=F}
 df6_demo <- read.csv("csv_files/6_demo.csv", header=T)
 df6_raw <- read.csv("csv_files/6_raw.csv", header=T)
 df6_cric <- read.csv("csv_files/6_cric.csv", header=T)
-
-
 ```
 
 ```{r echo=F}
