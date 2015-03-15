@@ -1,62 +1,87 @@
 ---
 title: "replication"
 author: "Nick F & Aaron K"
-date: "February 24, 2015"
+date: "March 15, 2015"
 output: html_document
 ---
 
 ```{r echo = FALSE}
 suppressPackageStartupMessages(require(dplyr))
+suppressPackageStartupMessages(require(tidyr))
+suppressPackageStartupMessages(require(aod)) # wald.test
 suppressPackageStartupMessages(require(broom))
+suppressPackageStartupMessages(require(lsr)) #etaSquared
 suppressPackageStartupMessages(require(ggplot2))
 suppressPackageStartupMessages(require(foreign))
-suppressPackageStartupMessages(require(aod))
-suppressPackageStartupMessages(require(lsr))
 
+# detect the user's directory:
+directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep"
+if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
+setwd(directory)
+
+# Function : calculates standard error of the mean
 Sem <- function(x) {
-  #creates the function to calculate standard error of the mean
   sqrt(var(x)/length(x))
   }
 
+# Function : to generate mean and confidence interval & name
+Mean_CI <- function(title, x){
+  print(title, quote=F)
+  # print Mean
+  M <- t.test(x) %>%
+    .$estimate %>%
+    round(digits = 2) %>%
+    .[[1]]
+  print(c("M:", M), quote = F)
+  # print Confidence Interval 95%
+  CI <- t.test(x) %>%
+    .$conf.int %>%
+    round(digits = 3) %>%
+    .[1:2]
+  print(c("CI : ", CI), quote = F)
+}
 ```
+<br> <br> <br>
+*note: beta coefficients for linear regressions calculate consistantly larger than published, even though the t value and p values are as published.  This occurs several times throughout.*
 
-# Study 1a
+### Study 1a
+
+
 > In this study, there were 103 participants (mean age = 29.3 years; median household size = 3 people; median household income = $35,000)...One participant was excluded as an outlier on income (more than 3 SD from the mean). We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income...
-
-*We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.*
 
 ```{r echo = FALSE}
 # Data import
 
-# detect the user's directory:
-directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
-if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
-setwd(directory)
-
 # read in the data for 1a using the spss file
 # the warning/messages suppressed; the data imports cleanly.
-suppressMessages(suppressWarnings(raw_1a_spss <- read.spss("study_1a.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1a_spss <- read.spss("framing/study_1a.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1a_csv <- read.csv("study_1a_demog.csv", header = FALSE)))
 
+#calculate mean age
+raw_1a_csv %>%
+  summarise(average_age = mean(V3)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown
+raw_1a_csv %>%
+  group_by(V4) %>%
+  summarise(sex_breakdown = n())
+
+#calculate sample size, median household income, median household size
 raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
-# removes the 1 removed observation for being 3 SDs away from the mean.
-clean_1a <- raw_1a_spss %>%
-  filter(filter_. != "Not Selected")
-# count number of participants who answered 'tradeoff' or 'location' for 1a.
-raw_1a_spss  %>%
-  summarise(total.tradeoff = sum(tradeoff), total.location = sum(location))
 ```
 
 > Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,...
 
-```{r}
+```{r echo = FALSE}
 logit1logses <- glm(location ~ logses, data = clean_1a, family = "binomial")
 summary(logit1logses)
 
 wald.test(b = coef(logit1logses), Sigma = vcov(logit1logses), Terms = 2)
 ```
 
-> but lower-income participants were more likely than higher- income participants to name trade-offs as the main con- sideration, β = −1.62, Wald-test χ2(1, N = 102) = 4.67, p <.05...
+> but lower-income participants were more likely than higher- income participants to name trade-offs as the main consideration, β = −1.62, Wald-test χ2(1, N = 102) = 4.67, p <.05...
 
 ```{r echo = FALSE}
 logit2logses <- glm(tradeoff ~ logses, data = clean_1a, family = "binomial")
@@ -65,9 +90,7 @@ summary(logit2logses)
 wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)
 ```
 
-
 ```{r echo = FALSE}
-
 figure1alow <- clean_1a %>%
   filter(income2 <= 35000) %>%
   mutate(total.n = n(), total.tradeoff = sum(tradeoff), prop.tradeoff = sum(tradeoff)/n(), total.location = sum(location), prop.location = sum(location)/n(), SE.tradeoff = sqrt(prop.tradeoff * (1 - prop.tradeoff)/total.n), CI.tradeoff = qnorm(.975) * SE.tradeoff, SE.location = sqrt(prop.location * (1 - prop.location)/total.n), CI.location = qnorm(.975) * SE.location) %>%
@@ -97,31 +120,33 @@ print(figure1a)
 #displays figure 1a
 ```
 
+### Study 1b
 
-# Study 1b
-=======
-
-
-# Study 1b - Consistent Valuations Under Scarcity
-
-
-In Study 1b, there were 151 participants (median household size = 3 people, median household income = $45000). We were unable to replicate sex breakdown and mean age of participants as this data was not provided in the released dataset.
+> In Study 1b, there were 151 participants (mean age = 32.9 years; 76 females, 75 males; median household size = 3 people, median household income = $45000).  In Study 1c, there were 604 participants (mean age = 29.9 years; 246 females, 358 males; median household size = 2 people; median household income = $45,000).  Study 1d was conducted with a large, representative sample drawn from Survey Sampling International's panel of U.S respondents.  There were 2,015 participants (mean age = 39.1 years; 1,022 females, 993 males; median household size = 3 people; median household income = $55,000).  In Study 1b, participants read the beer-on-the-beach scenario and indicated their WTP for the beer.  Studies 1c and 1d directly replicated Study 1b.  Because WTP was elicited with an open-ended scale, some participants named unreasonably high prices.  We describe our exclusion rules for these responses in the next section.  These rules were determined before we conducted the significance tests.
 
 ```{r echo = FALSE}
 
-setwd("framing")
-raw_1b_spss <- read.spss("study_1b.sav", to.data.frame = TRUE)
-#read in the data for 1b using the spss file - the warning that comes up is okay - the data imports cleanly.
+#read in the data for 1b using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
+suppressMessages(suppressWarnings(raw_1b_spss <- read.spss("framing/study_1b.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1b_csv <- read.csv("study_1b_demog.csv", header = TRUE)))
+
+#average age for Study 1b
+raw_1b_csv %>%
+  filter(Age != "NA") %>%
+  summarise(average_age = mean(Age)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown for Study 1b
+raw_1b_csv %>%
+  filter(Gender != 75, Gender != 76) %>%
+  group_by(Gender) %>%
+  summarise(sex_breakdown = n())
 
 raw_1b_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
 ```
 
-***Results***
------
-In Study 1b, 2 participants were excluded whose Willing-to-pay (WTP) was more than 3 standard deviations from the mean.
-
-Higher-income participants showed the classic effect, offering a higher price for beer from the resort
+> In Study 1b, 2 participants were excluded whose Willing-to-pay (WTP) was more than 3 standard deviations from the mean. Higher-income participants showed the classic effect, offering a higher price for beer from the resort, 
 
 ```{r echo = FALSE}
 
@@ -130,7 +155,8 @@ clean_1b <- raw_1b_spss %>%
 
 clean_1b %>%
   filter(split == 1, resort == 1) %>%
-  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer)))
+  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
+  round(digits = 2)
 #1.96 * standard error gives 95% CI in one direction
 #this calculates high-income WTP beer price at resort - summarise to display in print-out
 
@@ -141,14 +167,17 @@ clean_1b_high_resort <- clean_1b %>%
 #generates mean and CI for high income participants in the resort scenario - to use in figure 1b
 
 ```
-compared to the grocery store.
+
+> compared to the grocery store.
 
 ```{r echo = FALSE}
 clean_1b %>%
   filter(split == 1, resort == 0) %>%
-  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer)))
+  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
+  round(digits = 2)
 #1.96 * standard error gives 95% CI in one direction
 #this calculates high-income WTP beer price at grocer - summarise to display in print-out
+
 
 clean_1b_high_grocer <- clean_1b %>%
   filter(split == 1, resort == 0) %>%
@@ -156,12 +185,14 @@ clean_1b_high_grocer <- clean_1b %>%
   distinct(mean.beer, CI)
 #generates mean and CI for high income participants in the grocer scenario - to use in figure 1b
 ```
-But lower income participants' WTP did not differ significantly between beer from the resort
+
+> But lower income participants' WTP did not differ significantly between beer from the resort, 
 
 ```{r echo = FALSE}
 clean_1b %>%
   filter(split == 0, resort == 1) %>%
-  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer)))
+  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
+  round(digits = 2)
 #1.96 * standard error gives 95% CI in one direction
 #this calculates low income WTP beer price at resort
 
@@ -171,12 +202,14 @@ clean_1b_low_resort <- clean_1b %>%
   distinct(mean.beer, CI)
 #generates mean and CI for low income participants in the resort scenario - to use in figure 1b
 ```
- and beer from the store.
- 
+
+> and beer from the store.
+
 ```{r echo = FALSE}
 clean_1b %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer)))
+  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
+  round(digits = 2)
 #1.96 * standard error gives 95% CI in one direction
 #this calculates low income WTP beer price at grocery store
 
@@ -187,23 +220,27 @@ clean_1b_low_grocer <- clean_1b %>%
 #generates mean and CI for low income participants in the grocer scenario - to use in figure 1b
 ```
 
-The interaction between income and context was significant F(1,145) = 11.18, p < 0.01, eta squared partial = 0.07.
+
+> The interaction between income and context was significant F(1,145) = 11.18, p < 0.01, eta squared partial = 0.07.
+
 ```{r echo = FALSE}
+
 aov_1b <- aov(beer ~ resort * split, data = clean_1b)
 summary(aov_1b)
 #they ran this anova on the binary 'split' column?
 
 etaSquared(aov_1b, type = 2, anova = FALSE)
 ```
-The interaction was also significant when income was treated as a continuous variable beta = 2.27 (the closest I could replicate from the data was 2.67), t(145) = 2.17, p < 0.05.
+
+> The interaction was also significant when income was treated as a continuous variable beta = 2.27, t(145) = 2.17, p < 0.05.
 
 ```{r echo = FALSE}
 lm1 <- lm(beer ~ resort * logses, data = clean_1b)
 summary(lm1)
 ```
 
-```{r echo = FALSE}
 
+```{r echo = FALSE}
 title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
 values = c(clean_1b_low_grocer$mean.beer, clean_1b_high_grocer$mean.beer, clean_1b_low_resort$mean.beer, clean_1b_high_resort$mean.beer)
 location = c("Grocer", "Grocer", "Resort", "Resort")
@@ -217,33 +254,54 @@ figure1b <- fig1b.table %>%
 
 print(figure1b)
 #displays figure 1b
-
 ```
 
------
------
-#Study 1c
+---
 
+### Study 1c
 
-We replicated the results of 1b with larger samples in studies 1c and 1d.  In study 1c, we excluded 2 participants with missing responses, 5 with unreasonably high WTPs (over $100), and 19 additional outliers on WTP, which left 578 participants.
+> We replicated the results of 1b with larger samples in studies 1c and 1d.  In study 1c, we excluded 2 participants with missing responses, 5 with unreasonably high WTPs (over $100), and 19 additional outliers on WTP, which left 578 participants.
 
 ```{r echo = FALSE}
-setwd("framing")
-raw_1c_spss <- read.spss("study_1c.sav", to.data.frame = TRUE)
-#read in the data for 1c using the spss file - the warning that comes up is okay - the data imports cleanly.
+
+#read in the data for 1c using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
+suppressMessages(suppressWarnings(raw_1c_spss <- read.spss("framing/study_1c.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1c_csv <- read.csv("study_1c_demog.csv", header = TRUE)))
+
+#average age for Study 1c
+raw_1c_csv %>%
+  filter(age != "NA") %>%
+  summarise(mean.age = mean(age)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown for Study 1c
+raw_1c_csv %>%
+  filter(gender != "NA") %>%
+  group_by(gender) %>%
+  summarise(sex_breakdown = n())
+
+#calculate total sample size for Study 1c
+raw_1c_csv %>%
+  summarise(sample.size = n())
+
+#calculate median household income and size for Study 1c
+raw_1c_spss %>%
+  summarise(median.household.income = median(inc2), median.household.size = median(house))
 
 clean_1c <- raw_1c_spss %>%
   filter(filter_. != "Not Selected")
-```
-***Results***
------
 
-Dividing participants according to a median split on income, we found that higher-income participants offered a higher price for beer from the resort
+clean_1c %>%
+  summarise(cleaned.sample_size = n())
+```
+
+> Dividing participants according to a median split on income, we found that higher-income participants offered a higher price for beer from the resort,
 
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 1, resort == 1) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
+  round(digits = 2)
 
 clean_1c_high_resort <- clean_1c %>%
   filter(split == 1, resort == 1) %>%
@@ -252,12 +310,15 @@ clean_1c_high_resort <- clean_1c %>%
 #generates mean and CI for high income participants in the resort scenario - to use in figure 1c
 
 ```
-than for beer from the grocery store:
+
+> than for beer from the grocery store:
 
 ```{r echo = FALSE}
+
 clean_1c %>%
   filter(split == 1, resort == 0) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
+  round(digits = 2)
 
 clean_1c_high_grocer <- clean_1c %>%
   filter(split == 1, resort == 0) %>%
@@ -267,12 +328,13 @@ clean_1c_high_grocer <- clean_1c %>%
 
 ```
 
-Lower-income participants' WTP did not differ significantly between beer from the resort,
+> Lower-income participants' WTP did not differ significantly between beer from the resort,
 
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 0, resort == 1) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
+  round(digits = 2)
 
 clean_1c_low_resort <- clean_1c %>%
   filter(split == 0, resort == 1) %>%
@@ -280,13 +342,16 @@ clean_1c_low_resort <- clean_1c %>%
   distinct(mean.pay, CI)
 #generates mean and CI for low income participants in the resort scenario - to use in figure 1c
 
+
 ```
-and beer from the store.
+> and beer from the store.
+
 
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay)))
+  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
+  round(digits = 2)
 
 clean_1c_low_grocer <- clean_1c %>%
   filter(split == 0, resort == 0) %>%
@@ -296,25 +361,25 @@ clean_1c_low_grocer <- clean_1c %>%
 
 ```
 
-The interaction between income and context was significant, F(1,574) = 5.68, p < 0.05, eta squared partial = 0.01.
+
+> The interaction between income and context was significant, F(1,574) = 5.68, p < 0.05, eta squared partial = 0.01.
 
 ```{r echo = FALSE}
 aov_1c <- aov(pay ~ resort * split, data = clean_1c)
 summary(aov_1c)
-#they ran this anova on the binary 'split' column?
 
 etaSquared(aov_1c, type = 2, anova = FALSE)
 ```
 
-The interaction was also significant when income was treated continuously, beta = 1.65 **(the closest I could replicate was 2.03)**, t(574) = 3.27, p < 0.01.
+> The interaction was also significant when income was treated continuously, beta = 1.65, t(574) = 3.27, p < 0.01.
 
 ```{r echo = FALSE}
 lm2 <- lm(pay ~ resort * logses, data = clean_1c)
 summary(lm2)
 ```
 
-```{r echo = FALSE}
 
+```{r echo = FALSE}
 title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
 values = c(clean_1c_low_grocer$mean.pay, clean_1c_high_grocer$mean.pay, clean_1c_low_resort$mean.pay, clean_1c_high_resort$mean.pay)
 location = c("Grocer", "Grocer", "Resort", "Resort")
@@ -328,106 +393,134 @@ figure1c <- fig1c.table %>%
 
 print(figure1c)
 #displays figure 1c
-
 ```
 
 -----
------
-#Study 1d
 
+### Study 1d
+
+*note: in our replication, we counted 1,023 females and 992 males - this is a discrepency of +1 female and -1 male.*
 ```{r echo = FALSE}
-setwd("framing")
-raw_1d_spss <- read.spss("study_1d.sav", to.data.frame = TRUE)
-#reads the data for study 1d
+
+#read in the data for 1d using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
+suppressMessages(suppressWarnings(raw_1d_spss <- read.spss("framing/study_1d.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_1d_csv <- read.csv("study_1d_2c_demog.csv", header = TRUE)))
+
+#average age for Study 1d
+raw_1d_csv %>%
+  filter(age != "NA") %>%
+  summarise(mean.age = mean(age)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown for Study 1d
+raw_1d_csv %>%
+  filter(gender != "NA") %>%
+  group_by(gender) %>%
+  summarise(sex_breakdown = n())
+
+#calculate total sample size for Study 1d
+raw_1d_csv %>%
+  summarise(sample.size = n())
+
+#calculate median household income and size for Study 1d
+raw_1d_spss %>%
+  summarise(median.household.income = median(inc2), median.household.size = median(house))
 
 clean_1d <- raw_1d_spss %>%
   filter(filter_. != "Not Selected")
 ```
 
-In Study 1d (the nationally representative sample), a large number of participants reported unreasonably high WTPs, and exclusions based on the rules set for the smaller samples in previous studies would have left many unreasonable prices in the data set.  We therefore included in our analyses only those participants with a WTP of $20 or less, which seemed like the upper bound of a reasonable price.  This set a cutoff price similar to the cutoff price based on the stand deviations in Studies 1b and 1c. After this exclusion and the exclusion of 4 additional participants who were outlines on income, the final sample included 1,898 participants.  
+> In Study 1d (the nationally representative sample), a large number of participants reported unreasonably high WTPs, and exclusions based on the rules set for the smaller samples in previous studies would have left many unreasonable prices in the data set.  We therefore included in our analyses only those participants with a WTP of $20 or less, which seemed like the upper bound of a reasonable price.  This set a cutoff price similar to the cutoff price based on the stand deviations in Studies 1b and 1c. After this exclusion and the exclusion of 4 additional participants who were outlines on income, the final sample included 1,898 participants. 
 
-***Results***
------
+```{r echo = FALSE}
+clean_1d %>%
+  summarise(cleaned.sample.size = n())
+```
 
-Dividing participants according to a median split on eincome, we found that higher-income participants offered a higher price for feer from the resort (M = $6.80, 95% CI [$6.41, $7.18])
+
+> Dividing participants according to a median split on income, we found that higher-income participants offered a higher price for feer from the resort (M = $6.80, 95% CI [$6.41, $7.18]),
 
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 1, resort == 1) %>%
-  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp)))
+  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
+  round(digits = 2)
 
 clean_1d_high_resort <- clean_1d %>%
   filter(split == 1, resort == 1) %>%
   mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
   distinct(mean.wtp, CI)
+#for figure 1d
 ```
-than for beer from the grocery store (M = $5.46, 95% CI [$5.13, $5.79]).
+
+> than for beer from the grocery store (M = $5.46, 95% CI [$5.13, $5.79]).
 
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 1, resort == 0) %>%
-  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp)))
+  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
+  round(digits = 2)
 
 clean_1d_high_grocer <- clean_1d %>%
   filter(split == 1, resort == 0) %>%
   mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
   distinct(mean.wtp, CI)
-
+#for figure 1d
 ```
 
-Lower-income participants' WTP did not differ significantly between the resort (M = $6.21, 95% CI [$5.83, $6.60])
+> Lower-income participants' WTP did not differ significantly between the resort (M = $6.21, 95% CI [$5.83, $6.60])
 
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 0, resort == 1) %>%
-  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp)))
+  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
+  round(digits = 2)
 
 clean_1d_low_resort <- clean_1d %>%
   filter(split == 0, resort == 1) %>%
   mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
   distinct(mean.wtp, CI)
+#for figure 1d
 ```
 
-and the store (M = %5.71, 95% CI [$5.31, $6.11]).
+> and the store (M = %5.71, 95% CI [$5.31, $6.11]).
 
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp)))
+  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
+  round(digits = 2)
 
 clean_1d_low_grocer <- clean_1d %>%
   filter(split == 0, resort == 0) %>%
   mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
   distinct(mean.wtp, CI)
+#for figure 1d
 ```
 
-The interaction between income and context was significant, F(1, 1984) = 4.82, p < 0.05, eta squared partial = 0.003. (SEE FIGURE 1d)
+> The interaction between income and context was significant, F(1, 1984) = 4.82, p < 0.05, eta squared partial = 0.003.
 
 ```{r echo = FALSE}
 aov_1d <- aov(wtp ~ resort * split, data = clean_1d)
 summary(aov_1d)
-#they ran this anova on the binary 'split' column?
 
 etaSquared(aov_1d, type = 2, anova = FALSE)
-
 ```
 
-This interaction was marginally significant when income was treated continuously, beta = 0.50 **(the closest I could replicate was 0.93)**, t(1894) = 1.85, p < 0.07.
+> This interaction was marginally significant when income was treated continuously, beta = 0.50, t(1894) = 1.85, p < 0.07.
 
 ```{r echo = FALSE}
 lm3 <- lm(wtp ~ resort * logses, data = clean_1d)
 summary(lm3)
 ```
 
-
 ```{r echo = FALSE}
-
 title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
 values = c(clean_1d_low_grocer$mean.wtp, clean_1d_high_grocer$mean.wtp, clean_1d_low_resort$mean.wtp, clean_1d_high_resort$mean.wtp)
 location = c("Grocer", "Grocer", "Resort", "Resort")
 CIs = c(clean_1d_low_grocer$CI, clean_1d_high_grocer$CI, clean_1d_low_resort$CI, clean_1d_high_resort$CI)
 fig1d.table <- data.frame(title, values, location, CIs)
-#figure 1c data frame
+#figure 1d data frame
 
 figure1d <- fig1d.table %>%
   ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1d - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1d\n(error bars represent 95% confidence interval)") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
@@ -435,158 +528,889 @@ figure1d <- fig1d.table %>%
 
 print(figure1d)
 #displays figure 1d
+```
+
+> The beer-on-the-beach scenario provides a canonical example of the difficulty people have in translating utility into value.  People have a sense of how much they would enjoy the beer, but they have difficulty representing this enjoyment with a price.  However, under conditions of scarcity, people base their price not merely on anticipated enjoyment, but also on anticipated trade-offs, and those are more consistent guides for valuation.  Could scarcity also lead to more consistent baluation of a dollar itself? The next set of studies addressed this question.
+
+-----
+
+### Study 2a 
+
+```{r echo = FALSE}
+
+#reads the data for study 2a - spss file, csv file for demographics, and second csv file for income
+suppressMessages(suppressWarnings(raw_2a_spss <- read.spss("framing/study_2a.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_2a_csv <- read.csv("study_2a_demog.csv", header = FALSE)))
+suppressMessages(suppressWarnings(raw_2a_income_csv <- read.csv("study_2a_income.csv", header = TRUE)))
+
 
 ```
 
-
-The beer-on-the-beach scenario provides a canonical example of the difficulty people have in translating utility into value.  People have a sense of how much they would enjoy the beer, but they have difficulty representing this enjoyment with a price.  However, under conditions of scarcity, people base their price not merely on anticipated enjoyment, but also on anticipated trade-offs, and those are more consistent guides for valuation.  Could scarcity also lead to more consistent baluation of a dollar itself? The next set of studies addressed this question.
-
------
------
-
-#Study 2a - Proportional Versus Trade-Off Thinking
+> In Study 2a, there were 238 participants.
 
 ```{r echo = FALSE}
-setwd("framing")
-raw_2a_spss <- read.spss("study_2a.sav", to.data.frame = TRUE)
-#reads the data for study 2a
-```
-
-In Study 2a, there were 238 participants ((we are unable to replicate mean age, gender split, median household size, or median household income due to that data not being in the public dataset)) Median ses (which is income / sqrt(householdsize)):
-
-```{r echo = FALSE}
+#sample size for Study 2a
 raw_2a_spss %>%
   summarise(sample.size = n(), median.ses = median(ses))
 
+#average age for Study 2a
+raw_2a_csv %>%
+  filter(V3 != "NA") %>%
+  summarise(mean.age = mean(V3)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown for Study 2a (filter is because they calculated the sex breakdown inside their excel file...)
+raw_2a_csv %>%
+  filter(V4 != 142, V4 != 96) %>%
+  group_by(V4) %>%
+  summarise(sex_breakdown = n())
+
+#calculate median household income and size for Study 2a
+raw_2a_income_csv %>%
+  summarise(median.household.income = median(inc2), median.household.size = median(house))
 ```
 
-***Results***
--------
-
-One participant was excluded as an outlier on income.
+> One participant was excluded as an outlier on income.
 
 ```{r echo = FALSE}
-
+# Filter out outlier
 clean_2a <- raw_2a_spss %>%
   filter(filter_. != "Not Selected")
+
+clean_2a %>%
+  summarise(cleaned.sample.size = n())
 ```
 
-We conducted binary logistic regressions to comepare the frequency with which participants cited each of the two considerations of interest (trade-offs vs proportional discount) as a function of income.  Higher-income participants were more likely than lower-income participants to use proportional thinking, beta = 0.87, Wald-test chi square (1, N = 237) = 4.02, p < 0.05.
+> We conducted binary logistic regressions to comepare the frequency with which participants cited each of the two considerations of interest (trade-offs vs proportional discount) as a function of income.  Higher-income participants were more likely than lower-income participants to use proportional thinking, beta = 0.87, Wald-test chi square (1, N = 237) = 4.02, p < 0.05.
 
 ```{r echo = FALSE}
-
 logit3logses <- glm(context ~ lgses, data = clean_2a, family = "binomial")
 summary(logit3logses)
 
 wald.test(b = coef(logit3logses), Sigma = vcov(logit3logses), Terms = 2)
 ```
 
-but lower-income participants were more likely than higher-income participants to use trade-off thinking, beta = -0.96, Wald-test chi square (1, N = 237) = 4.69, p < 0.05.
+> but lower-income participants were more likely than higher-income participants to use trade-off thinking, beta = -0.96, Wald-test chi square (1, N = 237) = 4.69, p < 0.05.
 
 ```{r echo = FALSE}
-
 logit4logses <- glm(tradeoff ~ lgses, data = clean_2a, family = "binomial")
 summary(logit4logses)
 
 wald.test(b = coef(logit4logses), Sigma = vcov(logit4logses), Terms = 2)
 ```
 
-This again suggests that scarcity leads people to generate their own comparison standards, and Studies 2b through 2d tested whether this leads to more consistent preferences.
 
-#Study 2b - Valuing Discounts
+### Study 2b
+
+> In study 2b there were 705 participants (mean age = 30.0 years; 290 females, 415 males; median household size = 3 people; median household income = $45,000).  The participants in Study 2c were the same participants as in Study 1d (and analyses were limited to the same participants, but including all participants did not change the results).  Note that participants completed Studies 1d and 2c in a counterbalanced order.  Participants in Studies 2b and 2c responded to the same scenario as did participants in Study 2a, but they stated whether they would travel for the discount.
 
 ```{r echo = FALSE}
+
+#reads the data for study 2a - spss file, csv file for demographics, and second csv file for income
+suppressMessages(suppressWarnings(raw_2b_spss <- read.spss("framing/study_2b.sav", to.data.frame = TRUE)))
+suppressMessages(suppressWarnings(raw_2b_csv <- read.csv("study_2b_demog.csv", header = TRUE)))
+
+#average age for Study 2b
+raw_2b_csv %>%
+  filter(age != "NA") %>%
+  summarise(mean.age = mean(age)) %>%
+  round(digits = 1)
+
+#calculate sex breakdown for Study 2b
+raw_2b_csv %>%
+  group_by(gender) %>%
+  summarise(sex_breakdown = n())
+
+#calculate total sample size for Study 2b
+raw_2b_csv %>%
+  summarise(sample.size = n())
+
+#calculate median household income and size for Study 2b
+raw_2b_spss %>%
+  summarise(median.household.income = median(inc2), median.household.size = median(house))
+```
+
+
+***Results***
+-------
+
+> In Study 2b, 1 participant was excluded for missing responses, and 2 were excluded as outliers on income.
+
+```{r echo = FALSE}
+clean_2b <- raw_2b_spss %>%
+  filter(filter_. != "Not Selected", go != "NA")
+
+clean_2b %>%
+  summarise(cleaned.sample.size = n())
+```
+
+> The analyses conducted were based on a median split on income.  Confirming earlier findings, these analyses revealed that higher-income participants were more willing to travel when the discount was proportionally larger (i.e., the tablet cost less): Specifically, 86%, 75%, and 58% would travel when the tablet cost $300, $500, and $1,000, respectively.
+
+```{r echo = FALSE}
+clean_2b %>%
+  filter(split == 1, cond == 0) %>%
+  summarise(threehundred.go = (sum(go) / n()) * 100)
+
+clean_2b %>%
+  filter(split == 1, cond == 1) %>%
+  summarise(fivehundred.go = (sum(go) / n()) * 100)
+
+clean_2b %>%
+  filter(split == 1, cond == 2) %>%
+  summarise(onethousand.go = (sum(go) / n()) * 100)
+```
+
+> Lower-income participants were less sensitive to the proportional size of the discount: The corresponding percentages of lower-income participants willing to travel were 78%, 67%, and 67%.
+
+```{r echo = FALSE}
+clean_2b %>%
+  filter(split == 0, cond == 0) %>%
+  summarise(threehundred.go = (sum(go) / n()) * 100)
 
 clean_2b %>%
   filter(split == 0, cond == 1) %>%
-  summarise(fivehundred_go = (sum(go) / n()) * 100)
+  summarise(fivehundred.go = (sum(go) / n()) * 100)
 
 clean_2b %>%
   filter(split == 0, cond == 2) %>%
-  summarise(onethousand_go = (sum(go) / n()) * 100)
+  summarise(onethousand.go = (sum(go) / n()) * 100)
 
 ```
 
-The ineraction between income and context was significant in a binary logistic regression, beta = -0.048, Walt-test chi square (1, N = 702) = 4.93, p < 0.05,
+> The ineraction between income and context was significant in a binary logistic regression, beta = -0.048, Walt-test chi square (1, N = 702) = 4.93, p < 0.05,
 
 ```{r echo = FALSE}
-
 logit5logses <- glm(go ~ split * cond, data = clean_2b, family = "binomial")
 summary(logit5logses)
 
 wald.test(b = coef(logit5logses), Sigma = vcov(logit5logses), Terms = 4)
 ```
 
-and was marginally significant when income was treated continuously, beta = -0.57, Wald-test chi square(1, N - 702) = 3.32, p < 0.07.
+> and was marginally significant when income was treated continuously, beta = -0.57, Wald-test chi square(1, N - 702) = 3.32, p < 0.07.
 
 ```{r echo = FALSE}
-
 logit6logses <- glm(go ~ logses * cond, data = clean_2b, family = "binomial")
 summary(logit6logses)
 
 wald.test(b = coef(logit6logses), Sigma = vcov(logit6logses), Terms = 4)
 ```
 
-###Study 2c
+---
 
-Five participants were excluded for missing responses in Study 2c, so 1,893 participants were included in the analyses.
+### Study 2c
+
+> Five participants were excluded for missing responses in Study 2c, so 1,893 participants were included in the analyses.
 
 ```{r echo = FALSE}
-
-setwd("framing")
-raw_2c_spss <- read.spss("study_1d.sav", to.data.frame = TRUE)
+suppressMessages(suppressWarnings(raw_2c_spss <- read.spss("framing/study_1d.sav", to.data.frame = TRUE)))
 #reads the data for study 2c
 
 clean_2c <- raw_1d_spss %>%
   filter(filter_. != "Not Selected", go != "NA")
+
+clean_2c %>%
+  summarise(cleaned.sample.size = n())
 ```
 
-Analyses based to a median split on income revealed a more muted trend than in the previous study.  Among higher-income participants, 71%, 67%, and 51% were willing to travel when the tablet cost $300, $500, and $1,000, respectively;
+> Analyses based to a median split on income revealed a more muted trend than in the previous study.  Among higher-income participants, 71%, 67%, and 51% were willing to travel when the tablet cost $300, $500, and $1,000, respectively;
 
 ```{r echo = FALSE}
 clean_2c %>%
   filter(split == 1, webercond == 0) %>%
-  summarise(threehundred_go = (sum(go) / n()) * 100)
+  summarise(threehundred.go = (sum(go) / n()) * 100)
 
 clean_2c %>%
   filter(split == 1, webercond == 1) %>%
-  summarise(fivehundred_go = (sum(go) / n()) * 100)
+  summarise(fivehundred.go = (sum(go) / n()) * 100)
 
 clean_2c %>%
   filter(split == 1, webercond == 2) %>%
-  summarise(onethousand_go = (sum(go) / n()) * 100)
+  summarise(onethousand.go = (sum(go) / n()) * 100)
 ```
 
-among lower-income participants, the corresponding percentages were 70%, 69%, and 55%.
+> among lower-income participants, the corresponding percentages were 70%, 69%, and 55%.
 
 ```{r echo = FALSE}
 clean_2c %>%
   filter(split == 0, webercond == 0) %>%
-  summarise(threehundred_go = (sum(go) / n()) * 100)
+  summarise(threehundred.go = (sum(go) / n()) * 100)
 
 clean_2c %>%
   filter(split == 0, webercond == 1) %>%
-  summarise(fivehundred_go = (sum(go) / n()) * 100)
+  summarise(fivehundred.go = (sum(go) / n()) * 100)
 
 clean_2c %>%
   filter(split == 0, webercond == 2) %>%
-  summarise(onethousand_go = (sum(go) / n()) * 100)
+  summarise(onethousand.go = (sum(go) / n()) * 100)
 ```
 
-When income was treated continuously, the interaction between income and context was clear, beta = -0.39, Wald-test chi square(1, N = 1,893) = 6.13, p < 0.05.
+> When income was treated continuously, the interaction between income and context was clear, beta = -0.39, Wald-test chi square(1, N = 1,893) = 6.13, p < 0.05.
 
 ```{r echo = FALSE}
-
 logit7logses <- glm(go ~ logses * webercond, data = clean_2c, family = "binomial")
 summary(logit7logses)
 
+wald.test(b = coef(logit7logses), Sigma = vcov(logit7logses), Terms = 4)
 ```
 
-# Study 6
+---
+
+### Study 2d 
+
+> In Study 2d, there were 301 participants (mean age = 30.2 years; 120 females, 181 males; median household size = 3 people; median household income = $25,000).
+
+```{r echo = FALSE}
+# Read data in
+suppressMessages(suppressWarnings(df2d_1 <- read.csv("csv_files/2d_Sheet1.csv", header=TRUE)))
+suppressMessages(suppressWarnings(df2d_2 <- read.csv("csv_files/2d_Sheet2.csv", header=TRUE)))
+suppressMessages(suppressWarnings(df2d_spss <- read.spss("framing/study_2d.sav", to.data.frame = TRUE)))
+
+```
+
+```{r echo = FALSE}
+# Number of subjects
+df2d_1 %>%
+  select(subject) %>%
+  summarise(n())
+
+# Mean age
+df2d_2 %>%
+  summarise(mean(age, na.rm=T)) %>%
+  round(digits=1)
+
+# Number of females vs. males
+df2d_2 %>%
+  group_by(gender) %>%
+  summarise(n())
+```
+
+*Note: median household size and median income do not match the publication.  We also ran these calculations in excel and SPSS and all three match what is below, and do not match what is published*
+
+```{r echo = FALSE}
+# Median Household Size
+# calculated using income2 : doesn't match
+df2d_1 %>%
+  summarize(median(house))
+
+df2d_1 %>%
+  summarise(median(inc2))
+
+
+# calculated using ses : doesn't match
+# As calculated, we get median household of 2, income of 35,000 - they publish median household of 3, income of 25,000. Manuscript error?
+
+#df2d_1 %>%
+  #summarize(median(ses, na.rm=T)) %>%
+  #round(digits=0)
+# calculated using income (converted) then inverted : matches!
+#df2d_1 %>%
+  #summarize(median(income, na.rm=T))
+#df2d_1 %>%
+  #select(inc2) %>%
+  #distinct() %>%
+  #arrange(inc2) %>%
+  #slice(3) # '3' derived from above
+
+# Note above: (technical) I tried to, but couldn't figure out how to use a variable instead of explicitly using the value 3. Again, I suspected the median was taken from the categorized income and then backward matched to its raw value. I suspect this is erroneous and probably due to disregarding the categorical value of 0 is meaningful.
+
+
+```
+
+***Results***
+-------
+> We regressed willingness to travel on income (categorized by a median split), proportional size of the discount (large vs. small), absolute size of the discount ($10 vs. $150), all two-way interaction terms, and the three-way interaction term. 
+
+```{r eval = FALSE}
+# Regression
+glm(go ~ split * lgdiscount * lgsavings, data = df2d_1, family = "binomial")
+```
+
+
+> Higher-income participants were significantly more willing to travel for a proportionally larger discount (60%) than for a proportionally smaller discount (41%), 
+
+```{r echo = FALSE}
+# high-income & proportionately larger discount
+df2d_1 %>%
+  filter(split == 1, lgdiscount == 0) %>%
+  summarise(high.prop.large = (sum(go) / n()) * 100) %>%
+  round(digit = 0)
+
+# high-income & proprotionately smaller discount
+df2d_1 %>%
+  filter(split == 1, lgdiscount == 1) %>%
+  summarise(high.prop.small = (sum(go) / n()) * 100) %>%
+  round(digit = 0)
+```
+
+> but this was not true for lower-income participants (50% vs. 61%). 
+
+```{r echo = FALSE}
+# low-income & proprotionately larger discount
+df2d_1 %>%
+  filter(split == 0, lgdiscount == 0) %>%
+  summarise(high.prop.large = (sum(go) / n()) * 100) %>%
+  round(digit = 0)
+
+# low-income & proprotionately smaller discount
+df2d_1 %>%
+  filter(split == 0, lgdiscount == 1) %>%
+  summarise(high.prop.small = (sum(go) / n()) * 100) %>%
+  round(digit = 0)
+```
+
+> The interaction between proportional discount and income was significant, β = −1.90, Wald-test χ2(1, N = 301) = 4.11, p < .05. 
+
+```{r echo = FALSE}
+temp.model <- glm(go ~ split*lgdiscount*lgsavings, data = df2d_1, family = "binomial")
+
+# β (beta), p
+glm(go ~ split * lgdiscount * lgsavings, 
+    data = df2d_1, family = "binomial") %>% 
+  tidy() %>%
+  filter(term == "split:lgdiscount") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 2)) %>%
+  select(term, beta, p)
+
+# wald test
+print(wald.test(b = coef(temp.model), 
+                Sigma = vcov(temp.model), 
+                Terms = 5)$result$chi2[1], digit = 3)
+```
+
+> Note that this interaction did not depend on the absolute amount of the discount, as the three-way interaction was not significant, β = −0.89, Wald-test χ2(1, N = 301) = 0.28, p > .6. 
+
+```{r echo = FALSE}
+temp.model <- glm(go ~ split * lgdiscount * lgsavings, data = df2d_1, family = "binomial")
+
+# β (beta), p
+glm(go ~ split* lgdiscount * lgsavings, 
+    data = df2d_1, family = "binomial") %>% 
+  tidy() %>%
+  filter(term == "split:lgdiscount:lgsavings") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
+
+# wald test
+print(wald.test(b = coef(temp.model), 
+                Sigma = vcov(temp.model), 
+                Terms = 8)$result$chi2[1], digit = 3)
+```
+
+> When income was treated continuously, the interaction between proportional discount and income also emerged, but was not significant, β = −2.13, Wald-test χ2(1, N = 301) = 2.21, p < .15.
+
+```{r echo = FALSE}
+
+temp.model <- glm(go ~ lgses * lgdiscount * lgsavings, data = df2d_spss, family = "binomial")
+
+# β (beta), p
+glm(go ~ lgses * lgdiscount * lgsavings, 
+    data = df2d_spss, family = "binomial") %>% 
+  tidy() %>%
+  filter(term == "lgses:lgdiscount") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
+
+# wald test:
+print(wald.test(b = coef(temp.model), 
+                Sigma = vcov(temp.model), 
+                Terms = 5)$result$chi2[1], digit = 3)
+```
+
+---
+
+### Study 3
+
+> In Study 3, there were 505 participants (mean age = 33.0 years; 208 females, 297 males; median household size = 3 people; median household income = $45,000).
+
+```{r echo = FALSE}
+# Read data in
+suppressMessages(suppressWarnings(df3_1 <- read.csv("csv_files/3_Sheet1.csv", header=TRUE)))
+suppressMessages(suppressWarnings(df3_2 <- read.csv("csv_files/3_Sheet2.csv", header=TRUE)))
+suppressMessages(suppressWarnings(df3_spss <- read.spss("framing/study_3.sav", to.data.frame = TRUE)))
+
+```
+
+```{r echo = FALSE}
+# Number of subjects
+df3_1 %>%
+  select(Subject) %>%
+  summarise(n())
+
+# Mean age
+df3_2 %>%
+  summarise(mean(age, na.rm=T)) %>%
+  round(digits=1)
+
+# Number of females vs. males
+df3_2 %>%
+  group_by(gender) %>%
+  summarise(n())
+
+# Median household size
+df3_1 %>%
+  summarise(median(house))
+
+# Median household income
+df3_1 %>%
+  summarise(median(inc2))
+```
+
+> One participant was excluded for missing responses, and another was excluded as an outlier on income. 
+
+``` {r echo = FALSE}
+# remove participant with missing response
+df3_spss <- df3_spss %>%
+  filter(filter_. == "Selected", judge != "NA")
+
+df3_spss %>%
+  summarise (cleaned.sample.size = n())
+
+```
+
+> Analyses based on a median split on income replicated earlier results. Higher-income individuals rated the loss gamble as significantly more attractive (M = 11.63, 95% CI = [10.56, 12.69]) than the no-loss gamble (M = 8.33, 95% CI = [7.62, 9.04]), 
+
+
+```{r echo = FALSE}
+
+# high-income & loss gambling : attractive rating
+df3_spss %>%
+  filter(split == 1, smallloss == 1) %>%
+  summarise(mean.judge.highincome.lossgamble = mean(judge), CI.low = mean(judge) - (1.96 * sem(judge)), CI.high = mean(judge) + (1.96 * sem(judge))) %>%
+  round(digits = 2)
+
+# high-income & loss gambling : attractive rating
+#temp_title <- "High-income & Loss gambling : attractive rating"
+#temp_x <- df3_spss %>%
+  #filter(split==1, smallloss==1) %>%
+  #select(judge)
+#Mean_CI(temp_title, temp_x) # print
+
+# high-income & no-loss gambling : attractive rating
+df3_spss %>%
+  filter(split == 1, smallloss == 0) %>%
+  summarise(mean.judge.highincome.nolossgamble = mean(judge), CI.low = mean(judge) - (1.96 * sem(judge)), CI.high = mean(judge) + (1.96 * sem(judge))) %>%
+  round(digits = 2)
+```
+
+> but this difference was smaller for lower-income individuals (loss gamble: M = 10.38, 95% CI = [9.38, 11.38], no-loss gamble: M = 9.18, 95% CI = [8.31, 10.05]).
+
+```{r echo = FALSE}
+# high-income & no-loss gambling : attractive rating
+#temp_title <- "High-income & No-loss gambling : attractive rating"
+#temp_x <- df3_spss %>%
+  #filter(split==1, smallloss==0) %>%
+  #select(judge)
+#Mean_CI(temp_title, temp_x) # print
+
+# low-income & loss gambling : attractive rating
+df3_spss %>%
+  filter(split == 0, smallloss == 1) %>%
+  summarise(mean.judge.lowincome.lossgamble = mean(judge), CI.low = mean(judge) - (1.96 * sem(judge)), CI.high = mean(judge) + (1.96 * sem(judge))) %>%
+  round(digits = 2)
+
+# low-income & loss gambling : attractive rating
+#temp_title <- "Low-income & Loss gambling : attractive rating"
+#temp_x <- df3_spss %>%
+  #filter(split==0, smallloss==1) %>%
+  #select(judge)
+#Mean_CI(temp_title, temp_x) # print
+
+# low-income & no-loss gambling : attractive rating
+df3_spss %>%
+  filter(split == 0, smallloss == 0) %>%
+  summarise(mean.judge.lowincome.nolossgamble = mean(judge), CI.low = mean(judge) - (1.96 * sem(judge)), CI.high = mean(judge) + (1.96 * sem(judge))) %>%
+  round(digits = 2)
+        
+# low-income & no-loss gambling : attractive rating
+#temp_title <- "Low-income & No-loss gambling : attractive rating"
+#temp_x <- df3_spss %>%
+  #filter(split==0, smallloss==0) %>%
+  #select(judge)
+#Mean_CI(temp_title, temp_x) # print
+
+```
+
+> The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01.
+
+```{r echo = FALSE}
+# ANOVA : interaction effects
+summary(aov(judge ~ split * smallloss, df3_spss))
+temp_eta2 <- etaSquared(aov(judge ~ split * smallloss, df3_spss)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("partial eta squared:", temp_eta2), quote=F)
+```
+
+> The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
+
+```{r echo = FALSE}
+# again, we find a larger beta coeffieicnt, but matching t value and p value.
+summary(lm(judge ~ logses * smallloss, data = df3_spss))
+```
+
+---
+
+### Study 4
+
+> In Study 4, there were 263 participants (mean age = 31.6 years; 102 females, 161 males; median household size = 3 people; median household income = $45,000).
+
+```{r echo = FALSE}
+# Read data in
+suppressMessages(suppressWarnings(df4_1 <- read.csv("csv_files/4_Sheet1.csv", header=T)))
+suppressMessages(suppressWarnings(df4_2 <- read.csv("csv_files/4_Sheet2.csv", header=T)))
+suppressMessages(suppressWarnings(df4_4 <- read.csv("csv_files/4_Sheet4.csv", header=T)))
+suppressMessages(suppressWarnings(df4_spss <- read.spss("framing/study_4.sav", to.data.frame = TRUE)))
+```
+
+```{r echo = FALSE}
+# Number of subjects
+df4_2 %>%
+  select(Subject) %>%
+  summarise(n())
+
+# Mean age
+df4_2 %>%
+  summarise(mean(Age, na.rm=T)) %>%
+  round(digits=1)
+
+# Number of females vs. males
+df4_2 %>%
+  group_by(Gender) %>%
+  summarise(n())
+
+# Median household size
+df4_2 %>%
+  summarize(median(House))
+
+# Median household income
+df4_1 %>%
+  summarize(median(Income2))
+```
+
+> Four participants were excluded for not completing the prime question.
+
+```{r echo = FALSE}
+# find the four participants excluded
+df4_4 %>%
+  filter(Prime=="") %>%
+  select(Subject)
+# remove the 4 participants
+df4_1 <- df4_1 %>%
+  filter(Subject!=56, Subject!=75, Subject!=112, Subject!=236)
+
+df4_spss %>%
+  summarise(cleaned.sample.size = n())
+
+#the spss file has these already removed.
+```
+
+> When we analyzed the data using a median split based on income, higher-income participants rated the DVD as significantly more expensive when they thought about a small account (M = 5.74, 95% CI = [5.04, 6.44]) rather than a large account (M = 4.47, 95% CI = [3.93, 5.01]), 
+
+```{r echo = FALSE}
+# high-income & small account : expensiveness
+df4_spss %>%
+  filter(split == 1, largeacc == 0) %>%
+  summarise(mean.expense.highincome.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  round(digits = 2)
+
+# high-income & small account : expensiveness
+#temp_title <- "High-income & Small account : expensiveness"
+#temp_x <- df4_1 %>%
+  #filter(Large.Acc==0, Split==1) %>%
+  #select(Expense)
+#Mean_CI(temp_title, temp_x) # print
+
+# high-income & large account : expensiveness
+df4_spss %>%
+  filter(split == 1, largeacc == 1) %>%
+  summarise(mean.expense.highincome.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  round(digits = 2)
+
+# high-income & large account : expensiveness
+#temp_title <- "High-income & Large account : expensiveness"
+#temp_x <- df4_1 %>%
+  #filter(Large.Acc==1, Split==1) %>%
+  #select(Expense)
+#Mean_CI(temp_title, temp_x) # print
+```
+
+> whereas the evaluations of lower-income participants did not differ significantly between the conditions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48]).
+
+```{r echo = FALSE}
+# low-income & small account : expensiveness
+df4_spss %>%
+  filter(split == 0, largeacc == 0) %>%
+  summarise(mean.expense.lowincome.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  round(digits = 2)
+
+# low-income & small account : expensiveness
+#temp_title <- "Low-income & Small account : expensiveness"
+#temp_x <- df4_1 %>%
+  #filter(Large.Acc==0, Split==0) %>%
+  #select(Expense)
+#Mean_CI(temp_title, temp_x) # print
+
+# low-income & large account : expensiveness
+df4_spss %>%
+  filter(split == 0, largeacc == 1) %>%
+  summarise(mean.expense.lowincome.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  round(digits = 2)
+
+# low-income & large account : expensiveness
+#temp_title <- "Low-income & Large account : expensiveness"
+#temp_x <- df4_1 %>%
+  #filter(Large.Acc==1, Split==0) %>%
+  #select(Expense)
+#Mean_CI(temp_title, temp_x) # print
+```
+
+> The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02....
+
+```{r echo = FALSE}
+# ANOVA : interaction effects
+# income treated as split : replicates
+summary(aov(Expense ~ Large.Acc*Split, df4_1))
+temp_eta2 <- etaSquared(aov(Expense ~ Large.Acc*Split, df4_1)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("partial eta squared:", temp_eta2), quote=F)
+```
+
+> The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. 
+
+*Note: beta estimate and t value are negative, but are reported as positive*
+```{r echo = FALSE}
+
+summary(lm(expense ~ largeacc * logses, data = df4_spss))
+
+```
+
+---
+
+### Study 5
+
+> In Study 5, there were 234 participants (mean age = 31.8 years; 107 females, 127 males)
+
+```{r echo = FALSE}
+# Read data in
+suppressMessages(suppressWarnings(df5_demo <- read.csv("csv_files/5_demo.csv", header=T)))
+suppressMessages(suppressWarnings(df5_1 <- read.csv("csv_files/5_Sheet1.csv", header=T)))
+suppressMessages(suppressWarnings(df5_spss <- read.spss("framing/study_5.sav", to.data.frame = TRUE)))
+```
+
+```{r echo = FALSE}
+# Number of subjects
+df5_demo %>%
+  select(subject) %>%
+  summarise(n())
+
+# Number of females vs. males
+df5_demo %>%
+  group_by(gender) %>%
+  summarise(n())
+```
+
+> No participants were excluded from the analyses. We first analyzed responses using a median split on participants’ dieting behavior. Nondieters rated the fries as more fattening when they thought about a small account (M = 8.64, 95% CI = [8.20, 9.07]) than when they thought about a large account (M = 7.80, 95% CI = [7.21, 8.38]),
+
+
+```{r echo = FALSE}
+# Nondieters & Small account : Fattening
+df5_spss %>%
+  filter(split == 0, week == 0) %>%
+  summarise(mean.fattening.nondieters.smallaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * sem(fattening)), CI.high = mean(fattening) + (1.96 * sem(fattening))) %>%
+  round(digits = 2)
+
+# Nondieters & Small account : Fattening
+#temp_title <- "Nondieters & Small account : Fattening"
+#temp_x <- df5_1 %>%
+  #filter(split==0, large==0) %>%
+  #select(fat)
+#Mean_CI(temp_title, temp_x) # print
+
+# Nondieters & Large account : Fattening
+df5_spss %>%
+  filter(split == 0, week == 1) %>%
+  summarise(mean.fattening.nondieters.largeaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * sem(fattening)), CI.high = mean(fattening) + (1.96 * sem(fattening))) %>%
+  round(digits = 2)
+```
+
+> but this was not true for dieters (small account: M = 8.86, 95% CI = [8.29, 9.43]; large account: M = 9.13, 95% CI = [8.66, 9.60]).
+
+```{r echo = FALSE}
+# Nondieters & Large account : Fattening
+#temp_title <- "Nondieters & Large account : Fattening"
+#temp_x <- df5_1 %>%
+  #filter(split==0, large==1) %>%
+  #select(fat)
+#Mean_CI(temp_title, temp_x) # print
+
+# Dieter & Small account : Fattening
+df5_spss %>%
+  filter(split == 1, week == 0) %>%
+  summarise(mean.fattening.dieters.smallaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * sem(fattening)), CI.high = mean(fattening) + (1.96 * sem(fattening))) %>%
+  round(digits = 2)
+
+# Dieter & Small account : Fattening
+#temp_title <- "Dieter & Small account : Fattening"
+#temp_x <- df5_1 %>%
+  #filter(split==1, large==0) %>%
+  #select(fat)
+#Mean_CI(temp_title, temp_x) # print
+
+# Dieter & Large account : Fattening
+df5_spss %>%
+  filter(split == 1, week == 1) %>%
+  summarise(mean.fattening.dieters.largeaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * sem(fattening)), CI.high = mean(fattening) + (1.96 * sem(fattening))) %>%
+  round(digits = 2)
+
+# Dieter & Large account : Fattening
+#temp_title <- "Dieter & Large account : Fattening"
+#temp_x <- df5_1 %>%
+  #filter(split==1, large==1) %>%
+  #select(fat)
+#Mean_CI(temp_title, temp_x) # print
+```
+
+> The interaction between dieting status and condition was significant, F(1, 230) = 4.40, p < .05, ηp2 = .02,
+
+```{r echo = FALSE}
+# ANOVA : interaction effects
+# income treated as split : somewhat matches
+summary(aov(fattening ~ split * week, df5_spss))
+temp_eta2 <- etaSquared(aov(fattening ~ split * week, df5_spss)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("partial eta squared:", temp_eta2), quote=F)
+```
+
+> and the interaction was also found when dieting behavior was treated continuously, β = 0.43, t(230) = 2.11, p < .05.
+
+```{r echo = FALSE}
+
+summary(lm(fattening ~ log * week, data = df5_spss))
+
+```
+
+---
+
+### Study 6
+
 > In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
-```{r echo=F}
-df.6.demo <- read.csv("csv_files/6_demo.csv", header=T)
-str(df.6.demo)
-mean(df.6.demo$Age)
+
+```{r echo = FALSE}
+suppressMessages(suppressWarnings(df6_demo <- read.csv("csv_files/6_demo.csv", header=T)))
+suppressMessages(suppressWarnings(df6_raw <- read.csv("csv_files/6_raw.csv", header=T)))
+suppressMessages(suppressWarnings(df6_cric <- read.csv("csv_files/6_cric.csv", header=T)))
+suppressMessages(suppressWarnings(df6_spss <- read.spss("framing/study_6.sav", to.data.frame = TRUE)))
 ```
 
+```{r echo = FALSE}
+# Number of subjects
+df6_demo %>%
+  select(Subject) %>%
+  summarise(n())
+
+# Mean age
+df6_demo %>%
+  summarise(mean(Age, na.rm=T)) %>%
+  round(digit=1)
+
+# Number of females vs. males
+df6_demo %>%
+  group_by(Gender) %>%
+  summarise(n())
+```
+
+> One participant was excluded because of a computer malfunction during the game (not specifically indicated, we deduced based on raw data that this was Subject #16). 
+
+```{r echo = FALSE}
+# participant 16 deduced from SPSS
+df6_cric <- df6_cric %>%
+  filter(Subject!='16')
+
+df6_cric %>%
+   summarise(n_distinct(Subject))
+
+df6_spss <- df6_spss %>%
+  filter(subject != "16")
+
+df6_spss %>%
+  summarise(cleaned.sample.size = n())
+```
+
+> Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]),
+
+
+```{r echo = FALSE}
+# Time-rich & Small account: Expensive
+df6_spss %>%
+  filter(slack == 1, large == 0) %>%
+  summarise(mean.expense.timerich.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  round(digits = 2)
+
+# Time-rich & Small account: Expensive
+#temp_title <- "Time-rich & Small account: Expensive"
+#temp_x <- df6_cric %>%
+  #filter(Slack==1, Large==0) %>%
+  #select(expense)
+#Mean_CI(temp_title, temp_x) # print
+
+# Time-rich & Large account: Expensive
+df6_spss %>%
+  filter(slack == 1, large == 1) %>%
+  summarise(mean.expense.timerich.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  round(digits = 2)
+```
+
+> whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]).
+
+```{r echo = FALSE}
+# Time-rich & Large account: Expensive
+#temp_title <- "Time-rich & Large account: Expensive"
+#temp_x <- df6_cric %>%
+  #filter(Slack==1, Large==1) %>%
+  #select(expense)
+#Mean_CI(temp_title, temp_x) # print
+
+# Time-poor & Small account: Expensive
+df6_spss %>%
+  filter(slack == 0, large == 0) %>%
+  summarise(mean.expense.timepoor.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  round(digits = 2)
+
+# Time-poor & Small account: Expensive
+#temp_title <- "Time-poor & Small account: Expensive"
+#temp_x <- df6_cric %>%
+  #filter(Slack==0, Large==0) %>%
+  #select(expense)
+#Mean_CI(temp_title, temp_x) # print
+
+# Time-poor & Large account: Expensive
+df6_spss %>%
+  filter(slack == 0, large == 1) %>%
+  summarise(mean.expense.timepoor.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  round(digits = 2)
+
+# Time-poor & Large account: Expensive
+#temp_title <- "Time-poor & Large account: Expensive"
+#temp_x <- df6_cric %>%
+  #filter(Slack==0, Large==1) %>%
+  #select(expense)
+#Mean_CI(temp_title, temp_x) # print
+```
+
+> A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p < .05, ηp2 = .07.
+
+```{r echo = FALSE}
+
+summary(aov(expense ~ large * slack, df6_spss))
+temp_eta2 <- etaSquared(aov(expense ~ large * slack, df6_spss)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("partial eta squared:", temp_eta2), quote=F)
+```
+
+> End of replication.

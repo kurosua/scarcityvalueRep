@@ -1,6 +1,7 @@
 ---
 title: "replication2"
 author: "Nick F & Aaron K"
+<<<<<<< HEAD
 date: "February 24, 2015"
 output: html_document
 ---
@@ -17,12 +18,29 @@ Sem <- function(x) {
   #creates the function to calculate standard error of the mean
   sqrt(var(x)/length(x))
   }
+=======
+date: "March 13, 2015"
+output: html_document
+---
+
+joined with "replicate" on March 15
+
+---
+```{r echo = FALSE}
+suppressPackageStartupMessages(require(dplyr))
+suppressPackageStartupMessages(require(tidyr))
+suppressPackageStartupMessages(require(aod)) # wald.test
+suppressPackageStartupMessages(require(broom))
+suppressPackageStartupMessages(require(lsr)) #etaSquared
+suppressPackageStartupMessages(require(ggplot2))
+>>>>>>> fe55506803f34ec2125836b752d4fec532a875ce
 
 # detect the user's directory:
 directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
 if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate"
 setwd(directory)
 
+<<<<<<< HEAD
 ```
 
 
@@ -39,10 +57,326 @@ df.6.demo <- read.csv("csv_files/6_demo.csv", header=T)
 
 # Number of subjects
 df.6.demo %>%
+=======
+# Function : to generate mean and confidence interval & name
+Mean_CI <- function(title, x){
+  print(title, quote=F)
+  # print Mean
+  M <- t.test(x) %>%
+    .$estimate %>%
+    round(digits = 2) %>%
+    .[[1]]
+  print(c("M:", M), quote = F)
+  # print Confidence Interval 95%
+  CI <- t.test(x) %>%
+    .$conf.int %>%
+    round(digits = 2) %>%
+    .[1:2]
+  print(c("CI : ", CI), quote = F)
+}
+```
+
+*Note: headlines were added to some sheets (csv), i.e. assumptions made*
+
+---
+
+### Study 2d 
+###### Complete (last part failed to replicate)
+> In Study 2d, there were 301 participants (mean age = 30.2 years; 120 females, 181 males; median household size = 3 people; median household income = $25,000).
+
+```{r echo=F}
+# Read data in
+df2d_1 <- read.csv("csv_files/2d_Sheet1.csv", header=T)
+df2d_2 <- read.csv("csv_files/2d_Sheet2.csv", header=T)
+```
+
+```{r echo=F}
+# Number of subjects
+df2d_1 %>%
+  select(subject) %>%
+  summarise(n())
+
+# Mean age
+df2d_2 %>%
+  summarise(mean(age, na.rm=T)) %>%
+  round(digits=1)
+
+# Number of females vs. males
+df2d_2 %>%
+  group_by(gender) %>%
+  summarise(n())
+```
+
+Attempt to replicate median household size was complex:
+```{r}
+# Median Household Size
+# calculated using income2 : doesn't match
+df2d_1 %>%
+  summarize(median(inc2, na.rm=T))
+# calculated using ses : doesn't match
+df2d_1 %>%
+  summarize(median(ses, na.rm=T)) %>%
+  round(digits=0)
+# calculated using income (converted) then inverted : matches!
+df2d_1 %>%
+  summarize(median(income, na.rm=T))
+df2d_1 %>%
+  select(inc2) %>%
+  distinct() %>%
+  arrange(inc2) %>%
+  slice(3) # '3' derived from above
+# Note above: (technical) I tried to, but couldn't figure out how to use a variable instead of explicitly using the value 3. Again, I suspected the median was taken from the categorized income and then backward matched to its raw value. I suspect this is erroneous and probably due to disregarding the categorical value of 0 is meaningful.
+```
+
+> Results: We regressed willingness to travel on income (categorized by a median split), proportional size of the discount (large vs. small), absolute size of the discount ($10 vs. $150), all two-way interaction terms, and the three-way interaction term. 
+
+```{r eval=F}
+# Regression
+glm(go ~ split*lgdiscount*lgsavings, data = df2d_1, family = "binomial")
+```
+
+Assumptions:
+
+* willingness = 'go'
+* income with median split = 'split'
+* proportionate discount = 'lgdiscount'
+* abs size discount = 'lgsavings'
+
+> Higher-income participants were significantly more willing to travel for a proportionally larger discount (60%) than for a proportionally smaller discount (41%), but this was not true for lower-income participants (50% vs. 61%). 
+
+```{r echo=FALSE}
+# high-income & proportionately larger discount
+df2d_1 %>%
+  filter(split == 1, lgdiscount == 0) %>%
+  summarise(high_prop_large = (sum(go) / n()) * 100) %>%
+  round(digit=0)
+
+# high-income & proprotionately smaller discount
+df2d_1 %>%
+  filter(split == 1, lgdiscount == 1) %>%
+  summarise(high_prop_small = (sum(go) / n()) * 100) %>%
+  round(digit=0)
+
+# low-income & proprotionately larger discount
+df2d_1 %>%
+  filter(split == 0, lgdiscount == 0) %>%
+  summarise(high_prop_large = (sum(go) / n()) * 100) %>%
+  round(digit=0)
+
+# low-income & proprotionately smaller discount
+df2d_1 %>%
+  filter(split == 0, lgdiscount == 1) %>%
+  summarise(high_prop_small = (sum(go) / n()) * 100) %>%
+  round(digit=0)
+```
+
+> The interaction between proportional discount and income was significant, β = −1.90, Wald-test χ2(1, N = 301) = 4.11, p < .05. 
+
+```{r echo=F}
+temp.model <- glm(go ~ split*lgdiscount*lgsavings, data = df2d_1, family = "binomial")
+
+# β (beta), p
+glm(go ~ split*lgdiscount*lgsavings, 
+    data = df2d_1, family = "binomial") %>% 
+  tidy() %>%
+  filter(term == "split:lgdiscount") %>%
+  mutate(β = round(estimate, digit = 2),
+         p = round(p.value, digit = 2)) %>%
+  select(term, β, p)
+
+# wald test
+print(wald.test(b = coef(temp.model), 
+                Sigma = vcov(temp.model), 
+                Terms = 5)$result$chi2[1], digit = 3)
+```
+
+> Note that this interaction did not depend on the absolute amount of the discount, as the three-way interaction was not significant, β = −0.89, Wald-test χ2(1, N = 301) = 0.28, p > .6. 
+
+```{r echo=F}
+temp.model <- glm(go ~ split*lgdiscount*lgsavings, data = df2d_1, family = "binomial")
+
+# β (beta), p
+glm(go ~ split*lgdiscount*lgsavings, 
+    data = df2d_1, family = "binomial") %>% 
+  tidy() %>%
+  filter(term == "split:lgdiscount:lgsavings") %>%
+  mutate(β = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, β, p)
+
+# wald test
+print(wald.test(b = coef(temp.model), 
+                Sigma = vcov(temp.model), 
+                Terms = 8)$result$chi2[1], digit = 3)
+```
+
+> When income was treated continuously, the interaction between proportional discount and income also emerged, but was not significant, β = −2.13, Wald-test χ2(1, N = 301) = 2.21, p < .15.
+
+**^ Failed to replicate**
+
+```{r echo=F, eval=F}
+## Gaussian link function:
+# instead of split, use income : doesn't match
+tidy(glm(go ~ income*lgdiscount*lgsavings, data = df2d_1, family = "gaussian"))[5,]
+# instead of split, use inc2 : doesn't match
+tidy(glm(go ~ inc2*lgdiscount*lgsavings, data = df2d_1, family = "logses"))[5,]
+# instead of split, use ses : doesn't match
+tidy(glm(go ~ ses*lgdiscount*lgsavings, data = df2d_1, family = "gaussian"))[5,]
+
+## Tried Binomial link function: 
+# instead of split, use income : doesn't match
+tidy(glm(go ~ income*lgdiscount*lgsavings, data = df2d_1, family = "binomial"))[5,]
+# instead of split, use inc2 : doesn't match
+tidy(glm(go ~ inc2*lgdiscount*lgsavings, data = df2d_1, family = "binomial"))[5,]
+# instead of split, use ses : doesn't match
+tidy(glm(go ~ ses*lgdiscount*lgsavings, data = df2d_1, family = "binomial"))[5,]
+
+## Random attempt:
+# p matches : 0.145, but nothing else
+tidy(glm(go ~ inc2:lgdiscount, data = df2d_1, family = "gaussian"))
+
+# wald test : haven't because I don't know which model to use
+```
+
+---
+
+### Study 3
+
+> In Study 3, there were 505 participants (mean age = 33.0 years; 208 females, 297 males; median household size = 3 people; median household income = $45,000).
+
+```{r echo=F}
+# Read data in
+df3_1 <- read.csv("csv_files/3_Sheet1.csv", header=T)
+df3_2 <- read.csv("csv_files/3_Sheet2.csv", header=T)
+```
+
+```{r echo=F}
+# Number of subjects
+df3_1 %>%
   select(Subject) %>%
   summarise(n())
 
 # Mean age
+df3_2 %>%
+  summarise(mean(age, na.rm=T)) %>%
+  round(digits=1)
+
+# Number of females vs. males
+df3_2 %>%
+  group_by(gender) %>%
+  summarise(n())
+
+# Median household size
+df3_1 %>%
+  summarize(median(house))
+
+# Median household income
+df3_1 %>%
+  summarize(median(inc2))
+```
+
+> One participant was excluded for missing responses, and another was excluded as an outlier on income. 
+
+``` {r echo=F}
+# remove participant with missing response
+df3_1 <- df3_1 %>%
+  filter(!is.na(judge))
+
+# look for outlier in income (ses)
+df3_1 %>%
+  arrange(desc(ses)) %>%
+  tbl_df
+
+# remove outlier (subject 14)
+df3_1 <- df3_1 %>%
+  filter(Subject!=14)
+```
+
+> Analyses based on a median split on income replicated earlier results. Higher-income individuals rated the loss gamble as significantly more attractive (M = 11.63, 95% CI = [10.56, 12.69]) than the no-loss gamble (M = 8.33, 95% CI = [7.62, 9.04]), but this difference was smaller for lower-income individuals (loss gamble: M = 10.38, 95% CI = [9.38, 11.38], no-loss gamble: M = 9.18, 95% CI = [8.31, 10.05]).
+
+Assumptions:
+
+* Higher-income (via median split) : split = 1
+* Lower-income (via median split) : split = 0
+* Loss gamble : cond = 1
+* No-loss gamble : cond = 0
+* attractive rating : judge
+
+Numbers are fractionally different...
+
+```{r echo=F}
+# high-income & loss gambling : attractive rating
+temp_title <- "High-income & Loss gambling : attractive rating"
+temp_x <- df3_1 %>%
+  filter(split==1, cond==1) %>%
+  select(judge)
+Mean_CI(temp_title, temp_x) # print
+
+# high-income & no-loss gambling : attractive rating
+temp_title <- "High-income & No-loss gambling : attractive rating"
+temp_x <- df3_1 %>%
+  filter(split==1, cond==0) %>%
+  select(judge)
+Mean_CI(temp_title, temp_x) # print
+
+# low-income & loss gambling : attractive rating
+temp_title <- "Low-income & Loss gambling : attractive rating"
+temp_x <- df3_1 %>%
+  filter(split==0, cond==1) %>%
+  select(judge)
+Mean_CI(temp_title, temp_x) # print
+
+# low-income & no-loss gambling : attractive rating
+temp_title <- "Low-income & No-loss gambling : attractive rating"
+temp_x <- df3_1 %>%
+  filter(split==0, cond==0) %>%
+  select(judge)
+Mean_CI(temp_title, temp_x) # print
+```
+
+> The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01.
+
+```{r}
+# ANOVA : interaction effects
+# income treated as split : somewhat matches
+summary(aov(judge ~ split*cond, df3_1))
+temp_eta2 <- etaSquared(aov(judge ~ split*cond, df3_1)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("ηp2:", temp_eta2), quote=F)
+```
+
+> The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
+
+**^ replication is close; not different enough to effect significance**
+
+```{r}
+# when income is treated continuously as inc2 : matches even less
+summary(glm(judge ~ inc2*cond, df3_1, family=gaussian))
+```
+
+---
+
+### Study 4
+
+> In Study 4, there were 263 participants (mean age = 31.6 years; 102 females, 161 males; median household size = 3 people; median household income = $45,000).
+
+```{r echo=F}
+# Read data in
+df4_1 <- read.csv("csv_files/4_Sheet1.csv", header=T)
+df4_2 <- read.csv("csv_files/4_Sheet2.csv", header=T)
+df4_4 <- read.csv("csv_files/4_Sheet4.csv", header=T)
+```
+
+```{r echo=F}
+# Number of subjects
+df4_2 %>%
+>>>>>>> fe55506803f34ec2125836b752d4fec532a875ce
+  select(Subject) %>%
+  summarise(n())
+
+# Mean age
+<<<<<<< HEAD
 df.6.demo %>%
   summarise(mean(Age, na.rm=T))
 
@@ -83,5 +417,276 @@ mutate(Account=filter(Cond==2))
 aov(Total.Points~scarcity*account)
 
   
+=======
+df4_2 %>%
+  summarise(mean(Age, na.rm=T)) %>%
+  round(digits=1)
+
+# Number of females vs. males
+df4_2 %>%
+  group_by(Gender) %>%
+  summarise(n())
+
+# Median household size
+df4_2 %>%
+  summarize(median(House))
+
+# Median household income
+df4_1 %>%
+  summarize(median(Income2))
+```
+
+> Four participants were excluded for not completing the prime question.
+
+```{r echo=F}
+# find the four participants excluded
+df4_4 %>%
+  filter(Prime=="") %>%
+  select(Subject)
+# remove the 4 participants
+df4_1 <- df4_1 %>%
+  filter(Subject!=56, Subject!=75, Subject!=112, Subject!=236)
+```
+
+> When we analyzed the data using a median split based on income, higher-income participants rated the DVD as significantly more expensive when they thought about a small account (M = 5.74, 95% CI = [5.04, 6.44]) rather than a large account (M = 4.47, 95% CI = [3.93, 5.01]), whereas the evaluations of lower-income participants did not differ significantly between the conditions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48]).
+
+Assumptions:
+
+* Higher-income : Split = 1
+* Lower-income : Split = 0
+* Small Account : Large.Acc = 0
+* DVD expensiveness : Expense
+
+```{r echo=F}
+# high-income & small account : expensiveness
+temp_title <- "High-income & Small account : expensiveness"
+temp_x <- df4_1 %>%
+  filter(Large.Acc==0, Split==1) %>%
+  select(Expense)
+Mean_CI(temp_title, temp_x) # print
+
+# high-income & large account : expensiveness
+temp_title <- "High-income & Large account : expensiveness"
+temp_x <- df4_1 %>%
+  filter(Large.Acc==1, Split==1) %>%
+  select(Expense)
+Mean_CI(temp_title, temp_x) # print
+
+# low-income & small account : expensiveness
+temp_title <- "Low-income & Small account : expensiveness"
+temp_x <- df4_1 %>%
+  filter(Large.Acc==0, Split==0) %>%
+  select(Expense)
+Mean_CI(temp_title, temp_x) # print
+
+# low-income & large account : expensiveness
+temp_title <- "Low-income & Large account : expensiveness"
+temp_x <- df4_1 %>%
+  filter(Large.Acc==1, Split==0) %>%
+  select(Expense)
+Mean_CI(temp_title, temp_x) # print
+```
+
+> The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02....
+
+```{r}
+# ANOVA : interaction effects
+# income treated as split : replicates
+summary(aov(Expense ~ Large.Acc*Split, df4_1))
+temp_eta2 <- etaSquared(aov(Expense ~ Large.Acc*Split, df4_1)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("ηp2:", temp_eta2), quote=F)
+```
+
+> The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. 
+
+**^ as a continuous variable, failure to replicate**
+
+```{r}
+# when income is treated continuously as Income2 : doesn't replicate
+summary(glm(Expense ~ Large.Acc*Income2, df4_1, family=gaussian))
+
+# Multinomal regression : using package : nnet
+# multinom(Expense ~ Large.Acc*Income2, data = df4_1)
+```
+
+---
+
+### Study 5
+
+> In Study 5, there were 234 participants (mean age = 31.8 years; 107 females, 127 males)
+
+```{r echo=F}
+# Read data in
+df5_demo <- read.csv("csv_files/5_demo.csv", header=T)
+df5_1 <- read.csv("csv_files/5_Sheet1.csv", header=T)
+```
+
+```{r echo=F}
+# Number of subjects
+df5_demo %>%
+  select(subject) %>%
+  summarise(n())
+
+# Number of females vs. males
+df5_demo %>%
+  group_by(gender) %>%
+  summarise(n())
+```
+
+> No participants were excluded from the analyses. We first analyzed responses using a median split on participants’ dieting behavior. Nondieters rated the fries as more fattening when they thought about a small account (M = 8.64, 95% CI = [8.20, 9.07]) than when they thought about a large account (M = 7.80, 95% CI = [7.21, 8.38]), but this was not true for dieters (small account: M = 8.86, 95% CI = [8.29, 9.43]; large account: M = 9.13, 95% CI = [8.66, 9.60]).
+
+Assumptions:
+
+* Dieters : split = 1
+* Nondieters : split = 0
+* Small Account : large = 0
+* Large Account : large = 1
+* Fattening : fat
+
+```{r echo=F}
+# Nondieters & Small account : Fattening
+temp_title <- "Nondieters & Small account : Fattening"
+temp_x <- df5_1 %>%
+  filter(split==0, large==0) %>%
+  select(fat)
+Mean_CI(temp_title, temp_x) # print
+
+# Nondieters & Large account : Fattening
+temp_title <- "Nondieters & Large account : Fattening"
+temp_x <- df5_1 %>%
+  filter(split==0, large==1) %>%
+  select(fat)
+Mean_CI(temp_title, temp_x) # print
+
+# Dieter & Small account : Fattening
+temp_title <- "Dieter & Small account : Fattening"
+temp_x <- df5_1 %>%
+  filter(split==1, large==0) %>%
+  select(fat)
+Mean_CI(temp_title, temp_x) # print
+
+# Dieter & Large account : Fattening
+temp_title <- "Dieter & Large account : Fattening"
+temp_x <- df5_1 %>%
+  filter(split==1, large==1) %>%
+  select(fat)
+Mean_CI(temp_title, temp_x) # print
+```
+
+> The interaction between dieting status and condi- tion was significant, F(1, 230) = 4.40, p < .05, ηp2 = .02, and the...
+
+```{r}
+# ANOVA : interaction effects
+# income treated as split : somewhat matches
+summary(aov(fat ~ split*large, df5_1))
+temp_eta2 <- etaSquared(aov(fat ~ split*large, df5_1)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("ηp2:", temp_eta2), quote=F)
+```
+
+> interaction was also found when dieting behavior was treated continuously, β = 0.43, t(230) = 2.11, p < .05. ...
+
+**^ can't replicate continous because no continous variable provided..**
+
+```{r}
+# when income is treated continuously
+# note: no proper continuous income variable included in open dataset
+# can't replicate
+summary(lm(fat ~ split*large, df5_1))
+```
+
+---
+
+### Study 6
+
+> In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
+
+```{r echo=F}
+df6_demo <- read.csv("csv_files/6_demo.csv", header=T)
+df6_raw <- read.csv("csv_files/6_raw.csv", header=T)
+df6_cric <- read.csv("csv_files/6_cric.csv", header=T)
+```
+
+```{r echo=F}
+# Number of subjects
+df6_demo %>%
+  select(Subject) %>%
+  summarise(n())
+
+# Mean age
+df6_demo %>%
+  summarise(mean(Age, na.rm=T)) %>%
+  round(digit=1)
+
+# Number of females vs. males
+df6_demo %>%
+  group_by(Gender) %>%
+  summarise(n())
+```
+
+> One participant was excluded because of a computer malfunction during the game. 
+
+```{r}
+# participant 16 deduced from SPSS
+df6_cric <- df6_cric %>%
+  filter(Subject!='16')
+df6_cric %>%
+   summarise(n_distinct(Subject)) 
+```
+
+> Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]), whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]).
+
+Assumptions:
+
+*Time-rich : Slack = 1
+*Time-poor : Slack = 0
+*Small account : Large = 0
+*Large account : Large = 1
+*Expensive : expense
+
+```{r}
+# Time-rich & Small account: Expensive
+temp_title <- "Time-rich & Small account: Expensive"
+temp_x <- df6_cric %>%
+  filter(Slack==1, Large==0) %>%
+  select(expense)
+Mean_CI(temp_title, temp_x) # print
+
+# Time-rich & Large account: Expensive
+temp_title <- "Time-rich & Large account: Expensive"
+temp_x <- df6_cric %>%
+  filter(Slack==1, Large==1) %>%
+  select(expense)
+Mean_CI(temp_title, temp_x) # print
+
+# Time-poor & Small account: Expensive
+temp_title <- "Time-poor & Small account: Expensive"
+temp_x <- df6_cric %>%
+  filter(Slack==0, Large==0) %>%
+  select(expense)
+Mean_CI(temp_title, temp_x) # print
+
+# Time-poor & Large account: Expensive
+temp_title <- "Time-poor & Large account: Expensive"
+temp_x <- df6_cric %>%
+  filter(Slack==0, Large==1) %>%
+  select(expense)
+Mean_CI(temp_title, temp_x) # print
+```
+
+> A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p < .05, ηp2 = .07.
+
+```{r}
+# ANOVA : interaction effects
+# income treated as split : replicates
+summary(aov(expense ~ Large*Slack, df6_cric))
+temp_eta2 <- etaSquared(aov(expense ~ Large*Slack, df6_cric)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("ηp2:", temp_eta2), quote=F)
+>>>>>>> fe55506803f34ec2125836b752d4fec532a875ce
 ```
 
