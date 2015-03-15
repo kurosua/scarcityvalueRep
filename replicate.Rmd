@@ -12,6 +12,7 @@ suppressPackageStartupMessages(require(aod)) # wald.test
 suppressPackageStartupMessages(require(broom))
 suppressPackageStartupMessages(require(lsr)) #etaSquared
 suppressPackageStartupMessages(require(ggplot2))
+suppressPackageStartupMessages(require(foreign))
 
 # detect the user's directory:
 directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
@@ -45,7 +46,7 @@ Mean_CI <- function(title, x){
 
 ---
 
-# Study 1a
+### Study 1a
 
 > In this study, there were 103 participants (mean age = 29.3 years; median household size = 3 people; median household income = $35,000)...One participant was excluded as an outlier on income (more than 3 SD from the mean). We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income...
 
@@ -55,7 +56,9 @@ Mean_CI <- function(title, x){
 # Data import
 ###### detect the user's directory:
 directory  <- "C:/Users/Nick/Documents/Github/scarcityvalueRep/framing"
-if (Sys.getenv('USER')=="air") directory <- "~/Dropbox/SOC504/replicate/framing"
+if (Sys.getenv('USER')=="air"){
+  directory <- "~/Dropbox/SOC504/replicate/framing"
+}
 setwd(directory)
 
 # read in the data for 1a using the spss file
@@ -539,6 +542,8 @@ summary(logit6logses)
 wald.test(b = coef(logit6logses), Sigma = vcov(logit6logses), Terms = 4)
 ```
 
+---
+
 ### Study 2c
 
 > Five participants were excluded for missing responses in Study 2c, so 1,893 participants were included in the analyses.
@@ -730,6 +735,7 @@ print(wald.test(b = coef(temp.model),
 > When income was treated continuously, the interaction between proportional discount and income also emerged, but was not significant, β = −2.13, Wald-test χ2(1, N = 301) = 2.21, p < .15.
 
 **^ Failed to replicate**
+*didn't attempt wald because I don't know which model to use*
 
 ```{r echo=F, eval=F}
 ## Gaussian link function:
@@ -981,7 +987,7 @@ print(c("ηp2:", temp_eta2), quote=F)
 # when income is treated continuously as Income2 : doesn't replicate
 summary(glm(Expense ~ Large.Acc*Income2, df4_1, family=gaussian))
 
-# Multinomal regression : using package : nnet
+# Multinomal regression : using package : nnet : doesn't replicate
 # multinom(Expense ~ Large.Acc*Income2, data = df4_1)
 ```
 
