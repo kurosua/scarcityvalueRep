@@ -511,6 +511,9 @@ summary(lm(fat ~ split*large, df5_1))
 ```{r echo=F}
 df6_demo <- read.csv("csv_files/6_demo.csv", header=T)
 df6_raw <- read.csv("csv_files/6_raw.csv", header=T)
+df6_cric <- read.csv("csv_files/6_cric.csv", header=T)
+
+
 ```
 
 ```{r echo=F}
@@ -530,27 +533,65 @@ df6_demo %>%
   summarise(n())
 ```
 
-> One participant was excluded because of a computer malfunction during the game. Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]), whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]). A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p < .05, ηp2 = .07.
+> One participant was excluded because of a computer malfunction during the game. 
 
 ```{r}
-# # Number of subjects, filter our Subject 16 (deduced from spss filter)
-# df.6.edit <- df.6.raw %>%
-#   filter(Subject!='16')
-# df.6.edit %>%
-#    summarise(n_distinct(Subject)) 
-# 
-# # Total points per Subject
-# df.6.edit <- df.6.edit %>%
-#   group_by(Subject) %>%
-#   mutate(Total.Points=sum(Points)) %>%
-#   select(Subject, Cond, Total.Points) %>%
-#   distinct()
-# 
-# # Change variable to factos
-# df.6.edit$Subject <- as.factor(df.6.edit$Subject)
-# df.6.edit$Cond <- as.factor(df.6.edit$Cond)
-# 
-# # Add columns for different conditions: scarcity/account 
+# participant 16 deduced from SPSS
+df6_cric <- df6_cric %>%
+  filter(Subject!='16')
+df6_cric %>%
+   summarise(n_distinct(Subject)) 
+```
 
+> Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]), whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]).
+
+Assumptions:
+
+*Time-rich : Slack = 1
+*Time-poor : Slack = 0
+*Small account : Large = 0
+*Large account : Large = 1
+*Expensive : expense
+
+```{r}
+# Time-rich & Small account: Expensive
+temp_title <- "Time-rich & Small account: Expensive"
+temp_x <- df6_cric %>%
+  filter(Slack==1, Large==0) %>%
+  select(expense)
+Mean_CI(temp_title, temp_x) # print
+
+# Time-rich & Large account: Expensive
+temp_title <- "Time-rich & Large account: Expensive"
+temp_x <- df6_cric %>%
+  filter(Slack==1, Large==1) %>%
+  select(expense)
+Mean_CI(temp_title, temp_x) # print
+
+# Time-poor & Small account: Expensive
+temp_title <- "Time-poor & Small account: Expensive"
+temp_x <- df6_cric %>%
+  filter(Slack==0, Large==0) %>%
+  select(expense)
+Mean_CI(temp_title, temp_x) # print
+
+# Time-poor & Large account: Expensive
+temp_title <- "Time-poor & Large account: Expensive"
+temp_x <- df6_cric %>%
+  filter(Slack==0, Large==1) %>%
+  select(expense)
+Mean_CI(temp_title, temp_x) # print
+```
+
+> A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p < .05, ηp2 = .07.
+
+```{r}
+# ANOVA : interaction effects
+# income treated as split : replicates
+summary(aov(expense ~ Large*Slack, df6_cric))
+temp_eta2 <- etaSquared(aov(expense ~ Large*Slack, df6_cric)) %>%
+  .[3,2] %>%
+  round(digit=2)
+print(c("ηp2:", temp_eta2), quote=F)
 ```
 
