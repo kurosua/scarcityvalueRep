@@ -47,7 +47,7 @@ Mean_CI <- function(title, x){
 ### Study 1a
 
 
-> In this study, there were 103 participants (mean age = 29.3 years; median household size = 3 people; median household income = $35,000)...One participant was excluded as an outlier on income (more than 3 SD from the mean). We conducted binary logistic regressions to compare how frequently partici- pants cited each of the two considerations of interest (trade-offs vs. location) as a function of income...
+> In this study, there were 103 participants (mean age = 29.3 years; median household size = 3 people; median household income = $35,000). One participant was excluded as an outlier on income (more than 3 SD from the mean). We conducted binary logistic regressions to compare how frequently participants cited each of the two considerations of interest (trade-offs vs. location) as a function of income.
 
 ```{r echo = FALSE}
 # Data import
@@ -72,7 +72,7 @@ raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
 ```
 
-> Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,...
+> Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,
 
 ```{r echo = FALSE}
 glm(location ~ logses, data = clean_1a, family = "binomial") %>%
@@ -89,7 +89,7 @@ print(wald.test(b = coef(logit1logses),
                 Terms = 2)$result$chi2[1], digit = 3)
 ```
 
-> but lower-income participants were more likely than higher- income participants to name trade-offs as the main consideration, β = −1.62, Wald-test χ2(1, N = 102) = 4.67, p <.05...
+> but lower-income participants were more likely than higher- income participants to name trade-offs as the main consideration, β = −1.62, Wald-test χ2(1, N = 102) = 4.67, p <.05.
 
 ```{r echo = FALSE}
 glm(tradeoff ~ logses, data = clean_1a, family = "binomial") %>%
@@ -332,7 +332,7 @@ clean_1c_high_resort <- clean_1c %>%
 
 ```
 
-> than for beer from the grocery store:
+> than for beer from the grocery store.
 
 ```{r echo = FALSE}
 
@@ -365,8 +365,8 @@ clean_1c_low_resort <- clean_1c %>%
 
 
 ```
-> and beer from the store.
 
+> and beer from the store.
 
 ```{r echo = FALSE}
 clean_1c %>%
@@ -381,7 +381,6 @@ clean_1c_low_grocer <- clean_1c %>%
 #generates mean and CI for low income participants in the grocer scenario - to use in figure 1c
 
 ```
-
 
 > The interaction between income and context was significant, F(1,574) = 5.68, p < 0.05, eta squared partial = 0.01.
 
@@ -465,7 +464,6 @@ clean_1d %>%
   summarise(cleaned.sample.size = n())
 ```
 
-
 > Dividing participants according to a median split on income, we found that higher-income participants offered a higher price for feer from the resort (M = $6.80, 95% CI [$6.41, $7.18]),
 
 ```{r echo = FALSE}
@@ -535,7 +533,6 @@ temp_eta <- etaSquared(aov(wtp ~ resort * split, data = clean_1d)) %>%
   .[3,2] %>%
   round(digit = 3)
 print(c("partial eta squared:", temp_eta), quote = FALSE)
-
 ```
 
 > This interaction was marginally significant when income was treated continuously, beta = 0.50, t(1894) = 1.85, p < 0.07. *(unmatched beta coefficient)*
@@ -547,7 +544,6 @@ lm(wtp ~ resort * logses, data = clean_1d) %>%
   mutate(beta = round(estimate, digit = 2),
          p = round(p.value, digit = 4)) %>%
   select(term, beta, p)
-
 ```
 
 ```{r echo = FALSE}
@@ -1240,7 +1236,7 @@ df4_spss %>%
 #Mean_CI(temp_title, temp_x) # print
 ```
 
-> The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02....
+> The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02.
 
 ```{r echo = FALSE}
 # ANOVA : interaction effects
@@ -1381,7 +1377,7 @@ lm(fattening ~ log * week, data = df5_spss) %>%
 
 ### Study 6
 
-> In Study 6, 74 participants (mean age = 32.0 years; 46 females, 28 males) were...
+> In Study 6, there were 74 participants (mean age = 32.0 years; 46 females, 28 males).
 
 ```{r echo = FALSE}
 suppressMessages(suppressWarnings(df6_demo <- read.csv("csv_files/6_demo.csv", header=T)))
