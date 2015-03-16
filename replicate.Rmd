@@ -42,7 +42,7 @@ Mean_CI <- function(title, x){
 }
 ```
 <br> <br> <br>
-*note: beta coefficients for linear regressions calculate consistantly larger than published, even though the t value and p values are as published.  This occurs several times throughout.*
+*note: beta coefficients for linear regressions calculate consistantly larger than published, even though the t value and p values are as published.  This occurs several times throughout. t values that match the publication are available in the models*
 
 ### Study 1a
 
@@ -75,19 +75,33 @@ raw_1a_spss %>%
 > Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,...
 
 ```{r echo = FALSE}
-logit1logses <- glm(location ~ logses, data = clean_1a, family = "binomial")
-summary(logit1logses)
+glm(location ~ logses, data = clean_1a, family = "binomial") %>%
+  tidy() %>%
+  filter(term == "logses") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 
-wald.test(b = coef(logit1logses), Sigma = vcov(logit1logses), Terms = 2)
+logit1logses <- glm(location ~ logses, data = clean_1a, family = "binomial")
+
+print(wald.test(b = coef(logit1logses), 
+                Sigma = vcov(logit1logses), 
+                Terms = 2)$result$chi2[1], digit = 3)
 ```
 
 > but lower-income participants were more likely than higher- income participants to name trade-offs as the main consideration, β = −1.62, Wald-test χ2(1, N = 102) = 4.67, p <.05...
 
 ```{r echo = FALSE}
-logit2logses <- glm(tradeoff ~ logses, data = clean_1a, family = "binomial")
-summary(logit2logses)
+glm(tradeoff ~ logses, data = clean_1a, family = "binomial") %>%
+  tidy() %>%
+  filter(term == "logses") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 
-wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)
+logit2logses <- glm(tradeoff ~ logses, data = clean_1a, family = "binomial")
+
+print(wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)$result$chi2[1], digit = 3)
 ```
 
 ```{r echo = FALSE}
@@ -225,18 +239,25 @@ clean_1b_low_grocer <- clean_1b %>%
 
 ```{r echo = FALSE}
 
-aov_1b <- aov(beer ~ resort * split, data = clean_1b)
-summary(aov_1b)
-#they ran this anova on the binary 'split' column?
+summary(aov_1b <- aov(beer ~ resort * split, data = clean_1b))
 
-etaSquared(aov_1b, type = 2, anova = FALSE)
+temp_eta <- etaSquared(aov(beer ~ resort * split, data = clean_1b)) %>%
+  .[3,2] %>%
+  round(digit = 2)
+print(c("partial eta squared:", temp_eta), quote = FALSE)
+
 ```
 
-> The interaction was also significant when income was treated as a continuous variable beta = 2.27, t(145) = 2.17, p < 0.05.
+> The interaction was also significant when income was treated as a continuous variable beta = 2.27, t(145) = 2.17, p < 0.05. *(unmatched beta coefficient)*
 
 ```{r echo = FALSE}
-lm1 <- lm(beer ~ resort * logses, data = clean_1b)
-summary(lm1)
+lm(beer ~ resort * logses, data = clean_1b) %>%
+  tidy() %>%
+  filter(term == "resort:logses") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4))  %>%  
+        select(term, beta, p)
+
 ```
 
 
@@ -365,17 +386,24 @@ clean_1c_low_grocer <- clean_1c %>%
 > The interaction between income and context was significant, F(1,574) = 5.68, p < 0.05, eta squared partial = 0.01.
 
 ```{r echo = FALSE}
-aov_1c <- aov(pay ~ resort * split, data = clean_1c)
-summary(aov_1c)
+summary(aov(pay ~ resort * split, data = clean_1c))
 
-etaSquared(aov_1c, type = 2, anova = FALSE)
+temp_eta <- etaSquared(aov(pay ~ resort * split, data = clean_1c)) %>%
+  .[3,2] %>%
+  round(digit = 2)
+print(c("partial eta squared:", temp_eta), quote = FALSE)
 ```
 
-> The interaction was also significant when income was treated continuously, beta = 1.65, t(574) = 3.27, p < 0.01.
+> The interaction was also significant when income was treated continuously, beta = 1.65, t(574) = 3.27, p < 0.01. *(unmatched beta coefficient)*
 
 ```{r echo = FALSE}
-lm2 <- lm(pay ~ resort * logses, data = clean_1c)
-summary(lm2)
+lm(pay ~ resort * logses, data = clean_1c) %>%
+  tidy() %>%
+  filter(term == "resort:logses") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4))  %>%  
+        select(term, beta, p)
+  
 ```
 
 
@@ -501,17 +529,25 @@ clean_1d_low_grocer <- clean_1d %>%
 > The interaction between income and context was significant, F(1, 1984) = 4.82, p < 0.05, eta squared partial = 0.003.
 
 ```{r echo = FALSE}
-aov_1d <- aov(wtp ~ resort * split, data = clean_1d)
-summary(aov_1d)
+summary(aov(wtp ~ resort * split, data = clean_1d))
 
-etaSquared(aov_1d, type = 2, anova = FALSE)
+temp_eta <- etaSquared(aov(wtp ~ resort * split, data = clean_1d)) %>%
+  .[3,2] %>%
+  round(digit = 3)
+print(c("partial eta squared:", temp_eta), quote = FALSE)
+
 ```
 
-> This interaction was marginally significant when income was treated continuously, beta = 0.50, t(1894) = 1.85, p < 0.07.
+> This interaction was marginally significant when income was treated continuously, beta = 0.50, t(1894) = 1.85, p < 0.07. *(unmatched beta coefficient)*
 
 ```{r echo = FALSE}
-lm3 <- lm(wtp ~ resort * logses, data = clean_1d)
-summary(lm3)
+lm(wtp ~ resort * logses, data = clean_1d) %>%
+  tidy() %>%
+  filter(term == "resort:logses") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
+
 ```
 
 ```{r echo = FALSE}
@@ -584,19 +620,31 @@ clean_2a %>%
 > We conducted binary logistic regressions to comepare the frequency with which participants cited each of the two considerations of interest (trade-offs vs proportional discount) as a function of income.  Higher-income participants were more likely than lower-income participants to use proportional thinking, beta = 0.87, Wald-test chi square (1, N = 237) = 4.02, p < 0.05.
 
 ```{r echo = FALSE}
-logit3logses <- glm(context ~ lgses, data = clean_2a, family = "binomial")
-summary(logit3logses)
+glm(context ~ lgses, data = clean_2a, family = "binomial") %>%
+  tidy() %>%
+  filter(term == "lgses") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 
-wald.test(b = coef(logit3logses), Sigma = vcov(logit3logses), Terms = 2)
+logit3logses <- glm(context ~ lgses, data = clean_2a, family = "binomial")
+
+print(wald.test(b = coef(logit3logses), Sigma = vcov(logit3logses), Terms = 2)$result$chi2[1], digit = 3)
 ```
 
 > but lower-income participants were more likely than higher-income participants to use trade-off thinking, beta = -0.96, Wald-test chi square (1, N = 237) = 4.69, p < 0.05.
 
 ```{r echo = FALSE}
-logit4logses <- glm(tradeoff ~ lgses, data = clean_2a, family = "binomial")
-summary(logit4logses)
+glm(tradeoff ~ lgses, data = clean_2a, family = "binomial") %>%
+  tidy() %>%
+  filter(term == "lgses") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 
-wald.test(b = coef(logit4logses), Sigma = vcov(logit4logses), Terms = 2)
+logit4logses <- glm(tradeoff ~ lgses, data = clean_2a, family = "binomial")
+
+print(wald.test(b = coef(logit4logses), Sigma = vcov(logit4logses), Terms = 2)$result$chi2[1], digit = 3)
 ```
 
 
@@ -677,22 +725,36 @@ clean_2b %>%
 
 ```
 
-> The ineraction between income and context was significant in a binary logistic regression, beta = -0.048, Walt-test chi square (1, N = 702) = 4.93, p < 0.05,
+> The ineraction between income and context was significant in a binary logistic regression, beta = -0.48, Walt-test chi square (1, N = 702) = 4.93, p < 0.05,
 
 ```{r echo = FALSE}
-logit5logses <- glm(go ~ split * cond, data = clean_2b, family = "binomial")
-summary(logit5logses)
+glm(go ~ split * cond, data = clean_2b, family = "binomial") %>%
+  tidy() %>%
+  filter(term == "split:cond") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 
-wald.test(b = coef(logit5logses), Sigma = vcov(logit5logses), Terms = 4)
+
+logit5logses <- glm(go ~ split * cond, data = clean_2b, family = "binomial")
+
+print(wald.test(b = coef(logit5logses), Sigma = vcov(logit5logses), Terms = 4)$result$chi2[1], digit = 3)
+
 ```
 
 > and was marginally significant when income was treated continuously, beta = -0.57, Wald-test chi square(1, N - 702) = 3.32, p < 0.07.
 
 ```{r echo = FALSE}
-logit6logses <- glm(go ~ logses * cond, data = clean_2b, family = "binomial")
-summary(logit6logses)
+glm(go ~ logses * cond, data = clean_2b, family = "binomial") %>%
+  tidy() %>%
+  filter(term == "logses:cond") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 
-wald.test(b = coef(logit6logses), Sigma = vcov(logit6logses), Terms = 4)
+logit6logses <- glm(go ~ logses * cond, data = clean_2b, family = "binomial")
+
+print(wald.test(b = coef(logit6logses), Sigma = vcov(logit6logses), Terms = 4)$result$chi2[1], digit = 3)
 ```
 
 ---
@@ -747,10 +809,16 @@ clean_2c %>%
 > When income was treated continuously, the interaction between income and context was clear, beta = -0.39, Wald-test chi square(1, N = 1,893) = 6.13, p < 0.05.
 
 ```{r echo = FALSE}
-logit7logses <- glm(go ~ logses * webercond, data = clean_2c, family = "binomial")
-summary(logit7logses)
+glm(go ~ logses * webercond, data = clean_2c, family = "binomial") %>%
+  tidy() %>%
+  filter(term == "logses:webercond") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 
-wald.test(b = coef(logit7logses), Sigma = vcov(logit7logses), Terms = 4)
+logit7logses <- glm(go ~ logses * webercond, data = clean_2c, family = "binomial")
+
+print(wald.test(b = coef(logit7logses), Sigma = vcov(logit7logses), Terms = 4)$result$chi2[1], digit = 3)
 ```
 
 ---
@@ -1044,11 +1112,16 @@ temp_eta2 <- etaSquared(aov(judge ~ split * smallloss, df3_spss)) %>%
 print(c("partial eta squared:", temp_eta2), quote=F)
 ```
 
-> The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. 
+> The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05. *(unmatched beta coefficient)*
 
 ```{r echo = FALSE}
 # again, we find a larger beta coeffieicnt, but matching t value and p value.
-summary(lm(judge ~ logses * smallloss, data = df3_spss))
+lm(judge ~ logses * smallloss, data = df3_spss) %>%
+  tidy() %>%
+  filter(term == "logses:smallloss") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 ```
 
 ---
@@ -1179,12 +1252,17 @@ temp_eta2 <- etaSquared(aov(Expense ~ Large.Acc*Split, df4_1)) %>%
 print(c("partial eta squared:", temp_eta2), quote=F)
 ```
 
-> The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. 
+> The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01. *(unmatched beta coefficient)*
 
 *Note: beta estimate and t value are negative, but are reported as positive*
 ```{r echo = FALSE}
 
-summary(lm(expense ~ largeacc * logses, data = df4_spss))
+lm(expense ~ largeacc * logses, data = df4_spss) %>%
+  tidy() %>%
+  filter(term == "largeacc:logses") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 
 ```
 
@@ -1286,11 +1364,16 @@ temp_eta2 <- etaSquared(aov(fattening ~ split * week, df5_spss)) %>%
 print(c("partial eta squared:", temp_eta2), quote=F)
 ```
 
-> and the interaction was also found when dieting behavior was treated continuously, β = 0.43, t(230) = 2.11, p < .05.
+> and the interaction was also found when dieting behavior was treated continuously, β = 0.43, t(230) = 2.11, p < .05. *(unmatched beta coefficient)*
 
 ```{r echo = FALSE}
 
-summary(lm(fattening ~ log * week, data = df5_spss))
+lm(fattening ~ log * week, data = df5_spss) %>%
+  tidy() %>%
+  filter(term == "log:week") %>%
+  mutate(beta = round(estimate, digit = 2),
+         p = round(p.value, digit = 4)) %>%
+  select(term, beta, p)
 
 ```
 
