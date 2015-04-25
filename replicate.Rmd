@@ -42,7 +42,9 @@ Mean_CI <- function(title, x){
 }
 ```
 <br> <br> <br>
-*note: beta coefficients for linear regressions calculate consistantly larger than published, even though the t value and p values are as published.  This occurs several times throughout. t values that match the publication are available in the models*
+*note: beta coefficients for linear regressions calculate consistantly larger than published, even though the t value and p values are as published.  This occurs several times throughout. t values that match the publication are available in the models.*
+<br> <br>
+*Update 4/25/15 - The unmatched beta coeffients are due to the publication reporting standardized coefficients, and R function lm reporting unstandardized beta coeffients*
 
 ### Study 1a
 
@@ -70,6 +72,9 @@ raw_1a_csv %>%
 #calculate sample size, median household income, median household size
 raw_1a_spss %>%
   summarise(sample.size = n(), median.household.income = median(income2), median.household.size = median(house))
+
+clean_1a <- raw_1a_spss %>%
+  filter(filter_. != "Not Selected")
 ```
 
 > Higher-income participants were more likely than lower-income participants to name location as the main consideration, β = 2.52, Wald-test χ2(1, N = 102) = 5.54, p < .05,
@@ -721,6 +726,62 @@ clean_2b %>%
 
 ```
 
+```{r echo = FALSE}
+clean_2b_high_300 <- clean_2b %>%
+  filter(split == 1, cond == 0) %>%
+  summarise(threehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+
+clean_2b_high_500 <- clean_2b %>%
+  filter(split == 1, cond == 1) %>%
+  summarise(fivehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+
+clean_2b_high_1000 <- clean_2b %>%
+  filter(split == 1, cond == 2) %>%
+  summarise(onethousand.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (2b) - high income
+```
+
+```{r echo = FALSE}
+clean_2b_low_300 <- clean_2b %>%
+  filter(split == 0, cond == 0) %>%
+  summarise(threehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+
+clean_2b_low_500 <- clean_2b %>%
+  filter(split == 0, cond == 1) %>%
+  summarise(fivehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+
+clean_2b_low_1000 <- clean_2b %>%
+  filter(split == 0, cond == 2) %>%
+  summarise(onethousand.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (2b) - low income
+```
+
+
+```{r echo = FALSE}
+title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values = c(clean_2b_low_300$threehundred.go, clean_2b_high_300$threehundred.go, clean_2b_low_500$fivehundred.go, clean_2b_high_500$fivehundred.go, clean_2b_low_1000$onethousand.go, clean_2b_high_1000$onethousand.go)
+tablet_cost = c("$300", "$300", "$500", "$500", "$1,000", "$1,000")
+CIs = c(clean_2b_low_300$CI, clean_2b_high_300$CI, clean_2b_low_500$CI, clean_2b_high_500$CI, clean_2b_low_1000$CI, clean_2b_high_1000$CI)
+
+fig2b.table <- data.frame(title, values, tablet_cost, CIs)
+#figure 2b data frame
+fig2b.table$tablet_cost <- factor(fig2b.table$tablet_cost, levels = c("$300", "$500", "$1,000"))
+
+figure2b <- fig2b.table %>%
+  ggplot(aes(x = title, y = values, fill = tablet_cost)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("proportion willing to travel") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 2b - Proportion of participants willing to travel\nfor a discounted tablet computer in Study 2b\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+#produces figure 2b
+
+print(figure2b)
+#displays figure 2b
+```
+
+
 > The ineraction between income and context was significant in a binary logistic regression, beta = -0.48, Walt-test chi square (1, N = 702) = 4.93, p < 0.05,
 
 ```{r echo = FALSE}
@@ -802,6 +863,65 @@ clean_2c %>%
   summarise(onethousand.go = (sum(go) / n()) * 100)
 ```
 
+
+```{r echo = FALSE}
+clean_2c_high_300 <- clean_2c %>%
+  filter(split == 1, webercond == 0) %>%
+  summarise(threehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+
+clean_2c_high_500 <- clean_2c %>%
+  filter(split == 1, webercond == 1) %>%
+  summarise(fivehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+
+clean_2c_high_1000 <- clean_2c %>%
+  filter(split == 1, webercond == 2) %>%
+  summarise(onethousand.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (2c) - high income
+```
+
+```{r echo = FALSE}
+clean_2c_low_300 <- clean_2c %>%
+  filter(split == 0, webercond == 0) %>%
+  summarise(threehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+
+clean_2c_low_500 <- clean_2c %>%
+  filter(split == 0, webercond == 1) %>%
+  summarise(fivehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+
+clean_2c_low_1000 <- clean_2c %>%
+  filter(split == 0, webercond == 2) %>%
+  summarise(onethousand.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (2c) - low income
+```
+
+
+```{r echo = FALSE}
+title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values = c(clean_2c_low_300$threehundred.go, clean_2c_high_300$threehundred.go, clean_2c_low_500$fivehundred.go, clean_2c_high_500$fivehundred.go, clean_2c_low_1000$onethousand.go, clean_2c_high_1000$onethousand.go)
+tablet_cost = c("$300", "$300", "$500", "$500", "$1,000", "$1,000")
+CIs = c(clean_2c_low_300$CI, clean_2c_high_300$CI, clean_2c_low_500$CI, clean_2c_high_500$CI, clean_2c_low_1000$CI, clean_2c_high_1000$CI)
+
+fig2c.table <- data.frame(title, values, tablet_cost, CIs)
+#figure 2b data frame
+fig2c.table$tablet_cost <- factor(fig2c.table$tablet_cost, levels = c("$300", "$500", "$1,000"))
+
+figure2c <- fig2c.table %>%
+  ggplot(aes(x = title, y = values, fill = tablet_cost)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("proportion willing to travel") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 2c - Proportion of participants willing to travel\nfor a discounted tablet computer in Study 2c\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+#produces figure 2c
+
+print(figure2c)
+#displays figure 2c
+```
+
+
+
+
 > When income was treated continuously, the interaction between income and context was clear, beta = -0.39, Wald-test chi square(1, N = 1,893) = 6.13, p < 0.05.
 
 ```{r echo = FALSE}
@@ -858,25 +978,6 @@ df2d_1 %>%
 
 df2d_1 %>%
   summarise(median(inc2))
-
-
-# calculated using ses : doesn't match
-# As calculated, we get median household of 2, income of 35,000 - they publish median household of 3, income of 25,000. Manuscript error?
-
-#df2d_1 %>%
-  #summarize(median(ses, na.rm=T)) %>%
-  #round(digits=0)
-# calculated using income (converted) then inverted : matches!
-#df2d_1 %>%
-  #summarize(median(income, na.rm=T))
-#df2d_1 %>%
-  #select(inc2) %>%
-  #distinct() %>%
-  #arrange(inc2) %>%
-  #slice(3) # '3' derived from above
-
-# Note above: (technical) I tried to, but couldn't figure out how to use a variable instead of explicitly using the value 3. Again, I suspected the median was taken from the categorized income and then backward matched to its raw value. I suspect this is erroneous and probably due to disregarding the categorical value of 0 is meaningful.
-
 
 ```
 
@@ -1042,60 +1143,83 @@ df3_spss %>%
 # high-income & loss gambling : attractive rating
 df3_spss %>%
   filter(split == 1, smallloss == 1) %>%
-  summarise(mean.judge.highincome.lossgamble = mean(judge), CI.low = mean(judge) - (1.96 * sem(judge)), CI.high = mean(judge) + (1.96 * sem(judge))) %>%
+  summarise(mean.judge.highincome.lossgamble = mean(judge), CI.low = mean(judge) - (1.96 * Sem(judge)), CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
   round(digits = 2)
 
-# high-income & loss gambling : attractive rating
-#temp_title <- "High-income & Loss gambling : attractive rating"
-#temp_x <- df3_spss %>%
-  #filter(split==1, smallloss==1) %>%
-  #select(judge)
-#Mean_CI(temp_title, temp_x) # print
 
 # high-income & no-loss gambling : attractive rating
 df3_spss %>%
   filter(split == 1, smallloss == 0) %>%
-  summarise(mean.judge.highincome.nolossgamble = mean(judge), CI.low = mean(judge) - (1.96 * sem(judge)), CI.high = mean(judge) + (1.96 * sem(judge))) %>%
+  summarise(mean.judge.highincome.nolossgamble = mean(judge), CI.low = mean(judge) - (1.96 * Sem(judge)), CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
   round(digits = 2)
 ```
 
 > but this difference was smaller for lower-income individuals (loss gamble: M = 10.38, 95% CI = [9.38, 11.38], no-loss gamble: M = 9.18, 95% CI = [8.31, 10.05]).
 
 ```{r echo = FALSE}
-# high-income & no-loss gambling : attractive rating
-#temp_title <- "High-income & No-loss gambling : attractive rating"
-#temp_x <- df3_spss %>%
-  #filter(split==1, smallloss==0) %>%
-  #select(judge)
-#Mean_CI(temp_title, temp_x) # print
 
 # low-income & loss gambling : attractive rating
 df3_spss %>%
   filter(split == 0, smallloss == 1) %>%
-  summarise(mean.judge.lowincome.lossgamble = mean(judge), CI.low = mean(judge) - (1.96 * sem(judge)), CI.high = mean(judge) + (1.96 * sem(judge))) %>%
+  summarise(mean.judge.lowincome.lossgamble = mean(judge), CI.low = mean(judge) - (1.96 * Sem(judge)), CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
   round(digits = 2)
 
-# low-income & loss gambling : attractive rating
-#temp_title <- "Low-income & Loss gambling : attractive rating"
-#temp_x <- df3_spss %>%
-  #filter(split==0, smallloss==1) %>%
-  #select(judge)
-#Mean_CI(temp_title, temp_x) # print
 
 # low-income & no-loss gambling : attractive rating
 df3_spss %>%
   filter(split == 0, smallloss == 0) %>%
-  summarise(mean.judge.lowincome.nolossgamble = mean(judge), CI.low = mean(judge) - (1.96 * sem(judge)), CI.high = mean(judge) + (1.96 * sem(judge))) %>%
+  summarise(mean.judge.lowincome.nolossgamble = mean(judge), CI.low = mean(judge) - (1.96 * Sem(judge)), CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
   round(digits = 2)
-        
-# low-income & no-loss gambling : attractive rating
-#temp_title <- "Low-income & No-loss gambling : attractive rating"
-#temp_x <- df3_spss %>%
-  #filter(split==0, smallloss==0) %>%
-  #select(judge)
-#Mean_CI(temp_title, temp_x) # print
 
 ```
+
+```{r echo = FALSE}
+df3_high_loss <- df3_spss %>%
+  filter(split == 1, smallloss == 1) %>%
+  summarise(mean.judge.highincome.lossgamble = mean(judge), CI = (1.96 * Sem(judge))) %>%
+  round(digits = 2)
+
+df3_high_noloss <- df3_spss %>%
+  filter(split == 1, smallloss == 0) %>%
+  summarise(mean.judge.highincome.nolossgamble = mean(judge), CI.low = (1.96 * Sem(judge))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (3) - high income
+```
+
+```{r echo = FALSE}
+df3_low_loss <- df3_spss %>%
+  filter(split == 0, smallloss == 1) %>%
+  summarise(mean.judge.lowincome.lossgamble = mean(judge), CI = (1.96 * Sem(judge))) %>%
+  round(digits = 2)
+
+df3_low_noloss <- df3_spss %>%
+  filter(split == 0, smallloss == 0) %>%
+  summarise(mean.judge.lowincome.nolossgamble = mean(judge), CI = (1.96 * Sem(judge))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (3) - low income
+```
+
+
+```{r echo = FALSE}
+title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values = c(df3_low_loss$mean.judge.lowincome.lossgamble, df3_high_loss$mean.judge.highincome.lossgamble, df3_low_noloss$mean.judge.lowincome.nolossgamble, df3_high_noloss$mean.judge.highincome.nolossgamble)
+gamble = c("loss_gamble", "loss_gamble", "no_loss_gamble", "no_loss_gamble")
+CIs = c(df3_low_loss$CI, df3_high_loss$CI, df3_low_noloss$CI, df3_high_noloss$CI)
+
+fig3.table <- data.frame(title, values, gamble, CIs)
+#figure 3 data frame
+fig3.table$gamble <- factor(fig3.table$gamble, levels = c("loss_gamble", "no_loss_gamble"))
+#relevel figure 3 table
+
+figure3 <- fig3.table %>%
+  ggplot(aes(x = title, y = values, fill = gamble)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Attractiveness of gamble") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 3 - Attractiveness of loss or no-loss gamble\nfor Study 3\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+#produces figure 3
+
+print(figure3)
+#displays figure 3
+```
+
+
 
 > The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01.
 
@@ -1182,28 +1306,15 @@ df4_spss %>%
 # high-income & small account : expensiveness
 df4_spss %>%
   filter(split == 1, largeacc == 0) %>%
-  summarise(mean.expense.highincome.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  summarise(mean.expense.highincome.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
-
-# high-income & small account : expensiveness
-#temp_title <- "High-income & Small account : expensiveness"
-#temp_x <- df4_1 %>%
-  #filter(Large.Acc==0, Split==1) %>%
-  #select(Expense)
-#Mean_CI(temp_title, temp_x) # print
 
 # high-income & large account : expensiveness
 df4_spss %>%
   filter(split == 1, largeacc == 1) %>%
-  summarise(mean.expense.highincome.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  summarise(mean.expense.highincome.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
 
-# high-income & large account : expensiveness
-#temp_title <- "High-income & Large account : expensiveness"
-#temp_x <- df4_1 %>%
-  #filter(Large.Acc==1, Split==1) %>%
-  #select(Expense)
-#Mean_CI(temp_title, temp_x) # print
 ```
 
 > whereas the evaluations of lower-income participants did not differ significantly between the conditions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48]).
@@ -1212,29 +1323,67 @@ df4_spss %>%
 # low-income & small account : expensiveness
 df4_spss %>%
   filter(split == 0, largeacc == 0) %>%
-  summarise(mean.expense.lowincome.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  summarise(mean.expense.lowincome.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
-
-# low-income & small account : expensiveness
-#temp_title <- "Low-income & Small account : expensiveness"
-#temp_x <- df4_1 %>%
-  #filter(Large.Acc==0, Split==0) %>%
-  #select(Expense)
-#Mean_CI(temp_title, temp_x) # print
 
 # low-income & large account : expensiveness
 df4_spss %>%
   filter(split == 0, largeacc == 1) %>%
-  summarise(mean.expense.lowincome.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  summarise(mean.expense.lowincome.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
 
-# low-income & large account : expensiveness
-#temp_title <- "Low-income & Large account : expensiveness"
-#temp_x <- df4_1 %>%
-  #filter(Large.Acc==1, Split==0) %>%
-  #select(Expense)
-#Mean_CI(temp_title, temp_x) # print
 ```
+
+
+
+```{r echo = FALSE}
+df4_high_small <- df4_spss %>%
+  filter(split == 1, largeacc == 0) %>%
+  summarise(mean.expense.highincome.smallaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  round(digits = 2)
+
+df4_high_large <- df4_spss %>%
+  filter(split == 1, largeacc == 1) %>%
+  summarise(mean.expense.highincome.largeaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (4) - high income
+```
+
+```{r echo = FALSE}
+df4_low_small <- df4_spss %>%
+  filter(split == 0, largeacc == 0) %>%
+  summarise(mean.expense.lowincome.smallaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  round(digits = 2)
+
+df4_low_large <- df4_spss %>%
+  filter(split == 0, largeacc == 1) %>%
+  summarise(mean.expense.lowincome.largeaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (4) - low income
+```
+
+
+```{r echo = FALSE}
+title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values = c(df4_low_small$mean.expense.lowincome.smallaccount, df4_high_small$mean.expense.highincome.smallaccount, df4_low_large$mean.expense.lowincome.largeaccount, df4_high_large$mean.expense.highincome.largeaccount)
+account_size = c("small_account", "small_account", "large_account", "large_account")
+CIs = c(df4_low_small$CI, df4_high_small$CI, df4_low_large$CI, df4_high_large$CI)
+
+fig4.table <- data.frame(title, values, account_size, CIs)
+#figure 4 data frame
+fig4.table$account_size <- factor(fig4.table$account_size, levels = c("small_account", "large_account"))
+#relevel figure 4 table
+
+figure4 <- fig4.table %>%
+  ggplot(aes(x = title, y = values, fill = account_size)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Expense rating") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 4 - DVD Expense Rating for either\na small or large account size for Study 4\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+#produces figure 4
+
+print(figure4)
+#displays figure 4
+```
+
+
+
 
 > The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02.
 
@@ -1294,59 +1443,84 @@ df5_demo %>%
 # Nondieters & Small account : Fattening
 df5_spss %>%
   filter(split == 0, week == 0) %>%
-  summarise(mean.fattening.nondieters.smallaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * sem(fattening)), CI.high = mean(fattening) + (1.96 * sem(fattening))) %>%
+  summarise(mean.fattening.nondieters.smallaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * Sem(fattening)), CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
   round(digits = 2)
-
-# Nondieters & Small account : Fattening
-#temp_title <- "Nondieters & Small account : Fattening"
-#temp_x <- df5_1 %>%
-  #filter(split==0, large==0) %>%
-  #select(fat)
-#Mean_CI(temp_title, temp_x) # print
 
 # Nondieters & Large account : Fattening
 df5_spss %>%
   filter(split == 0, week == 1) %>%
-  summarise(mean.fattening.nondieters.largeaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * sem(fattening)), CI.high = mean(fattening) + (1.96 * sem(fattening))) %>%
+  summarise(mean.fattening.nondieters.largeaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * Sem(fattening)), CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
   round(digits = 2)
 ```
 
 > but this was not true for dieters (small account: M = 8.86, 95% CI = [8.29, 9.43]; large account: M = 9.13, 95% CI = [8.66, 9.60]).
 
 ```{r echo = FALSE}
-# Nondieters & Large account : Fattening
-#temp_title <- "Nondieters & Large account : Fattening"
-#temp_x <- df5_1 %>%
-  #filter(split==0, large==1) %>%
-  #select(fat)
-#Mean_CI(temp_title, temp_x) # print
 
 # Dieter & Small account : Fattening
 df5_spss %>%
   filter(split == 1, week == 0) %>%
-  summarise(mean.fattening.dieters.smallaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * sem(fattening)), CI.high = mean(fattening) + (1.96 * sem(fattening))) %>%
+  summarise(mean.fattening.dieters.smallaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * Sem(fattening)), CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
   round(digits = 2)
 
-# Dieter & Small account : Fattening
-#temp_title <- "Dieter & Small account : Fattening"
-#temp_x <- df5_1 %>%
-  #filter(split==1, large==0) %>%
-  #select(fat)
-#Mean_CI(temp_title, temp_x) # print
 
 # Dieter & Large account : Fattening
 df5_spss %>%
   filter(split == 1, week == 1) %>%
-  summarise(mean.fattening.dieters.largeaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * sem(fattening)), CI.high = mean(fattening) + (1.96 * sem(fattening))) %>%
+  summarise(mean.fattening.dieters.largeaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * Sem(fattening)), CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
   round(digits = 2)
 
-# Dieter & Large account : Fattening
-#temp_title <- "Dieter & Large account : Fattening"
-#temp_x <- df5_1 %>%
-  #filter(split==1, large==1) %>%
-  #select(fat)
-#Mean_CI(temp_title, temp_x) # print
 ```
+
+
+
+```{r echo = FALSE}
+df5_nondiet_small <- df5_spss %>%
+  filter(split == 0, week == 0) %>%
+  summarise(mean.fattening.nondieters.smallaccount = mean(fattening), CI = (1.96 * Sem(fattening))) %>%
+  round(digits = 2)
+
+df5_nondiet_large <- df5_spss %>%
+  filter(split == 0, week == 1) %>%
+  summarise(mean.fattening.nondieters.largeaccount = mean(fattening), CI = (1.96 * Sem(fattening))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (5) - non-dieters
+```
+
+```{r echo = FALSE}
+df5_diet_small <- df5_spss %>%
+  filter(split == 1, week == 0) %>%
+  summarise(mean.fattening.dieters.smallaccount = mean(fattening), CI = (1.96 * Sem(fattening))) %>%
+  round(digits = 2)
+
+df5_diet_large <- df5_spss %>%
+  filter(split == 1, week == 1) %>%
+  summarise(mean.fattening.dieters.largeaccount = mean(fattening), CI = (1.96 * Sem(fattening))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (5) - dieters
+```
+
+
+```{r echo = FALSE}
+title = factor(c("Dieting", "Not Dieting"), levels = c("Dieting", "Not Dieting"))
+values = c(df5_diet_small$mean.fattening.dieters.smallaccount, df5_nondiet_small$mean.fattening.nondieters.smallaccount, df5_diet_large$mean.fattening.dieters.largeaccount, df5_nondiet_large$mean.fattening.nondieters.largeaccount)
+account_size = c("small_account", "small_account", "large_account", "large_account")
+CIs = c(df5_diet_small$CI, df5_nondiet_small$CI, df5_diet_large$CI, df5_nondiet_large$CI)
+
+fig5.table <- data.frame(title, values, account_size, CIs)
+#figure 5 data frame
+fig5.table$account_size <- factor(fig5.table$account_size, levels = c("small_account", "large_account"))
+#relevel figure 5 table
+
+figure5 <- fig5.table %>%
+  ggplot(aes(x = title, y = values, fill = account_size)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Fattiness rating") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 5 - French Fry Fattiness rating for either\na small or large calorie account size for Study 5\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+#produces figure 5
+
+print(figure5)
+#displays figure 5
+```
+
+
 
 > The interaction between dieting status and condition was significant, F(1, 230) = 4.40, p < .05, ηp2 = .02,
 
@@ -1424,62 +1598,85 @@ df6_spss %>%
 
 
 ```{r echo = FALSE}
-# Time-rich & Small account: Expensive
+
 df6_spss %>%
   filter(slack == 1, large == 0) %>%
-  summarise(mean.expense.timerich.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  summarise(mean.expense.timerich.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
 
-# Time-rich & Small account: Expensive
-#temp_title <- "Time-rich & Small account: Expensive"
-#temp_x <- df6_cric %>%
-  #filter(Slack==1, Large==0) %>%
-  #select(expense)
-#Mean_CI(temp_title, temp_x) # print
-
-# Time-rich & Large account: Expensive
 df6_spss %>%
   filter(slack == 1, large == 1) %>%
-  summarise(mean.expense.timerich.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  summarise(mean.expense.timerich.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
 ```
 
 > whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]).
 
 ```{r echo = FALSE}
-# Time-rich & Large account: Expensive
-#temp_title <- "Time-rich & Large account: Expensive"
-#temp_x <- df6_cric %>%
-  #filter(Slack==1, Large==1) %>%
-  #select(expense)
-#Mean_CI(temp_title, temp_x) # print
 
-# Time-poor & Small account: Expensive
 df6_spss %>%
   filter(slack == 0, large == 0) %>%
-  summarise(mean.expense.timepoor.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  summarise(mean.expense.timepoor.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
 
-# Time-poor & Small account: Expensive
-#temp_title <- "Time-poor & Small account: Expensive"
-#temp_x <- df6_cric %>%
-  #filter(Slack==0, Large==0) %>%
-  #select(expense)
-#Mean_CI(temp_title, temp_x) # print
 
-# Time-poor & Large account: Expensive
 df6_spss %>%
   filter(slack == 0, large == 1) %>%
-  summarise(mean.expense.timepoor.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * sem(expense)), CI.high = mean(expense) + (1.96 * sem(expense))) %>%
+  summarise(mean.expense.timepoor.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
 
-# Time-poor & Large account: Expensive
-#temp_title <- "Time-poor & Large account: Expensive"
-#temp_x <- df6_cric %>%
-  #filter(Slack==0, Large==1) %>%
-  #select(expense)
-#Mean_CI(temp_title, temp_x) # print
 ```
+
+```{r echo = FALSE}
+df6_rich_small <- df6_spss %>%
+  filter(slack == 1, large == 0) %>%
+  summarise(mean.expense.timerich.smallaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  round(digits = 2)
+
+df6_rich_large <- df6_spss %>%
+  filter(slack == 1, large == 1) %>%
+  summarise(mean.expense.timerich.largeaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (6) - time rich
+```
+
+```{r echo = FALSE}
+df6_poor_small <- df6_spss %>%
+  filter(slack == 0, large == 0) %>%
+  summarise(mean.expense.timepoor.smallaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  round(digits = 2)
+
+df6_poor_large <- df6_spss %>%
+  filter(slack == 0, large == 1) %>%
+  summarise(mean.expense.timepoor.largeaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  round(digits = 2)
+#producing data.frames for new figure (6) - time poor
+```
+
+
+```{r echo = FALSE}
+title = factor(c("Time Poor", "Time Rich"), levels = c("Time Poor", "Time Rich"))
+values = c(df6_poor_small$mean.expense.timepoor.smallaccount, df6_rich_small$mean.expense.timerich.smallaccount, df6_poor_large$mean.expense.timepoor.largeaccount, df6_rich_large$mean.expense.timerich.largeaccount)
+account_size = c("small_account", "small_account", "large_account", "large_account")
+CIs = c(df6_poor_small$CI, df6_rich_small$CI, df6_poor_large$CI, df6_rich_large$CI)
+
+fig6.table <- data.frame(title, values, account_size, CIs)
+#figure 6 data frame
+fig6.table$account_size <- factor(fig6.table$account_size, levels = c("small_account", "large_account"))
+#relevel figure 6 table
+
+figure6 <- fig6.table %>%
+  ggplot(aes(x = title, y = values, fill = account_size)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Expense rating") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 6 - Time loss Expense rating for either\na small or large time account size for Study 6\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+#produces figure 6
+
+print(figure6)
+#displays figure 6
+```
+
+
+
+
+
 
 > A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p < .05, ηp2 = .07.
 
