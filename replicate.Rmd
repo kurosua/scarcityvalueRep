@@ -135,10 +135,10 @@ figure1ahigh <- clean_1a %>%
   distinct(prop.tradeoff, prop.location, CI.tradeoff, CI.location)
 #computes new variables for proportion of answers, standard errors, and 95% confidence intervals for higher income group
 
-title = factor(c("trade-offs", "location"), levels = c("trade-offs", "location"))
-values = c(figure1alow$prop.tradeoff, figure1alow$prop.location, figure1ahigh$prop.tradeoff, figure1ahigh$prop.location)
-income = c("lower income", "lower income", "higher income", "higher income")
-CIs = c(figure1alow$CI.tradeoff, figure1alow$CI.location, figure1ahigh$CI.tradeoff, figure1ahigh$CI.location)
+title <- factor(c("trade-offs", "location"), levels = c("trade-offs", "location"))
+values <- c(figure1alow$prop.tradeoff, figure1alow$prop.location, figure1ahigh$prop.tradeoff, figure1ahigh$prop.location)
+income <- c("lower income", "lower income", "higher income", "higher income")
+CIs <- c(figure1alow$CI.tradeoff, figure1alow$CI.location, figure1ahigh$CI.tradeoff, figure1ahigh$CI.location)
 fig1a.table <- data.frame(title, values, income, CIs)
 income.factor <- factor(fig1a.table$income, levels = c("lower income", "higher income"))
 #figure 1a data frame (+ income.factor reverses the default position dodge of the bars)
@@ -279,10 +279,10 @@ lm(scale(beer) ~ scale(resort) + scale(logses) + scale(resort * logses), data = 
 
 
 ```{r echo = FALSE}
-title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values = c(clean_1b_low_grocer$mean.beer, clean_1b_high_grocer$mean.beer, clean_1b_low_resort$mean.beer, clean_1b_high_resort$mean.beer)
-location = c("Grocer", "Grocer", "Resort", "Resort")
-CIs = c(clean_1b_low_grocer$CI, clean_1b_high_grocer$CI, clean_1b_low_resort$CI, clean_1b_high_resort$CI)
+title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values <- c(clean_1b_low_grocer$mean.beer, clean_1b_high_grocer$mean.beer, clean_1b_low_resort$mean.beer, clean_1b_high_resort$mean.beer)
+location <- c("Grocer", "Grocer", "Resort", "Resort")
+CIs <- c(clean_1b_low_grocer$CI, clean_1b_high_grocer$CI, clean_1b_low_resort$CI, clean_1b_high_resort$CI)
 fig1b.table <- data.frame(title, values, location, CIs)
 #figure 1b data frame
 
@@ -424,10 +424,10 @@ lm(scale(pay) ~ scale(resort) + scale(logses) + scale(resort * logses), data = c
 
 
 ```{r echo = FALSE}
-title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values = c(clean_1c_low_grocer$mean.pay, clean_1c_high_grocer$mean.pay, clean_1c_low_resort$mean.pay, clean_1c_high_resort$mean.pay)
-location = c("Grocer", "Grocer", "Resort", "Resort")
-CIs = c(clean_1c_low_grocer$CI, clean_1c_high_grocer$CI, clean_1c_low_resort$CI, clean_1c_high_resort$CI)
+title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values <- c(clean_1c_low_grocer$mean.pay, clean_1c_high_grocer$mean.pay, clean_1c_low_resort$mean.pay, clean_1c_high_resort$mean.pay)
+location <- c("Grocer", "Grocer", "Resort", "Resort")
+CIs <- c(clean_1c_low_grocer$CI, clean_1c_high_grocer$CI, clean_1c_low_resort$CI, clean_1c_high_resort$CI)
 fig1c.table <- data.frame(title, values, location, CIs)
 #figure 1c data frame
 
@@ -446,7 +446,7 @@ print(figure1c)
 *note: in our replication, we counted 1,023 females and 992 males - this is a discrepency of +1 female and -1 male.*
 ```{r echo = FALSE}
 
-#read in the data for 1d using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
+#read in the data for 1d using the spss file and csv file
 suppressMessages(suppressWarnings(raw_1d_spss <- read.spss("framing/study_1d.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_1d_csv <- read.csv("study_1d_2c_demog.csv", header = TRUE)))
 
@@ -564,10 +564,10 @@ lm(scale(wtp) ~ scale(resort) + scale(logses) + scale(resort * logses), data = c
 ```
 
 ```{r echo = FALSE}
-title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values = c(clean_1d_low_grocer$mean.wtp, clean_1d_high_grocer$mean.wtp, clean_1d_low_resort$mean.wtp, clean_1d_high_resort$mean.wtp)
-location = c("Grocer", "Grocer", "Resort", "Resort")
-CIs = c(clean_1d_low_grocer$CI, clean_1d_high_grocer$CI, clean_1d_low_resort$CI, clean_1d_high_resort$CI)
+title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values <- c(clean_1d_low_grocer$mean.wtp, clean_1d_high_grocer$mean.wtp, clean_1d_low_resort$mean.wtp, clean_1d_high_resort$mean.wtp)
+location <- c("Grocer", "Grocer", "Resort", "Resort")
+CIs <- c(clean_1d_low_grocer$CI, clean_1d_high_grocer$CI, clean_1d_low_resort$CI, clean_1d_high_resort$CI)
 fig1d.table <- data.frame(title, values, location, CIs)
 #figure 1d data frame
 
@@ -582,7 +582,7 @@ print(figure1d)
 "The beer-on-the-beach scenario provides a canonical example of the difficulty people have in translating utility into value.  People have a sense of how much they would enjoy the beer, but they have difficulty representing this enjoyment with a price.  However, under conditions of scarcity, people base their price not merely on anticipated enjoyment, but also on anticipated trade-offs, and those are more consistent guides for valuation.  Could scarcity also lead to more consistent baluation of a dollar itself? The next set of studies addressed this question."
 
 
-### Replicator's Note - Graphs from here on out are newly added by us.  We feel that visualizing this data helps understand that the effects for the following experiments are not large, and differences between groups are very small at times.  These figures are in color to better differentiate them from the figures in the paper (which were in black and white and were replicated in black and white).
+### Replicator's Note - Graphs from here on out are newly added by us.  We feel that these figure strongly convey the findings in each experiment, namely, those with more resources are sensitive to experimental priming to change value measure, and those with scarce resources have a stable measure of value, independent of experimental priming.  With figures for each experiment, the paper's conclusion is more throughly driven to the reader. 
 -----
 
 ### Study 2a 
@@ -778,10 +778,10 @@ clean_2b_low_1000 <- clean_2b %>%
 
 
 ```{r echo = FALSE}
-title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values = c(clean_2b_low_300$threehundred.go, clean_2b_high_300$threehundred.go, clean_2b_low_500$fivehundred.go, clean_2b_high_500$fivehundred.go, clean_2b_low_1000$onethousand.go, clean_2b_high_1000$onethousand.go)
-tablet_cost = c("$300", "$300", "$500", "$500", "$1,000", "$1,000")
-CIs = c(clean_2b_low_300$CI, clean_2b_high_300$CI, clean_2b_low_500$CI, clean_2b_high_500$CI, clean_2b_low_1000$CI, clean_2b_high_1000$CI)
+title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values <- c(clean_2b_low_300$threehundred.go, clean_2b_high_300$threehundred.go, clean_2b_low_500$fivehundred.go, clean_2b_high_500$fivehundred.go, clean_2b_low_1000$onethousand.go, clean_2b_high_1000$onethousand.go)
+tablet_cost <- c("$300", "$300", "$500", "$500", "$1,000", "$1,000")
+CIs <- c(clean_2b_low_300$CI, clean_2b_high_300$CI, clean_2b_low_500$CI, clean_2b_high_500$CI, clean_2b_low_1000$CI, clean_2b_high_1000$CI)
 
 fig2b.table <- data.frame(title, values, tablet_cost, CIs)
 #figure 2b data frame
@@ -916,10 +916,10 @@ clean_2c_low_1000 <- clean_2c %>%
 
 
 ```{r echo = FALSE}
-title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values = c(clean_2c_low_300$threehundred.go, clean_2c_high_300$threehundred.go, clean_2c_low_500$fivehundred.go, clean_2c_high_500$fivehundred.go, clean_2c_low_1000$onethousand.go, clean_2c_high_1000$onethousand.go)
-tablet_cost = c("$300", "$300", "$500", "$500", "$1,000", "$1,000")
-CIs = c(clean_2c_low_300$CI, clean_2c_high_300$CI, clean_2c_low_500$CI, clean_2c_high_500$CI, clean_2c_low_1000$CI, clean_2c_high_1000$CI)
+title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values <- c(clean_2c_low_300$threehundred.go, clean_2c_high_300$threehundred.go, clean_2c_low_500$fivehundred.go, clean_2c_high_500$fivehundred.go, clean_2c_low_1000$onethousand.go, clean_2c_high_1000$onethousand.go)
+tablet_cost <- c("$300", "$300", "$500", "$500", "$1,000", "$1,000")
+CIs <- c(clean_2c_low_300$CI, clean_2c_high_300$CI, clean_2c_low_500$CI, clean_2c_high_500$CI, clean_2c_low_1000$CI, clean_2c_high_1000$CI)
 
 fig2c.table <- data.frame(title, values, tablet_cost, CIs)
 #figure 2b data frame
@@ -1212,10 +1212,10 @@ df3_low_noloss <- df3_spss %>%
 
 
 ```{r echo = FALSE}
-title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values = c(df3_low_loss$mean.judge.lowincome.lossgamble, df3_high_loss$mean.judge.highincome.lossgamble, df3_low_noloss$mean.judge.lowincome.nolossgamble, df3_high_noloss$mean.judge.highincome.nolossgamble)
-gamble = c("loss_gamble", "loss_gamble", "no_loss_gamble", "no_loss_gamble")
-CIs = c(df3_low_loss$CI, df3_high_loss$CI, df3_low_noloss$CI, df3_high_noloss$CI)
+title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values <- c(df3_low_loss$mean.judge.lowincome.lossgamble, df3_high_loss$mean.judge.highincome.lossgamble, df3_low_noloss$mean.judge.lowincome.nolossgamble, df3_high_noloss$mean.judge.highincome.nolossgamble)
+gamble <- c("loss_gamble", "loss_gamble", "no_loss_gamble", "no_loss_gamble")
+CIs <- c(df3_low_loss$CI, df3_high_loss$CI, df3_low_noloss$CI, df3_high_noloss$CI)
 
 fig3.table <- data.frame(title, values, gamble, CIs)
 #figure 3 data frame
@@ -1375,10 +1375,10 @@ df4_low_large <- df4_spss %>%
 
 
 ```{r echo = FALSE}
-title = factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values = c(df4_low_small$mean.expense.lowincome.smallaccount, df4_high_small$mean.expense.highincome.smallaccount, df4_low_large$mean.expense.lowincome.largeaccount, df4_high_large$mean.expense.highincome.largeaccount)
-account_size = c("small_account", "small_account", "large_account", "large_account")
-CIs = c(df4_low_small$CI, df4_high_small$CI, df4_low_large$CI, df4_high_large$CI)
+title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
+values <- c(df4_low_small$mean.expense.lowincome.smallaccount, df4_high_small$mean.expense.highincome.smallaccount, df4_low_large$mean.expense.lowincome.largeaccount, df4_high_large$mean.expense.highincome.largeaccount)
+account_size <- c("small_account", "small_account", "large_account", "large_account")
+CIs <- c(df4_low_small$CI, df4_high_small$CI, df4_low_large$CI, df4_high_large$CI)
 
 fig4.table <- data.frame(title, values, account_size, CIs)
 #figure 4 data frame
@@ -1511,10 +1511,10 @@ df5_diet_large <- df5_spss %>%
 
 
 ```{r echo = FALSE}
-title = factor(c("Dieting", "Not Dieting"), levels = c("Dieting", "Not Dieting"))
-values = c(df5_diet_small$mean.fattening.dieters.smallaccount, df5_nondiet_small$mean.fattening.nondieters.smallaccount, df5_diet_large$mean.fattening.dieters.largeaccount, df5_nondiet_large$mean.fattening.nondieters.largeaccount)
-account_size = c("small_account", "small_account", "large_account", "large_account")
-CIs = c(df5_diet_small$CI, df5_nondiet_small$CI, df5_diet_large$CI, df5_nondiet_large$CI)
+title <- factor(c("Dieting", "Not Dieting"), levels = c("Dieting", "Not Dieting"))
+values <- c(df5_diet_small$mean.fattening.dieters.smallaccount, df5_nondiet_small$mean.fattening.nondieters.smallaccount, df5_diet_large$mean.fattening.dieters.largeaccount, df5_nondiet_large$mean.fattening.nondieters.largeaccount)
+account_size <- c("small_account", "small_account", "large_account", "large_account")
+CIs <- c(df5_diet_small$CI, df5_nondiet_small$CI, df5_diet_large$CI, df5_nondiet_large$CI)
 
 fig5.table <- data.frame(title, values, account_size, CIs)
 #figure 5 data frame
@@ -1664,10 +1664,10 @@ df6_poor_large <- df6_spss %>%
 
 
 ```{r echo = FALSE}
-title = factor(c("Time Poor", "Time Rich"), levels = c("Time Poor", "Time Rich"))
-values = c(df6_poor_small$mean.expense.timepoor.smallaccount, df6_rich_small$mean.expense.timerich.smallaccount, df6_poor_large$mean.expense.timepoor.largeaccount, df6_rich_large$mean.expense.timerich.largeaccount)
-account_size = c("small_account", "small_account", "large_account", "large_account")
-CIs = c(df6_poor_small$CI, df6_rich_small$CI, df6_poor_large$CI, df6_rich_large$CI)
+title <- factor(c("Time Poor", "Time Rich"), levels = c("Time Poor", "Time Rich"))
+values <- c(df6_poor_small$mean.expense.timepoor.smallaccount, df6_rich_small$mean.expense.timerich.smallaccount, df6_poor_large$mean.expense.timepoor.largeaccount, df6_rich_large$mean.expense.timerich.largeaccount)
+account_size <- c("small_account", "small_account", "large_account", "large_account")
+CIs <- c(df6_poor_small$CI, df6_rich_small$CI, df6_poor_large$CI, df6_rich_large$CI)
 
 fig6.table <- data.frame(title, values, account_size, CIs)
 #figure 6 data frame
