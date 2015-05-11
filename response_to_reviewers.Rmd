@@ -1,0 +1,13 @@
+---
+title: "response_to_reviewers"
+author: "Nick F & Aaron K"
+date: "May 11, 2015"
+output: html_document
+---
+
+Thank you everyone for the great feedback on our replication-project! There was a lot of encouragement as well as revealing insights as to what our code looks like to people not deeply familiar with our project. 
+
+We cleaned up the code. Deleted many of our misleading notes. Overall there is more consistency and legibility across the file. A bigger undertaking that we couldn't commit would have be to create some kind of dynamic function to auto-generate plots with data germane to each experiment in this paper. That aside, we included more notes revealing our intentions. Finally we replaced many of the ambiguous reference by index-numbers and instead used the variable-names to make the code easier to read. Overall this was a great paper and a tractable regression replication project.  
+
+Best Wishes,
+Nick & Aaron

@@ -5,6 +5,11 @@ date: "March 15, 2015"
 output: html_document
 ---
 
+Replicating the analysis for:
+Shah, A. K., Mullainathan, S., & Shafir, E. (2015). Scarcity Frames Value. Psychological Science, 1–11. http://doi.org/10.1177/0956797614563958
+
+Briefly: this paper was about the effects of scarcity (e.g. financial, caloric, etc) interacts other contextual psychological effects. 
+
 ```{r echo = FALSE}
 suppressPackageStartupMessages(require(dplyr))
 suppressPackageStartupMessages(require(tidyr))
