@@ -41,8 +41,8 @@ Mean_CI <- function(title, x){
   print(c("CI : ", CI), quote = F)
 }
 ```
-<br> <br> <br>
 
+***
 
 ### Study 1a
 
@@ -106,7 +106,10 @@ logit2logses <- glm(tradeoff ~ logses, data = clean_1a, family = "binomial")
 print(wald.test(b = coef(logit2logses), Sigma = vcov(logit2logses), Terms = 2)$result$chi2[1], digit = 3)
 ```
 
-```{r echo = FALSE}
+```{r, echo = FALSE}
+# Plotting : 
+
+# computes new variables for proportion of answers, standard errors, and 95% confidence intervals for lower income group:
 figure1alow <- clean_1a %>%
   filter(income2 <= 35000) %>%
   mutate(total.n = n(), total.tradeoff = sum(tradeoff), 
@@ -118,9 +121,8 @@ figure1alow <- clean_1a %>%
          SE.location = sqrt(prop.location * (1 - prop.location)/total.n), 
          CI.location = qnorm(.975) * SE.location) %>%
   distinct(prop.tradeoff, prop.location, CI.tradeoff, CI.location)
-#computes new variables for proportion of answers, standard errors, and 95% confidence intervals for lower income group
 
-
+# computes new variables for proportion of answers, standard errors, and 95% confidence intervals for higher income group:
 figure1ahigh <- clean_1a %>%
     filter(income2 > 35000) %>%
   mutate(total.n = n(), 
@@ -133,31 +135,56 @@ figure1ahigh <- clean_1a %>%
          SE.location = sqrt(prop.location * (1 - prop.location)/total.n), 
          CI.location = qnorm(.975) * SE.location) %>%
   distinct(prop.tradeoff, prop.location, CI.tradeoff, CI.location)
-#computes new variables for proportion of answers, standard errors, and 95% confidence intervals for higher income group
 
-title <- factor(c("trade-offs", "location"), levels = c("trade-offs", "location"))
-values <- c(figure1alow$prop.tradeoff, figure1alow$prop.location, figure1ahigh$prop.tradeoff, figure1ahigh$prop.location)
-income <- c("lower income", "lower income", "higher income", "higher income")
-CIs <- c(figure1alow$CI.tradeoff, figure1alow$CI.location, figure1ahigh$CI.tradeoff, figure1ahigh$CI.location)
+# Set values for figure
+title <- factor(c("trade-offs", "location"), 
+                levels = c("trade-offs", "location"))
+values <- c(figure1alow$prop.tradeoff, 
+            figure1alow$prop.location, 
+            figure1ahigh$prop.tradeoff, 
+            figure1ahigh$prop.location)
+income <- c("lower income", 
+            "lower income", "higher income", 
+            "higher income")
+CIs <- c(figure1alow$CI.tradeoff, 
+         figure1alow$CI.location, 
+         figure1ahigh$CI.tradeoff, 
+         figure1ahigh$CI.location)
 fig1a.table <- data.frame(title, values, income, CIs)
-income.factor <- factor(fig1a.table$income, levels = c("lower income", "higher income"))
-#figure 1a data frame (+ income.factor reverses the default position dodge of the bars)
+income.factor <- factor(fig1a.table$income, 
+                        levels = c("lower income", "higher income"))
 
+# figure 1a data frame (+ income.factor reverses the default position dodge of the bars)
 figure1a <- fig1a.table %>%
-  ggplot(aes(x = title, y = values, fill = income.factor)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Proportion Endorsing Reason") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a\n(error bars represent 95% confidence interval)") + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 1a
+  ggplot(aes(x = title, y = values, fill = income.factor)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(), 
+           colour = "black") + 
+  ylab("Proportion Endorsing Reason") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs, 
+                    ymax = values + CIs), 
+                width = 0.2, position = position_dodge(0.9)) + 
+  theme_bw() + 
+  scale_fill_grey(start = .3, end = .85) + 
+  ggtitle("Figure 1a - the proportion of lower- and higher-income participants\nciting trade-off and location considerations in Study 1a\n(error bars represent 95% confidence interval)") + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# Plot Figure 1a
 print(figure1a)
-#displays figure 1a
 ```
+
+***
 
 ### Study 1b
 
 "In Study 1b, there were 151 participants (mean age = 32.9 years; 76 females, 75 males; median household size = 3 people, median household income = $45000).  In Study 1c, there were 604 participants (mean age = 29.9 years; 246 females, 358 males; median household size = 2 people; median household income = $45,000).  Study 1d was conducted with a large, representative sample drawn from Survey Sampling International's panel of U.S respondents.  There were 2,015 participants (mean age = 39.1 years; 1,022 females, 993 males; median household size = 3 people; median household income = $55,000).  In Study 1b, participants read the beer-on-the-beach scenario and indicated their WTP for the beer.  Studies 1c and 1d directly replicated Study 1b.  Because WTP was elicited with an open-ended scale, some participants named unreasonably high prices.  We describe our exclusion rules for these responses in the next section.  These rules were determined before we conducted the significance tests."
 
 ```{r echo = FALSE}
-
-#read in the data for 1b using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
+# Read in the data for 1b using the spss file and csv file - the warning that comes up is okay - the data imports cleanly:
 suppressMessages(suppressWarnings(raw_1b_spss <- read.spss("framing/study_1b.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_1b_csv <- read.csv("study_1b_demog.csv", header = TRUE)))
 
@@ -180,89 +207,90 @@ raw_1b_spss %>%
 "In Study 1b, 2 participants were excluded whose Willing-to-pay (WTP) was more than 3 standard deviations from the mean. Higher-income participants showed the classic effect, offering a higher price for beer from the resort, "
 
 ```{r echo = FALSE}
-
+# Remove item's not selected:
 clean_1b <- raw_1b_spss %>%
   filter(filter_. != "Not Selected")
 
+# this calculates high-income WTP beer price at resort - summarise to display in print-out:
 clean_1b %>%
   filter(split == 1, resort == 1) %>%
-  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
+  summarise(mean.beer = mean(beer), 
+            CI.low = mean(beer) -  (1.96 * Sem(beer)), 
+            CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
   round(digits = 2)
-#1.96 * standard error gives 95% CI in one direction
-#this calculates high-income WTP beer price at resort - summarise to display in print-out
+# 1.96 * standard error gives 95% CI in one direction
 
+# Generates mean and CI for high income (noted by "split") participants in the resort scenario - to use in figure 1b
 clean_1b_high_resort <- clean_1b %>%
   filter(split == 1, resort == 1) %>%
   mutate(mean.beer = mean(beer), CI = (1.96 * Sem(beer))) %>%
   distinct(mean.beer, CI)
-#generates mean and CI for high income participants in the resort scenario - to use in figure 1b
-
 ```
 
 "compared to the grocery store."
 
 ```{r echo = FALSE}
+# This calculates high-income WTP beer price at grocer - summarise to display in print-out:
 clean_1b %>%
   filter(split == 1, resort == 0) %>%
   summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
   round(digits = 2)
 #1.96 * standard error gives 95% CI in one direction
-#this calculates high-income WTP beer price at grocer - summarise to display in print-out
 
-
+# Generates mean and CI for high income participants in the grocer scenario - to use in figure 1b:
 clean_1b_high_grocer <- clean_1b %>%
   filter(split == 1, resort == 0) %>%
   mutate(mean.beer = mean(beer), CI = (1.96 * Sem(beer))) %>%
   distinct(mean.beer, CI)
-#generates mean and CI for high income participants in the grocer scenario - to use in figure 1b
 ```
 
 "But lower income participants' WTP did not differ significantly between beer from the resort,"
 
 ```{r echo = FALSE}
+# This calculates low income WTP beer price at resort: 
 clean_1b %>%
   filter(split == 0, resort == 1) %>%
   summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
   round(digits = 2)
 #1.96 * standard error gives 95% CI in one direction
-#this calculates low income WTP beer price at resort
 
+# generates mean and CI for low income participants in the resort scenario - to use in figure 1b:
 clean_1b_low_resort <- clean_1b %>%
   filter(split == 0, resort == 1) %>%
   mutate(mean.beer = mean(beer), CI = (1.96 * Sem(beer))) %>%
   distinct(mean.beer, CI)
-#generates mean and CI for low income participants in the resort scenario - to use in figure 1b
 ```
 
 "and beer from the store."
 
 ```{r echo = FALSE}
+# this calculates low income WTP beer price at grocery store (resort=0):
 clean_1b %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.beer = mean(beer), CI.low = mean(beer) -  (1.96 * Sem(beer)), CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
+  summarise(mean.beer = mean(beer), 
+            CI.low = mean(beer) -  (1.96 * Sem(beer)), 
+            CI.high = mean(beer) + (1.96 * Sem(beer))) %>%
   round(digits = 2)
 #1.96 * standard error gives 95% CI in one direction
-#this calculates low income WTP beer price at grocery store
 
+# generates mean and CI for low income participants in the grocer scenario - to use in figure 1b: 
 clean_1b_low_grocer <- clean_1b %>%
   filter(split == 0, resort == 0) %>%
   mutate(mean.beer = mean(beer), CI = (1.96 * Sem(beer))) %>%
   distinct(mean.beer, CI)
-#generates mean and CI for low income participants in the grocer scenario - to use in figure 1b
 ```
-
 
 "The interaction between income and context was significant F(1,145) = 11.18, p < 0.01, eta squared partial = 0.07."
 
 ```{r echo = FALSE}
+# ANOVA
+summary(aov(beer ~ resort * split, data = clean_1b))
 
-summary(aov_1b <- aov(beer ~ resort * split, data = clean_1b))
-
-temp_eta <- etaSquared(aov(beer ~ resort * split, data = clean_1b)) %>%
-  .[3,2] %>%
-  round(digit = 2)
-print(c("partial eta squared:", temp_eta), quote = FALSE)
-
+# partial eta squared
+etaSquared(aov(beer ~ resort * split, data = clean_1b)) %>%
+  .["resort:split", "eta.sq.part"] %>%
+  round(digit = 3) %>%
+  cat("Grocery/Resort & Low/High-Income\nPartial Eta Squared:",.)
 ```
 
 "The interaction was also significant when income was treated as a continuous variable beta = 2.27, t(145) = 2.17, p < 0.05."
@@ -274,57 +302,81 @@ lm(scale(beer) ~ scale(resort) + scale(logses) + scale(resort * logses), data = 
   mutate(beta = round(estimate, digit = 2),
          p = round(p.value, digit = 4))  %>%  
         select(term, beta, p)
-
 ```
-
 
 ```{r echo = FALSE}
-title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values <- c(clean_1b_low_grocer$mean.beer, clean_1b_high_grocer$mean.beer, clean_1b_low_resort$mean.beer, clean_1b_high_resort$mean.beer)
+# Plotting :
+
+# Figure 1b data frame
+title <- factor(c("Lower Income", "Higher Income"), 
+                levels = c("Lower Income", "Higher Income"))
+values <- c(clean_1b_low_grocer$mean.beer, 
+            clean_1b_high_grocer$mean.beer, 
+            clean_1b_low_resort$mean.beer, 
+            clean_1b_high_resort$mean.beer)
 location <- c("Grocer", "Grocer", "Resort", "Resort")
-CIs <- c(clean_1b_low_grocer$CI, clean_1b_high_grocer$CI, clean_1b_low_resort$CI, clean_1b_high_resort$CI)
+CIs <- c(clean_1b_low_grocer$CI, 
+         clean_1b_high_grocer$CI, 
+         clean_1b_low_resort$CI, 
+         clean_1b_high_resort$CI)
 fig1b.table <- data.frame(title, values, location, CIs)
-#figure 1b data frame
 
+# Produces figure 1b
 figure1b <- fig1b.table %>%
-  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1b - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1b\n(error bars represent 95% confidence interval)") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 1b
+  ggplot(aes(x = title, y = values, fill = location)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(), 
+           colour = "black") + 
+  ylab("WTP (dollars)") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs, 
+                    ymax = values + CIs), 
+                width = 0.2, 
+                position = position_dodge(0.9)) + 
+  theme_bw() + 
+  scale_fill_grey(start = .3, end = .85) + 
+  ggtitle("Figure 1b - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1b\n(error bars represent 95% confidence interval)") + 
+  scale_y_continuous(breaks = seq(0, 8, 1)) + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# Plots figure 1b:
 print(figure1b)
-#displays figure 1b
 ```
 
----
+***
 
 ### Study 1c
 
 "We replicated the results of 1b with larger samples in studies 1c and 1d.  In study 1c, we excluded 2 participants with missing responses, 5 with unreasonably high WTPs (over $100), and 19 additional outliers on WTP, which left 578 participants."
 
 ```{r echo = FALSE}
-
-#read in the data for 1c using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
+# read in the data for 1c using the spss file and csv file - the warning that comes up is okay - the data imports cleanly.
 suppressMessages(suppressWarnings(raw_1c_spss <- read.spss("framing/study_1c.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_1c_csv <- read.csv("study_1c_demog.csv", header = TRUE)))
 
-#average age for Study 1c
+# average age for Study 1c
 raw_1c_csv %>%
   filter(age != "NA") %>%
   summarise(mean.age = mean(age)) %>%
   round(digits = 1)
 
-#calculate sex breakdown for Study 1c
+# calculate sex breakdown for Study 1c
 raw_1c_csv %>%
   filter(gender != "NA") %>%
   group_by(gender) %>%
   summarise(sex_breakdown = n())
 
-#calculate total sample size for Study 1c
+# calculate total sample size for Study 1c
 raw_1c_csv %>%
   summarise(sample.size = n())
 
-#calculate median household income and size for Study 1c
+# calculate median household income and size for Study 1c
 raw_1c_spss %>%
-  summarise(median.household.income = median(inc2), median.household.size = median(house))
+  summarise(median.household.income = median(inc2), 
+            median.household.size = median(house))
 
 clean_1c <- raw_1c_spss %>%
   filter(filter_. != "Not Selected")
@@ -336,6 +388,7 @@ clean_1c %>%
 "Dividing participants according to a median split on income, we found that higher-income participants offered a higher price for beer from the resort,"
 
 ```{r echo = FALSE}
+# Generates mean and CI for high income participants in the resort scenario - to use in figure 1c:
 clean_1c %>%
   filter(split == 1, resort == 1) %>%
   summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
@@ -345,25 +398,23 @@ clean_1c_high_resort <- clean_1c %>%
   filter(split == 1, resort == 1) %>%
   mutate(mean.pay = mean(pay), CI = (1.96 * Sem(pay))) %>%
   distinct(mean.pay, CI)
-#generates mean and CI for high income participants in the resort scenario - to use in figure 1c
-
 ```
 
 "than for beer from the grocery store."
 
 ```{r echo = FALSE}
-
 clean_1c %>%
   filter(split == 1, resort == 0) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
+  summarise(mean.beer = mean(pay), 
+            ci.low = mean(pay) -  (1.96 * Sem(pay)), 
+            ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
   round(digits = 2)
 
+# generates mean and CI for high income participants in the grocer scenario - to use in figure 1c
 clean_1c_high_grocer <- clean_1c %>%
   filter(split == 1, resort == 0) %>%
   mutate(mean.pay = mean(pay), CI = (1.96 * Sem(pay))) %>%
   distinct(mean.pay, CI)
-#generates mean and CI for high income participants in the grocer scenario - to use in figure 1c
-
 ```
 
 "Lower-income participants' WTP did not differ significantly between beer from the resort,"
@@ -371,16 +422,16 @@ clean_1c_high_grocer <- clean_1c %>%
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 0, resort == 1) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
+  summarise(mean.beer = mean(pay), 
+            ci.low = mean(pay) -  (1.96 * Sem(pay)), 
+            ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
   round(digits = 2)
 
+# generates mean and CI for low income participants in the resort scenario - to use in figure 1c:
 clean_1c_low_resort <- clean_1c %>%
   filter(split == 0, resort == 1) %>%
   mutate(mean.pay = mean(pay), CI = (1.96 * Sem(pay))) %>%
   distinct(mean.pay, CI)
-#generates mean and CI for low income participants in the resort scenario - to use in figure 1c
-
-
 ```
 
 "and beer from the store."
@@ -388,26 +439,29 @@ clean_1c_low_resort <- clean_1c %>%
 ```{r echo = FALSE}
 clean_1c %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.beer = mean(pay), ci.low = mean(pay) -  (1.96 * Sem(pay)), ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
+  summarise(mean.beer = mean(pay), 
+            ci.low = mean(pay) -  (1.96 * Sem(pay)), 
+            ci.high = mean(pay) + (1.96 * Sem(pay))) %>%
   round(digits = 2)
 
+# generates mean and CI for low income participants in the grocer scenario - to use in figure 1c:
 clean_1c_low_grocer <- clean_1c %>%
   filter(split == 0, resort == 0) %>%
   mutate(mean.pay = mean(pay), CI = (1.96 * Sem(pay))) %>%
   distinct(mean.pay, CI)
-#generates mean and CI for low income participants in the grocer scenario - to use in figure 1c
-
 ```
 
 "The interaction between income and context was significant, F(1,574) = 5.68, p < 0.05, eta squared partial = 0.01."
 
 ```{r echo = FALSE}
+# anova
 summary(aov(pay ~ resort * split, data = clean_1c))
 
-temp_eta <- etaSquared(aov(pay ~ resort * split, data = clean_1c)) %>%
-  .[3,2] %>%
-  round(digit = 2)
-print(c("partial eta squared:", temp_eta), quote = FALSE)
+# partial eta squared
+etaSquared(aov(pay ~ resort * split, data = clean_1c)) %>%
+  .["resort:split", "eta.sq.part"] %>%
+  round(digit = 3) %>%
+  cat("Grocery/Resort & Low/High-Income\nPartial Eta Squared:",.)
 ```
 
 "The interaction was also significant when income was treated continuously, beta = 1.65, t(574) = 3.27, p < 0.01."
@@ -419,24 +473,43 @@ lm(scale(pay) ~ scale(resort) + scale(logses) + scale(resort * logses), data = c
   mutate(beta = round(estimate, digit = 2),
          p = round(p.value, digit = 4))  %>%  
         select(term, beta, p)
-  
 ```
 
 
 ```{r echo = FALSE}
-title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values <- c(clean_1c_low_grocer$mean.pay, clean_1c_high_grocer$mean.pay, clean_1c_low_resort$mean.pay, clean_1c_high_resort$mean.pay)
+# Ploting: 
+title <- factor(c("Lower Income", "Higher Income"), 
+                levels = c("Lower Income", "Higher Income"))
+values <- c(clean_1c_low_grocer$mean.pay, 
+            clean_1c_high_grocer$mean.pay, 
+            clean_1c_low_resort$mean.pay, clean_1c_high_resort$mean.pay)
 location <- c("Grocer", "Grocer", "Resort", "Resort")
-CIs <- c(clean_1c_low_grocer$CI, clean_1c_high_grocer$CI, clean_1c_low_resort$CI, clean_1c_high_resort$CI)
+CIs <- c(clean_1c_low_grocer$CI, 
+         clean_1c_high_grocer$CI, clean_1c_low_resort$CI, 
+         clean_1c_high_resort$CI)
 fig1c.table <- data.frame(title, values, location, CIs)
-#figure 1c data frame
 
+# figure 1c data frame
 figure1c <- fig1c.table %>%
-  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1c - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1c\n(error bars represent 95% confidence interval)") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 1c
+  ggplot(aes(x = title, y = values, fill = location)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(), 
+           colour = "black") + 
+  ylab("WTP (dollars)") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), 
+                width = 0.2, position = position_dodge(0.9)) + 
+  theme_bw() + 
+  scale_fill_grey(start = .3, end = .85) + 
+  ggtitle("Figure 1c - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1c\n(error bars represent 95% confidence interval)") + 
+  scale_y_continuous(breaks = seq(0, 8, 1)) + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# Plots figure 1c
 print(figure1c)
-#displays figure 1c
 ```
 
 -----
@@ -445,28 +518,27 @@ print(figure1c)
 
 *note: in our replication, we counted 1,023 females and 992 males - this is a discrepency of +1 female and -1 male.*
 ```{r echo = FALSE}
-
-#read in the data for 1d using the spss file and csv file
+# read in the data for 1d using the spss file and csv file
 suppressMessages(suppressWarnings(raw_1d_spss <- read.spss("framing/study_1d.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_1d_csv <- read.csv("study_1d_2c_demog.csv", header = TRUE)))
 
-#average age for Study 1d
+# average age for Study 1d
 raw_1d_csv %>%
   filter(age != "NA") %>%
   summarise(mean.age = mean(age)) %>%
   round(digits = 1)
 
-#calculate sex breakdown for Study 1d
+# calculate sex breakdown for Study 1d
 raw_1d_csv %>%
   filter(gender != "NA") %>%
   group_by(gender) %>%
   summarise(sex_breakdown = n())
 
-#calculate total sample size for Study 1d
+# calculate total sample size for Study 1d
 raw_1d_csv %>%
   summarise(sample.size = n())
 
-#calculate median household income and size for Study 1d
+# calculate median household income and size for Study 1d
 raw_1d_spss %>%
   summarise(median.household.income = median(inc2), median.household.size = median(house))
 
@@ -486,14 +558,16 @@ clean_1d %>%
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 1, resort == 1) %>%
-  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
+  summarise(mean.wtp = mean(wtp), 
+            CI.low = mean(wtp) -  (1.96 * Sem(wtp)), 
+            CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
   round(digits = 2)
 
+# for figure 1d
 clean_1d_high_resort <- clean_1d %>%
   filter(split == 1, resort == 1) %>%
   mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
   distinct(mean.wtp, CI)
-#for figure 1d
 ```
 
 "than for beer from the grocery store (M = $5.46, 95% CI [$5.13, $5.79])."
@@ -501,14 +575,16 @@ clean_1d_high_resort <- clean_1d %>%
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 1, resort == 0) %>%
-  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
+  summarise(mean.wtp = mean(wtp), 
+            CI.low = mean(wtp) -  (1.96 * Sem(wtp)), 
+            CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
   round(digits = 2)
 
+# for figure 1d
 clean_1d_high_grocer <- clean_1d %>%
   filter(split == 1, resort == 0) %>%
   mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
   distinct(mean.wtp, CI)
-#for figure 1d
 ```
 
 "Lower-income participants' WTP did not differ significantly between the resort (M = $6.21, 95% CI [$5.83, $6.60])"
@@ -516,40 +592,47 @@ clean_1d_high_grocer <- clean_1d %>%
 ```{r echo = FALSE}
 clean_1d %>%
   filter(split == 0, resort == 1) %>%
-  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
+  summarise(mean.wtp = mean(wtp), 
+            CI.low = mean(wtp) -  (1.96 * Sem(wtp)), 
+            CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
   round(digits = 2)
 
+# for figure 1d
 clean_1d_low_resort <- clean_1d %>%
   filter(split == 0, resort == 1) %>%
   mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
   distinct(mean.wtp, CI)
-#for figure 1d
 ```
 
 "and the store (M = %5.71, 95% CI [$5.31, $6.11])."
 
 ```{r echo = FALSE}
+# for figure 1d
 clean_1d %>%
   filter(split == 0, resort == 0) %>%
-  summarise(mean.wtp = mean(wtp), CI.low = mean(wtp) -  (1.96 * Sem(wtp)), CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
+  summarise(mean.wtp = mean(wtp), 
+            CI.low = mean(wtp) -  (1.96 * Sem(wtp)), 
+            CI.high = mean(wtp) + (1.96 * Sem(wtp))) %>%
   round(digits = 2)
 
 clean_1d_low_grocer <- clean_1d %>%
   filter(split == 0, resort == 0) %>%
-  mutate(mean.wtp = mean(wtp), CI = (1.96 * Sem(wtp))) %>%
+  mutate(mean.wtp = mean(wtp), 
+         CI = (1.96 * Sem(wtp))) %>%
   distinct(mean.wtp, CI)
-#for figure 1d
 ```
 
 "The interaction between income and context was significant, F(1, 1984) = 4.82, p < 0.05, eta squared partial = 0.003."
 
 ```{r echo = FALSE}
+# anova
 summary(aov(wtp ~ resort * split, data = clean_1d))
 
-temp_eta <- etaSquared(aov(wtp ~ resort * split, data = clean_1d)) %>%
-  .[3,2] %>%
-  round(digit = 3)
-print(c("partial eta squared:", temp_eta), quote = FALSE)
+# partial eta squared
+etaSquared(aov(wtp ~ resort * split, data = clean_1d)) %>%
+  .["resort:split", "eta.sq.part"] %>%
+  round(digit = 3) %>%
+  cat("Grocery/Resort & Low/High-Income\nPartial Eta Squared:",.)
 ```
 
 "This interaction was marginally significant when income was treated continuously, beta = 0.50, t(1894) = 1.85, p < 0.07."
@@ -564,61 +647,83 @@ lm(scale(wtp) ~ scale(resort) + scale(logses) + scale(resort * logses), data = c
 ```
 
 ```{r echo = FALSE}
-title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values <- c(clean_1d_low_grocer$mean.wtp, clean_1d_high_grocer$mean.wtp, clean_1d_low_resort$mean.wtp, clean_1d_high_resort$mean.wtp)
+# Plotting :
+title <- factor(c("Lower Income", "Higher Income"), 
+                levels = c("Lower Income", "Higher Income"))
+values <- c(clean_1d_low_grocer$mean.wtp, 
+            clean_1d_high_grocer$mean.wtp, 
+            clean_1d_low_resort$mean.wtp, 
+            clean_1d_high_resort$mean.wtp)
 location <- c("Grocer", "Grocer", "Resort", "Resort")
-CIs <- c(clean_1d_low_grocer$CI, clean_1d_high_grocer$CI, clean_1d_low_resort$CI, clean_1d_high_resort$CI)
+CIs <- c(clean_1d_low_grocer$CI, 
+         clean_1d_high_grocer$CI, 
+         clean_1d_low_resort$CI, 
+         clean_1d_high_resort$CI)
 fig1d.table <- data.frame(title, values, location, CIs)
-#figure 1d data frame
 
+# figure 1d data frame
 figure1d <- fig1d.table %>%
-  ggplot(aes(x = title, y = values, fill = location)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("WTP (dollars)") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + theme_bw() + scale_fill_grey(start = .3, end = .85) + ggtitle("Figure 1d - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1d\n(error bars represent 95% confidence interval)") + scale_y_continuous(breaks = seq(0, 8, 1)) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 1d
+  ggplot(aes(x = title, y = values, fill = location)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(), 
+           colour = "black") + 
+  ylab("WTP (dollars)") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs, 
+                    ymax = values + CIs), 
+                width = 0.2, 
+                position = position_dodge(0.9)) + 
+  theme_bw() + 
+  scale_fill_grey(start = .3, end = .85) + 
+  ggtitle("Figure 1d - Amount participants were willing to pay (WTP)\nfor beer at the grocery store and resort in Study 1d\n(error bars represent 95% confidence interval)") + 
+  scale_y_continuous(breaks = seq(0, 8, 1)) + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# plots figure 1d :
 print(figure1d)
-#displays figure 1d
 ```
 
-"The beer-on-the-beach scenario provides a canonical example of the difficulty people have in translating utility into value.  People have a sense of how much they would enjoy the beer, but they have difficulty representing this enjoyment with a price.  However, under conditions of scarcity, people base their price not merely on anticipated enjoyment, but also on anticipated trade-offs, and those are more consistent guides for valuation.  Could scarcity also lead to more consistent baluation of a dollar itself? The next set of studies addressed this question."
-
+"The beer-on-the-beach scenario provides a canonical example of the difficulty people have in translating utility into value. People have a sense of how much they would enjoy the beer, but they have difficulty representing this enjoyment with a price. However, under conditions of scarcity, people base their price not merely on anticipated enjoyment, but also on anticipated trade-offs, and those are more consistent guides for valuation. Could scarcity also lead to more consistent valuation of a dollar itself? The next set of studies addressed this question."
 
 ### Replicator's Note - Graphs from here on out are newly added by us.  We feel that these figure strongly convey the findings in each experiment, namely, those with more resources are sensitive to experimental priming to change value measure, and those with scarce resources have a stable measure of value, independent of experimental priming.  With figures for each experiment, the paper's conclusion is more throughly driven to the reader. 
------
+
+****
 
 ### Study 2a 
 
 ```{r echo = FALSE}
-
 #reads the data for study 2a - spss file, csv file for demographics, and second csv file for income
 suppressMessages(suppressWarnings(raw_2a_spss <- read.spss("framing/study_2a.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_2a_csv <- read.csv("study_2a_demog.csv", header = FALSE)))
 suppressMessages(suppressWarnings(raw_2a_income_csv <- read.csv("study_2a_income.csv", header = TRUE)))
-
-
 ```
 
 "In Study 2a, there were 238 participants."
 
 ```{r echo = FALSE}
-#sample size for Study 2a
+# sample size for Study 2a
 raw_2a_spss %>%
   summarise(sample.size = n(), median.ses = median(ses))
 
-#average age for Study 2a
+# average age for Study 2a
 raw_2a_csv %>%
   filter(V3 != "NA") %>%
   summarise(mean.age = mean(V3)) %>%
   round(digits = 1)
 
-#calculate sex breakdown for Study 2a (filter is because they calculated the sex breakdown inside their excel file...)
+# calculate sex breakdown for Study 2a (filter is because they calculated the sex breakdown inside their excel file...)
 raw_2a_csv %>%
   filter(V4 != 142, V4 != 96) %>%
   group_by(V4) %>%
   summarise(sex_breakdown = n())
 
-#calculate median household income and size for Study 2a
+# calculate median household income and size for Study 2a
 raw_2a_income_csv %>%
-  summarise(median.household.income = median(inc2), median.household.size = median(house))
+  summarise(median.household.income = median(inc2), 
+            median.household.size = median(house))
 ```
 
 "One participant was excluded as an outlier on income."
@@ -635,6 +740,7 @@ clean_2a %>%
 "We conducted binary logistic regressions to comepare the frequency with which participants cited each of the two considerations of interest (trade-offs vs proportional discount) as a function of income.  Higher-income participants were more likely than lower-income participants to use proportional thinking, beta = 0.87, Wald-test chi square (1, N = 237) = 4.02, p < 0.05.""
 
 ```{r echo = FALSE}
+# GLM
 glm(context ~ lgses, data = clean_2a, family = "binomial") %>%
   tidy() %>%
   filter(term == "lgses") %>%
@@ -642,33 +748,46 @@ glm(context ~ lgses, data = clean_2a, family = "binomial") %>%
          p = round(p.value, digit = 4)) %>%
   select(term, beta, p)
 
-logit3logses <- glm(context ~ lgses, data = clean_2a, family = "binomial")
+logit3logses <- glm(context ~ lgses, 
+                    data = clean_2a, 
+                    family = "binomial")
 
-print(wald.test(b = coef(logit3logses), Sigma = vcov(logit3logses), Terms = 2)$result$chi2[1], digit = 3)
+wald.test(b = coef(logit3logses),
+          Sigma = vcov(logit3logses),
+          Terms = 2)$result$chi2[1] %>% 
+  round(digits = 3)
 ```
 
 "but lower-income participants were more likely than higher-income participants to use trade-off thinking, beta = -0.96, Wald-test chi square (1, N = 237) = 4.69, p < 0.05."
 
 ```{r echo = FALSE}
-glm(tradeoff ~ lgses, data = clean_2a, family = "binomial") %>%
+# GLM
+glm(tradeoff ~ lgses, 
+    data = clean_2a, 
+    family = "binomial") %>%
   tidy() %>%
   filter(term == "lgses") %>%
   mutate(beta = round(estimate, digit = 2),
          p = round(p.value, digit = 4)) %>%
   select(term, beta, p)
 
-logit4logses <- glm(tradeoff ~ lgses, data = clean_2a, family = "binomial")
+logit4logses <- glm(tradeoff ~ lgses, 
+                    data = clean_2a, 
+                    family = "binomial")
 
-print(wald.test(b = coef(logit4logses), Sigma = vcov(logit4logses), Terms = 2)$result$chi2[1], digit = 3)
+wald.test(b = coef(logit4logses), 
+          Sigma = vcov(logit4logses), 
+          Terms = 2)$result$chi2[1] %>% 
+  round(digits = 3)
 ```
 
+***
 
 ### Study 2b
 
 "In study 2b there were 705 participants (mean age = 30.0 years; 290 females, 415 males; median household size = 3 people; median household income = $45,000).  The participants in Study 2c were the same participants as in Study 1d (and analyses were limited to the same participants, but including all participants did not change the results).  Note that participants completed Studies 1d and 2c in a counterbalanced order.  Participants in Studies 2b and 2c responded to the same scenario as did participants in Study 2a, but they stated whether they would travel for the discount."
 
 ```{r echo = FALSE}
-
 #reads the data for study 2a - spss file, csv file for demographics, and second csv file for income
 suppressMessages(suppressWarnings(raw_2b_spss <- read.spss("framing/study_2b.sav", to.data.frame = TRUE)))
 suppressMessages(suppressWarnings(raw_2b_csv <- read.csv("study_2b_demog.csv", header = TRUE)))
@@ -676,26 +795,27 @@ suppressMessages(suppressWarnings(raw_2b_csv <- read.csv("study_2b_demog.csv", h
 #average age for Study 2b
 raw_2b_csv %>%
   filter(age != "NA") %>%
-  summarise(mean.age = mean(age)) %>%
+  summarise(meanAge = mean(age)) %>%
   round(digits = 1)
 
 #calculate sex breakdown for Study 2b
 raw_2b_csv %>%
   group_by(gender) %>%
-  summarise(sex_breakdown = n())
+  summarise(sexBreakdown = n())
 
 #calculate total sample size for Study 2b
 raw_2b_csv %>%
-  summarise(sample.size = n())
+  summarise(sampleSize = n())
 
 #calculate median household income and size for Study 2b
 raw_2b_spss %>%
-  summarise(median.household.income = median(inc2), median.household.size = median(house))
+  summarise(medianHouseholdIncome = median(inc2),
+            medianHouseholdSize = median(house))
 ```
 
-
+***
 ***Results***
--------
+***
 
 "In Study 2b, 1 participant was excluded for missing responses, and 2 were excluded as outliers on income."
 
@@ -704,7 +824,7 @@ clean_2b <- raw_2b_spss %>%
   filter(filter_. != "Not Selected", go != "NA")
 
 clean_2b %>%
-  summarise(cleaned.sample.size = n())
+  summarise(cleanedSampleSize = n())
 ```
 
 "The analyses conducted were based on a median split on income.  Confirming earlier findings, these analyses revealed that higher-income participants were more willing to travel when the discount was proportionally larger (i.e., the tablet cost less): Specifically, 86%, 75%, and 58% would travel when the tablet cost $300, $500, and $1,000, respectively."
@@ -712,15 +832,15 @@ clean_2b %>%
 ```{r echo = FALSE}
 clean_2b %>%
   filter(split == 1, cond == 0) %>%
-  summarise(threehundred.go = (sum(go) / n()) * 100)
+  summarise(threehundredGo = (sum(go) / n()) * 100)
 
 clean_2b %>%
   filter(split == 1, cond == 1) %>%
-  summarise(fivehundred.go = (sum(go) / n()) * 100)
+  summarise(fivehundredGo = (sum(go) / n()) * 100)
 
 clean_2b %>%
   filter(split == 1, cond == 2) %>%
-  summarise(onethousand.go = (sum(go) / n()) * 100)
+  summarise(onethousandGo = (sum(go) / n()) * 100)
 ```
 
 "Lower-income participants were less sensitive to the proportional size of the discount: The corresponding percentages of lower-income participants willing to travel were 78%, 67%, and 67%."
@@ -728,37 +848,40 @@ clean_2b %>%
 ```{r echo = FALSE}
 clean_2b %>%
   filter(split == 0, cond == 0) %>%
-  summarise(threehundred.go = (sum(go) / n()) * 100)
+  summarise(threehundredGo = (sum(go) / n()) * 100)
 
 clean_2b %>%
   filter(split == 0, cond == 1) %>%
-  summarise(fivehundred.go = (sum(go) / n()) * 100)
+  summarise(fivehundredGo = (sum(go) / n()) * 100)
 
 clean_2b %>%
   filter(split == 0, cond == 2) %>%
-  summarise(onethousand.go = (sum(go) / n()) * 100)
-
+  summarise(onethousandGo = (sum(go) / n()) * 100)
 ```
 
 ```{r echo = FALSE}
+# producing data.frames for new figure (2b) - high income:
 clean_2b_high_300 <- clean_2b %>%
   filter(split == 1, cond == 0) %>%
-  summarise(threehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  summarise(threehundredGo = (sum(go) / n()), 
+            CI = (1.96 * Sem(go))) %>%
   round(digits = 2)
 
 clean_2b_high_500 <- clean_2b %>%
   filter(split == 1, cond == 1) %>%
-  summarise(fivehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  summarise(fivehundredGo = (sum(go) / n()), 
+            CI = (1.96 * Sem(go))) %>%
   round(digits = 2)
 
 clean_2b_high_1000 <- clean_2b %>%
   filter(split == 1, cond == 2) %>%
-  summarise(onethousand.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
+  summarise(onethousandGo = (sum(go) / n()), 
+            CI = (1.96 * Sem(go))) %>%
   round(digits = 2)
-#producing data.frames for new figure (2b) - high income
 ```
 
 ```{r echo = FALSE}
+# producing data.frames for new figure (2b) - low income:
 clean_2b_low_300 <- clean_2b %>%
   filter(split == 0, cond == 0) %>%
   summarise(threehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
@@ -773,70 +896,111 @@ clean_2b_low_1000 <- clean_2b %>%
   filter(split == 0, cond == 2) %>%
   summarise(onethousand.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
   round(digits = 2)
-#producing data.frames for new figure (2b) - low income
 ```
-
 
 ```{r echo = FALSE}
-title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values <- c(clean_2b_low_300$threehundred.go, clean_2b_high_300$threehundred.go, clean_2b_low_500$fivehundred.go, clean_2b_high_500$fivehundred.go, clean_2b_low_1000$onethousand.go, clean_2b_high_1000$onethousand.go)
+# Plotting :
+title <- factor(c("Lower Income", "Higher Income"), 
+                levels = c("Lower Income", "Higher Income"))
+values <- c(clean_2b_low_300$threehundred.go, 
+            clean_2b_high_300$threehundred.go, 
+            clean_2b_low_500$fivehundred.go, 
+            clean_2b_high_500$fivehundred.go, 
+            clean_2b_low_1000$onethousand.go, 
+            clean_2b_high_1000$onethousand.go)
 tablet_cost <- c("$300", "$300", "$500", "$500", "$1,000", "$1,000")
-CIs <- c(clean_2b_low_300$CI, clean_2b_high_300$CI, clean_2b_low_500$CI, clean_2b_high_500$CI, clean_2b_low_1000$CI, clean_2b_high_1000$CI)
+CIs <- c(clean_2b_low_300$CI, 
+         clean_2b_high_300$CI, 
+         clean_2b_low_500$CI, 
+         clean_2b_high_500$CI, 
+         clean_2b_low_1000$CI, 
+         clean_2b_high_1000$CI)
 
+# figure 2b data frame
 fig2b.table <- data.frame(title, values, tablet_cost, CIs)
-#figure 2b data frame
-fig2b.table$tablet_cost <- factor(fig2b.table$tablet_cost, levels = c("$300", "$500", "$1,000"))
-
+fig2b.table$tablet_cost <- factor(fig2b.table$tablet_cost, 
+                                  levels = c("$300", "$500", "$1,000"))
 figure2b <- fig2b.table %>%
-  ggplot(aes(x = title, y = values, fill = tablet_cost)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("proportion willing to travel") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 2b - Proportion of participants willing to travel\nfor a discounted tablet computer in Study 2b\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 2b
+  ggplot(aes(x = title, 
+             y = values, 
+             fill = tablet_cost)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(), 
+           colour = "black") + 
+  ylab("proportion willing to travel") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs, 
+                    ymax = values + CIs), 
+                width = 0.2, 
+                position = position_dodge(0.9)) + 
+  ggtitle("Figure 2b - Proportion of participants willing to travel\nfor a discounted tablet computer in Study 2b\n(error bars represent 95% confidence interval)") + 
+  theme_bw() + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# displays figure 2b
 print(figure2b)
-#displays figure 2b
 ```
-
 
 "The ineraction between income and context was significant in a binary logistic regression, beta = -0.48, Walt-test chi square (1, N = 702) = 4.93, p < 0.05,"
 
 ```{r echo = FALSE}
-glm(go ~ split * cond, data = clean_2b, family = "binomial") %>%
+# GLM
+glm(go ~ split * cond, 
+    data = clean_2b, 
+    family = "binomial") %>%
   tidy() %>%
   filter(term == "split:cond") %>%
   mutate(beta = round(estimate, digit = 2),
          p = round(p.value, digit = 4)) %>%
   select(term, beta, p)
 
+logit5logses <- glm(go ~ split * cond, 
+                    data = clean_2b, 
+                    family = "binomial")
 
-logit5logses <- glm(go ~ split * cond, data = clean_2b, family = "binomial")
-
-print(wald.test(b = coef(logit5logses), Sigma = vcov(logit5logses), Terms = 4)$result$chi2[1], digit = 3)
-
+# Wald test
+wald.test(b = coef(logit5logses), 
+          Sigma = vcov(logit5logses), 
+          Terms = 4)$result$chi2[1] %>% 
+  round(digits = 3)
 ```
 
 "and was marginally significant when income was treated continuously, beta = -0.57, Wald-test chi square(1, N - 702) = 3.32, p < 0.07."
 
 ```{r echo = FALSE}
-glm(go ~ logses * cond, data = clean_2b, family = "binomial") %>%
+# GLM
+glm(go ~ logses * cond, 
+    data = clean_2b, 
+    family = "binomial") %>%
   tidy() %>%
   filter(term == "logses:cond") %>%
   mutate(beta = round(estimate, digit = 2),
          p = round(p.value, digit = 4)) %>%
   select(term, beta, p)
 
-logit6logses <- glm(go ~ logses * cond, data = clean_2b, family = "binomial")
+logit6logses <- glm(go ~ logses * cond, 
+                    data = clean_2b, 
+                    family = "binomial")
 
-print(wald.test(b = coef(logit6logses), Sigma = vcov(logit6logses), Terms = 4)$result$chi2[1], digit = 3)
+# Wald test
+wald.test(b = coef(logit6logses), 
+          Sigma = vcov(logit6logses), 
+          Terms = 4)$result$chi2[1] %>% 
+  round(digits = 3)
 ```
 
----
+***
 
 ### Study 2c
 
 "Five participants were excluded for missing responses in Study 2c, so 1,893 participants were included in the analyses."
 
 ```{r echo = FALSE}
+# reads the data for study 2c
 suppressMessages(suppressWarnings(raw_2c_spss <- read.spss("framing/study_1d.sav", to.data.frame = TRUE)))
-#reads the data for study 2c
 
 clean_2c <- raw_1d_spss %>%
   filter(filter_. != "Not Selected", go != "NA")
@@ -877,8 +1041,8 @@ clean_2c %>%
   summarise(onethousand.go = (sum(go) / n()) * 100)
 ```
 
-
 ```{r echo = FALSE}
+# producing data.frames for new figure (2c) - high income:
 clean_2c_high_300 <- clean_2c %>%
   filter(split == 1, webercond == 0) %>%
   summarise(threehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
@@ -893,10 +1057,10 @@ clean_2c_high_1000 <- clean_2c %>%
   filter(split == 1, webercond == 2) %>%
   summarise(onethousand.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
   round(digits = 2)
-#producing data.frames for new figure (2c) - high income
 ```
 
 ```{r echo = FALSE}
+# producing data.frames for new figure (2c) - low income
 clean_2c_low_300 <- clean_2c %>%
   filter(split == 0, webercond == 0) %>%
   summarise(threehundred.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
@@ -911,44 +1075,79 @@ clean_2c_low_1000 <- clean_2c %>%
   filter(split == 0, webercond == 2) %>%
   summarise(onethousand.go = (sum(go) / n()), CI = (1.96 * Sem(go))) %>%
   round(digits = 2)
-#producing data.frames for new figure (2c) - low income
 ```
 
-
 ```{r echo = FALSE}
-title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values <- c(clean_2c_low_300$threehundred.go, clean_2c_high_300$threehundred.go, clean_2c_low_500$fivehundred.go, clean_2c_high_500$fivehundred.go, clean_2c_low_1000$onethousand.go, clean_2c_high_1000$onethousand.go)
+# Plotting :
+title <- factor(c("Lower Income", "Higher Income"), 
+                levels = c("Lower Income", "Higher Income"))
+values <- c(clean_2c_low_300$threehundred.go, 
+            clean_2c_high_300$threehundred.go, 
+            clean_2c_low_500$fivehundred.go, 
+            clean_2c_high_500$fivehundred.go, 
+            clean_2c_low_1000$onethousand.go, 
+            clean_2c_high_1000$onethousand.go)
 tablet_cost <- c("$300", "$300", "$500", "$500", "$1,000", "$1,000")
-CIs <- c(clean_2c_low_300$CI, clean_2c_high_300$CI, clean_2c_low_500$CI, clean_2c_high_500$CI, clean_2c_low_1000$CI, clean_2c_high_1000$CI)
+CIs <- c(clean_2c_low_300$CI, 
+         clean_2c_high_300$CI, 
+         clean_2c_low_500$CI, 
+         clean_2c_high_500$CI, 
+         clean_2c_low_1000$CI, 
+         clean_2c_high_1000$CI)
 
+# Figure 2b data frame
 fig2c.table <- data.frame(title, values, tablet_cost, CIs)
-#figure 2b data frame
-fig2c.table$tablet_cost <- factor(fig2c.table$tablet_cost, levels = c("$300", "$500", "$1,000"))
-
+fig2c.table$tablet_cost <- factor(fig2c.table$tablet_cost, 
+                                  levels = c("$300", "$500", "$1,000"))
 figure2c <- fig2c.table %>%
-  ggplot(aes(x = title, y = values, fill = tablet_cost)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("proportion willing to travel") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 2c - Proportion of participants willing to travel\nfor a discounted tablet computer in Study 2c\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 2c
+  ggplot(aes(x = title, 
+             y = values, 
+             fill = tablet_cost)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(), 
+           colour = "black") + 
+  ylab("proportion willing to travel") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs, 
+                    ymax = values + CIs), 
+                width = 0.2, 
+                position = position_dodge(0.9)) + 
+  ggtitle("Figure 2c - Proportion of participants willing to travel\nfor a discounted tablet computer in Study 2c\n(error bars represent 95% confidence interval)") + 
+  theme_bw() + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# Plots figure 2c
 print(figure2c)
-#displays figure 2c
 ```
 
 "When income was treated continuously, the interaction between income and context was clear, beta = -0.39, Wald-test chi square(1, N = 1,893) = 6.13, p < 0.05."
 
 ```{r echo = FALSE}
-glm(go ~ logses * webercond, data = clean_2c, family = "binomial") %>%
+# GLM
+glm(go ~ logses * webercond, 
+    data = clean_2c, 
+    family = "binomial") %>%
   tidy() %>%
   filter(term == "logses:webercond") %>%
   mutate(beta = round(estimate, digit = 2),
          p = round(p.value, digit = 4)) %>%
   select(term, beta, p)
 
-logit7logses <- glm(go ~ logses * webercond, data = clean_2c, family = "binomial")
+logit7logses <- glm(go ~ logses * webercond, 
+                    data = clean_2c, 
+                    family = "binomial")
 
-print(wald.test(b = coef(logit7logses), Sigma = vcov(logit7logses), Terms = 4)$result$chi2[1], digit = 3)
+# Wald test
+wald.test(b = coef(logit7logses), 
+          Sigma = vcov(logit7logses), 
+          Terms = 4)$result$chi2[1] %>% 
+  round(digits = 3)
 ```
 
----
+***
 
 ### Study 2d 
 
@@ -959,7 +1158,6 @@ print(wald.test(b = coef(logit7logses), Sigma = vcov(logit7logses), Terms = 4)$r
 suppressMessages(suppressWarnings(df2d_1 <- read.csv("csv_files/2d_Sheet1.csv", header=TRUE))) #sheet 1 from original xlsx file
 suppressMessages(suppressWarnings(df2d_2 <- read.csv("csv_files/2d_Sheet2.csv", header=TRUE))) #sheet 2 from original xlsx file
 suppressMessages(suppressWarnings(df2d_spss <- read.spss("framing/study_2d.sav", to.data.frame = TRUE))) #table from original SPSS file
-
 ```
 
 ```{r echo = FALSE}
@@ -989,18 +1187,20 @@ df2d_1 %>%
 
 df2d_1 %>%
   summarise(median(inc2))
-
 ```
 
+***
 ***Results***
--------
+***
+
 "We regressed willingness to travel on income (categorized by a median split), proportional size of the discount (large vs. small), absolute size of the discount ($10 vs. $150), all two-way interaction terms, and the three-way interaction term." 
 
 ```{r eval = FALSE}
 # Regression
-glm(go ~ split * lgdiscount * lgsavings, data = df2d_1, family = "binomial")
+glm(go ~ split * lgdiscount * lgsavings, 
+    data = df2d_1, 
+    family = "binomial")
 ```
-
 
 "Higher-income participants were significantly more willing to travel for a proportionally larger discount (60%) than for a proportionally smaller discount (41%),"
 
@@ -1008,13 +1208,13 @@ glm(go ~ split * lgdiscount * lgsavings, data = df2d_1, family = "binomial")
 # high-income & proportionately larger discount
 df2d_1 %>%
   filter(split == 1, lgdiscount == 0) %>%
-  summarise(high.prop.large = (sum(go) / n()) * 100) %>%
+  summarise(highPropLarge = (sum(go) / n()) * 100) %>%
   round(digit = 0)
 
 # high-income & proprotionately smaller discount
 df2d_1 %>%
   filter(split == 1, lgdiscount == 1) %>%
-  summarise(high.prop.small = (sum(go) / n()) * 100) %>%
+  summarise(highPropSmall = (sum(go) / n()) * 100) %>%
   round(digit = 0)
 ```
 
@@ -1024,20 +1224,20 @@ df2d_1 %>%
 # low-income & proprotionately larger discount
 df2d_1 %>%
   filter(split == 0, lgdiscount == 0) %>%
-  summarise(high.prop.large = (sum(go) / n()) * 100) %>%
+  summarise(higgPropLarge = (sum(go) / n()) * 100) %>%
   round(digit = 0)
 
 # low-income & proprotionately smaller discount
 df2d_1 %>%
   filter(split == 0, lgdiscount == 1) %>%
-  summarise(high.prop.small = (sum(go) / n()) * 100) %>%
+  summarise(highPropSmall = (sum(go) / n()) * 100) %>%
   round(digit = 0)
 ```
 
 "The interaction between proportional discount and income was significant, β = −1.90, Wald-test χ2(1, N = 301) = 4.11, p < .05." 
 
 ```{r echo = FALSE}
-temp.model <- glm(go ~ split*lgdiscount*lgsavings, data = df2d_1, family = "binomial")
+temp_model <- glm(go ~ split*lgdiscount*lgsavings, data = df2d_1, family = "binomial")
 
 # β (beta), p
 glm(go ~ split * lgdiscount * lgsavings, 
@@ -1049,15 +1249,17 @@ glm(go ~ split * lgdiscount * lgsavings,
   select(term, beta, p)
 
 # wald test
-print(wald.test(b = coef(temp.model), 
-                Sigma = vcov(temp.model), 
+print(wald.test(b = coef(temp_model), 
+                Sigma = vcov(temp_model), 
                 Terms = 5)$result$chi2[1], digit = 3)
 ```
 
 "Note that this interaction did not depend on the absolute amount of the discount, as the three-way interaction was not significant, β = −0.89, Wald-test χ2(1, N = 301) = 0.28, p > .6."
 
 ```{r echo = FALSE}
-temp.model <- glm(go ~ split * lgdiscount * lgsavings, data = df2d_1, family = "binomial")
+temp_model <- glm(go ~ split * lgdiscount * lgsavings, 
+                  data = df2d_1, 
+                  family = "binomial")
 
 # β (beta), p
 glm(go ~ split* lgdiscount * lgsavings, 
@@ -1069,20 +1271,24 @@ glm(go ~ split* lgdiscount * lgsavings,
   select(term, beta, p)
 
 # wald test
-print(wald.test(b = coef(temp.model), 
-                Sigma = vcov(temp.model), 
-                Terms = 8)$result$chi2[1], digit = 3)
+wald.test(b = coef(temp_model), 
+          Sigma = vcov(temp_model), 
+          Terms = 8)$result$chi2[1] %>% 
+  round(digits = 3)
 ```
 
 "When income was treated continuously, the interaction between proportional discount and income also emerged, but was not significant, β = −2.13, Wald-test χ2(1, N = 301) = 2.21, p < .15."
 
 ```{r echo = FALSE}
-
-temp.model <- glm(go ~ lgses * lgdiscount * lgsavings, data = df2d_spss, family = "binomial")
+# GLM
+temp_model <- glm(go ~ lgses * lgdiscount * lgsavings, 
+                  data = df2d_spss, 
+                  family = "binomial")
 
 # β (beta), p
 glm(go ~ lgses * lgdiscount * lgsavings, 
-    data = df2d_spss, family = "binomial") %>% 
+    data = df2d_spss, 
+    family = "binomial") %>% 
   tidy() %>%
   filter(term == "lgses:lgdiscount") %>%
   mutate(beta = round(estimate, digit = 2),
@@ -1090,12 +1296,13 @@ glm(go ~ lgses * lgdiscount * lgsavings,
   select(term, beta, p)
 
 # wald test:
-print(wald.test(b = coef(temp.model), 
-                Sigma = vcov(temp.model), 
-                Terms = 5)$result$chi2[1], digit = 3)
+wald.test(b = coef(temp_model),
+          Sigma = vcov(temp_model), 
+          Terms = 5)$result$chi2[1] %>% 
+  round(digits = 3)
 ```
 
----
+***
 
 ### Study 3
 
@@ -1106,7 +1313,6 @@ print(wald.test(b = coef(temp.model),
 suppressMessages(suppressWarnings(df3_1 <- read.csv("csv_files/3_Sheet1.csv", header=TRUE)))
 suppressMessages(suppressWarnings(df3_2 <- read.csv("csv_files/3_Sheet2.csv", header=TRUE)))
 suppressMessages(suppressWarnings(df3_spss <- read.spss("framing/study_3.sav", to.data.frame = TRUE)))
-
 ```
 
 ```{r echo = FALSE}
@@ -1142,105 +1348,138 @@ df3_spss <- df3_spss %>%
   filter(filter_. == "Selected", judge != "NA")
 
 df3_spss %>%
-  summarise (cleaned.sample.size = n())
-
+  summarise (cleanedSampleSize = n())
 ```
 
 "Analyses based on a median split on income replicated earlier results. Higher-income individuals rated the loss gamble as significantly more attractive (M = 11.63, 95% CI = [10.56, 12.69]) than the no-loss gamble (M = 8.33, 95% CI = [7.62, 9.04])," 
 
 
 ```{r echo = FALSE}
-
 # high-income & loss gambling : attractive rating
 df3_spss %>%
   filter(split == 1, smallloss == 1) %>%
-  summarise(mean.judge.highincome.lossgamble = mean(judge), CI.low = mean(judge) - (1.96 * Sem(judge)), CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
+  summarise(meanJudgeHighIncomeLossGamble = mean(judge), 
+            CI.low = mean(judge) - (1.96 * Sem(judge)), 
+            CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
   round(digits = 2)
-
 
 # high-income & no-loss gambling : attractive rating
 df3_spss %>%
   filter(split == 1, smallloss == 0) %>%
-  summarise(mean.judge.highincome.nolossgamble = mean(judge), CI.low = mean(judge) - (1.96 * Sem(judge)), CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
+  summarise(meanJudgeHighIncomenoLossGamble = mean(judge), 
+            CI.low = mean(judge) - (1.96 * Sem(judge)), 
+            CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
   round(digits = 2)
 ```
 
 "but this difference was smaller for lower-income individuals (loss gamble: M = 10.38, 95% CI = [9.38, 11.38], no-loss gamble: M = 9.18, 95% CI = [8.31, 10.05])."
 
 ```{r echo = FALSE}
-
 # low-income & loss gambling : attractive rating
 df3_spss %>%
   filter(split == 0, smallloss == 1) %>%
-  summarise(mean.judge.lowincome.lossgamble = mean(judge), CI.low = mean(judge) - (1.96 * Sem(judge)), CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
+  summarise(meanJudgeLowIncomeLossGamble = mean(judge), 
+            CI.low = mean(judge) - (1.96 * Sem(judge)), 
+            CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
   round(digits = 2)
-
 
 # low-income & no-loss gambling : attractive rating
 df3_spss %>%
   filter(split == 0, smallloss == 0) %>%
-  summarise(mean.judge.lowincome.nolossgamble = mean(judge), CI.low = mean(judge) - (1.96 * Sem(judge)), CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
+  summarise(meanJudgeLowIncomeNoLossGamble = mean(judge), 
+            CI.low = mean(judge) - (1.96 * Sem(judge)), 
+            CI.high = mean(judge) + (1.96 * Sem(judge))) %>%
   round(digits = 2)
-
 ```
 
 ```{r echo = FALSE}
+# producing data.frames for new figure (3) - high income:
 df3_high_loss <- df3_spss %>%
   filter(split == 1, smallloss == 1) %>%
-  summarise(mean.judge.highincome.lossgamble = mean(judge), CI = (1.96 * Sem(judge))) %>%
+  summarise(meanJudgeHighIncomeLossGamble = mean(judge), 
+            CI = (1.96 * Sem(judge))) %>%
   round(digits = 2)
 
 df3_high_noloss <- df3_spss %>%
   filter(split == 1, smallloss == 0) %>%
-  summarise(mean.judge.highincome.nolossgamble = mean(judge), CI.low = (1.96 * Sem(judge))) %>%
+  summarise(meanJudgeHighIncomeNoLossGamble = mean(judge), 
+            CI.low = (1.96 * Sem(judge))) %>%
   round(digits = 2)
-#producing data.frames for new figure (3) - high income
 ```
 
 ```{r echo = FALSE}
+# producing data.frames for new figure (3) - low income
 df3_low_loss <- df3_spss %>%
   filter(split == 0, smallloss == 1) %>%
-  summarise(mean.judge.lowincome.lossgamble = mean(judge), CI = (1.96 * Sem(judge))) %>%
+  summarise(meanJudgeLowIncomeLossGamble = mean(judge), 
+            CI = (1.96 * Sem(judge))) %>%
   round(digits = 2)
 
 df3_low_noloss <- df3_spss %>%
   filter(split == 0, smallloss == 0) %>%
-  summarise(mean.judge.lowincome.nolossgamble = mean(judge), CI = (1.96 * Sem(judge))) %>%
+  summarise(meanJudgeLowincomeNoLossGamble = mean(judge), 
+            CI = (1.96 * Sem(judge))) %>%
   round(digits = 2)
-#producing data.frames for new figure (3) - low income
 ```
 
 
 ```{r echo = FALSE}
-title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values <- c(df3_low_loss$mean.judge.lowincome.lossgamble, df3_high_loss$mean.judge.highincome.lossgamble, df3_low_noloss$mean.judge.lowincome.nolossgamble, df3_high_noloss$mean.judge.highincome.nolossgamble)
-gamble <- c("loss_gamble", "loss_gamble", "no_loss_gamble", "no_loss_gamble")
-CIs <- c(df3_low_loss$CI, df3_high_loss$CI, df3_low_noloss$CI, df3_high_noloss$CI)
+# Plotting :
+title <- factor(c("Lower Income", "Higher Income"), 
+                levels = c("Lower Income", "Higher Income"))
+values <- c(df3_low_loss$meanJudgeLowIncomeLossGamble, 
+            df3_high_loss$mean.judgeHighIncomeLossGamble, 
+            df3_low_noloss$meanJudgeLowIncomeNoLossGamble, 
+            df3_high_noloss$meanJudgeHighIncomeNoLossGamble)
+gamble <- c("loss_gamble", 
+            "loss_gamble", 
+            "no_loss_gamble", 
+            "no_loss_gamble")
+CIs <- c(df3_low_loss$CI, 
+         df3_high_loss$CI, 
+         df3_low_noloss$CI, 
+         df3_high_noloss$CI)
 
+# figure 3 data frame :
 fig3.table <- data.frame(title, values, gamble, CIs)
-#figure 3 data frame
-fig3.table$gamble <- factor(fig3.table$gamble, levels = c("loss_gamble", "no_loss_gamble"))
-#relevel figure 3 table
-
+# Change referenced :
+fig3.table$gamble <- factor(fig3.table$gamble, 
+                            levels = c("loss_gamble", "no_loss_gamble"))
 figure3 <- fig3.table %>%
-  ggplot(aes(x = title, y = values, fill = gamble)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Attractiveness of gamble") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 3 - Attractiveness of loss or no-loss gamble\nfor Study 3\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 3
+  ggplot(aes(x = title, 
+             y = values, 
+             fill = gamble)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(), 
+           colour = "black") + 
+  ylab("Attractiveness of gamble") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs,
+                    ymax = values + CIs), 
+                width = 0.2, 
+                position = position_dodge(0.9)) + 
+  ggtitle("Figure 3 - Attractiveness of loss or no-loss gamble\nfor Study 3\n(error bars represent 95% confidence interval)") + 
+  theme_bw() + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# plot figure 3
 print(figure3)
-#displays figure 3
 ```
-
-
 
 "The interaction between gamble and income was significant, F(1, 499) = 5.04, p < .05, ηp2 = .01."
 
 ```{r echo = FALSE}
 # ANOVA : interaction effects
 summary(aov(judge ~ split * smallloss, df3_spss))
-temp_eta2 <- etaSquared(aov(judge ~ split * smallloss, df3_spss)) %>%
-  .[3,2] %>%
-  round(digit=2)
-print(c("partial eta squared:", temp_eta2), quote=F)
+
+# Partial eta squared : 
+etaSquared(aov(judge ~ split * smallloss, df3_spss)) %>%
+  .["split:smallloss", "eta.sq.part"] %>%
+  round(digits=3) %>%
+  cat("Low-/High-Income & Loss-/No-loss-gamble\npartial eta squared:",.)
 ```
 
 "The interaction was also significant when income was treated continuously, β = 1.13, t(499) = 2.21, p < .05."
@@ -1255,7 +1494,7 @@ lm(scale(judge) ~ scale(logses) + scale(smallloss) + scale(logses * smallloss), 
   select(term, beta, p)
 ```
 
----
+***
 
 ### Study 4
 
@@ -1301,14 +1540,14 @@ df4_1 %>%
 df4_4 %>%
   filter(Prime=="") %>%
   select(Subject)
+
 # remove the 4 participants
 df4_1 <- df4_1 %>%
   filter(Subject!=56, Subject!=75, Subject!=112, Subject!=236)
 
+# the spss file has these already removed.
 df4_spss %>%
   summarise(cleaned.sample.size = n())
-
-#the spss file has these already removed.
 ```
 
 "When we analyzed the data using a median split based on income, higher-income participants rated the DVD as significantly more expensive when they thought about a small account (M = 5.74, 95% CI = [5.04, 6.44]) rather than a large account (M = 4.47, 95% CI = [3.93, 5.01])," 
@@ -1325,7 +1564,6 @@ df4_spss %>%
   filter(split == 1, largeacc == 1) %>%
   summarise(mean.expense.highincome.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
-
 ```
 
 "whereas the evaluations of lower-income participants did not differ significantly between the conditions (small account: M = 5.55, 95% CI = [4.92, 6.18]; large account: M = 5.75, 95% CI = [5.03, 6.48])."
@@ -1345,9 +1583,8 @@ df4_spss %>%
 
 ```
 
-
-
 ```{r echo = FALSE}
+# Producing data.frames for new figure (4) - high income
 df4_high_small <- df4_spss %>%
   filter(split == 1, largeacc == 0) %>%
   summarise(mean.expense.highincome.smallaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
@@ -1357,10 +1594,10 @@ df4_high_large <- df4_spss %>%
   filter(split == 1, largeacc == 1) %>%
   summarise(mean.expense.highincome.largeaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
   round(digits = 2)
-#producing data.frames for new figure (4) - high income
 ```
 
 ```{r echo = FALSE}
+# Producing data.frames for new figure (4) - low income
 df4_low_small <- df4_spss %>%
   filter(split == 0, largeacc == 0) %>%
   summarise(mean.expense.lowincome.smallaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
@@ -1370,29 +1607,54 @@ df4_low_large <- df4_spss %>%
   filter(split == 0, largeacc == 1) %>%
   summarise(mean.expense.lowincome.largeaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
   round(digits = 2)
-#producing data.frames for new figure (4) - low income
 ```
 
 
 ```{r echo = FALSE}
-title <- factor(c("Lower Income", "Higher Income"), levels = c("Lower Income", "Higher Income"))
-values <- c(df4_low_small$mean.expense.lowincome.smallaccount, df4_high_small$mean.expense.highincome.smallaccount, df4_low_large$mean.expense.lowincome.largeaccount, df4_high_large$mean.expense.highincome.largeaccount)
-account_size <- c("small_account", "small_account", "large_account", "large_account")
-CIs <- c(df4_low_small$CI, df4_high_small$CI, df4_low_large$CI, df4_high_large$CI)
+# Plotting :
+title <- factor(c("Lower Income", "Higher Income"), 
+                levels = c("Lower Income", "Higher Income"))
+values <- c(df4_low_small$mean.expense.lowincome.smallaccount, 
+            df4_high_small$mean.expense.highincome.smallaccount,
+            df4_low_large$mean.expense.lowincome.largeaccount, 
+            df4_high_large$mean.expense.highincome.largeaccount)
+account_size <- c("small_account", 
+                  "small_account", 
+                  "large_account", 
+                  "large_account")
+CIs <- c(df4_low_small$CI, 
+         df4_high_small$CI, 
+         df4_low_large$CI, 
+         df4_high_large$CI)
 
+# figure data frame
 fig4.table <- data.frame(title, values, account_size, CIs)
-#figure 4 data frame
-fig4.table$account_size <- factor(fig4.table$account_size, levels = c("small_account", "large_account"))
-#relevel figure 4 table
-
+# change referenced level
+fig4.table$account_size <- factor(fig4.table$account_size, 
+                                  levels = c("small_account", 
+                                             "large_account"))
 figure4 <- fig4.table %>%
-  ggplot(aes(x = title, y = values, fill = account_size)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Expense rating") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 4 - DVD Expense Rating for either\na small or large account size for Study 4\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 4
+  ggplot(aes(x = title, 
+             y = values, 
+             fill = account_size)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(),
+           colour = "black") + 
+  ylab("Expense rating") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs, 
+                    ymax = values + CIs), 
+                width = 0.2, 
+                position = position_dodge(0.9)) + 
+  ggtitle("Figure 4 - DVD Expense Rating for either\na small or large account size for Study 4\n(error bars represent 95% confidence interval)") + theme_bw() + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# plot figure 4 :
 print(figure4)
-#displays figure 4
 ```
-
 
 "The interaction between income and condition was significant, F(1, 255) = 4.96, p < .05, ηp2 = .02."
 
@@ -1400,27 +1662,31 @@ print(figure4)
 # ANOVA : interaction effects
 # income treated as split : replicates
 summary(aov(Expense ~ Large.Acc*Split, df4_1))
-temp_eta2 <- etaSquared(aov(Expense ~ Large.Acc*Split, df4_1)) %>%
-  .[3,2] %>%
-  round(digit=2)
-print(c("partial eta squared:", temp_eta2), quote=F)
+
+# partial eta squared :
+etaSquared(aov(Expense ~ Large.Acc*Split, df4_1)) %>%
+  .["Large.Acc:Split","eta.sq.part"] %>%
+  round(digit=3) %>%
+  cat("Small-/Large-account & Low-/High-Income\nPartial Eta-squared:",.)
 ```
 
 "The interaction was also significant when income was treated as a continuous variable, β = 2.43, t(255) = 3.39, p < .01."
 
 *Note: beta estimate and t value are negative, but are reported as positive*
 ```{r echo = FALSE}
-
-lm(scale(expense) ~ scale(largeacc) + scale(logses) + scale(largeacc * logses), data = df4_spss) %>%
+# regression:
+lm(scale(expense) ~ scale(largeacc) + 
+     scale(logses) + 
+     scale(largeacc * logses), 
+   data = df4_spss) %>%
   tidy() %>%
   filter(term == "scale(largeacc * logses)") %>%
   mutate(beta = round(estimate, digit = 2),
          p = round(p.value, digit = 4)) %>%
   select(term, beta, p)
-
 ```
 
----
+***
 
 ### Study 5
 
@@ -1447,89 +1713,122 @@ df5_demo %>%
 
 "No participants were excluded from the analyses. We first analyzed responses using a median split on participants’ dieting behavior. Nondieters rated the fries as more fattening when they thought about a small account (M = 8.64, 95% CI = [8.20, 9.07]) than when they thought about a large account (M = 7.80, 95% CI = [7.21, 8.38]),"
 
-
 ```{r echo = FALSE}
 # Nondieters & Small account : Fattening
 df5_spss %>%
   filter(split == 0, week == 0) %>%
-  summarise(mean.fattening.nondieters.smallaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * Sem(fattening)), CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
+  summarise(mean.fattening.nondieters.smallaccount = mean(fattening), 
+            CI.low = mean(fattening) - (1.96 * Sem(fattening)), 
+            CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
   round(digits = 2)
 
 # Nondieters & Large account : Fattening
 df5_spss %>%
   filter(split == 0, week == 1) %>%
-  summarise(mean.fattening.nondieters.largeaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * Sem(fattening)), CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
+  summarise(mean.fattening.nondieters.largeaccount = mean(fattening), 
+            CI.low = mean(fattening) - (1.96 * Sem(fattening)), 
+            CI.high = mean(fattening) + 
+              (1.96 * Sem(fattening))) %>%
   round(digits = 2)
 ```
 
 "but this was not true for dieters (small account: M = 8.86, 95% CI = [8.29, 9.43]; large account: M = 9.13, 95% CI = [8.66, 9.60])."
 
 ```{r echo = FALSE}
-
 # Dieter & Small account : Fattening
 df5_spss %>%
   filter(split == 1, week == 0) %>%
-  summarise(mean.fattening.dieters.smallaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * Sem(fattening)), CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
+  summarise(mean.fattening.dieters.smallaccount = mean(fattening), 
+            CI.low = mean(fattening) - (1.96 * Sem(fattening)), 
+            CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
   round(digits = 2)
-
 
 # Dieter & Large account : Fattening
 df5_spss %>%
   filter(split == 1, week == 1) %>%
-  summarise(mean.fattening.dieters.largeaccount = mean(fattening), CI.low = mean(fattening) - (1.96 * Sem(fattening)), CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
+  summarise(mean.fattening.dieters.largeaccount = mean(fattening), 
+            CI.low = mean(fattening) - (1.96 * Sem(fattening)), 
+            CI.high = mean(fattening) + (1.96 * Sem(fattening))) %>%
   round(digits = 2)
-
 ```
 
 
 
 ```{r echo = FALSE}
+# Producing data.frames for new figure (5) - non-dieters
 df5_nondiet_small <- df5_spss %>%
   filter(split == 0, week == 0) %>%
-  summarise(mean.fattening.nondieters.smallaccount = mean(fattening), CI = (1.96 * Sem(fattening))) %>%
+  summarise(mean.fattening.nondieters.smallaccount = mean(fattening), 
+            CI = (1.96 * Sem(fattening))) %>%
   round(digits = 2)
 
 df5_nondiet_large <- df5_spss %>%
   filter(split == 0, week == 1) %>%
-  summarise(mean.fattening.nondieters.largeaccount = mean(fattening), CI = (1.96 * Sem(fattening))) %>%
+  summarise(mean.fattening.nondieters.largeaccount = mean(fattening), 
+            CI = (1.96 * Sem(fattening))) %>%
   round(digits = 2)
-#producing data.frames for new figure (5) - non-dieters
 ```
 
 ```{r echo = FALSE}
+# Producing data.frames for new figure (5) - dieters:
 df5_diet_small <- df5_spss %>%
   filter(split == 1, week == 0) %>%
-  summarise(mean.fattening.dieters.smallaccount = mean(fattening), CI = (1.96 * Sem(fattening))) %>%
+  summarise(mean.fattening.dieters.smallaccount = mean(fattening), 
+            CI = (1.96 * Sem(fattening))) %>%
   round(digits = 2)
 
 df5_diet_large <- df5_spss %>%
   filter(split == 1, week == 1) %>%
-  summarise(mean.fattening.dieters.largeaccount = mean(fattening), CI = (1.96 * Sem(fattening))) %>%
+  summarise(mean.fattening.dieters.largeaccount = mean(fattening), 
+            CI = (1.96 * Sem(fattening))) %>%
   round(digits = 2)
-#producing data.frames for new figure (5) - dieters
 ```
-
 
 ```{r echo = FALSE}
-title <- factor(c("Dieting", "Not Dieting"), levels = c("Dieting", "Not Dieting"))
-values <- c(df5_diet_small$mean.fattening.dieters.smallaccount, df5_nondiet_small$mean.fattening.nondieters.smallaccount, df5_diet_large$mean.fattening.dieters.largeaccount, df5_nondiet_large$mean.fattening.nondieters.largeaccount)
-account_size <- c("small_account", "small_account", "large_account", "large_account")
-CIs <- c(df5_diet_small$CI, df5_nondiet_small$CI, df5_diet_large$CI, df5_nondiet_large$CI)
-
+# Plotting : 
+title <- factor(c("Dieting", "Not Dieting"), 
+                levels = c("Dieting", "Not Dieting"))
+values <- c(df5_diet_small$mean.fattening.dieters.smallaccount, 
+            df5_nondiet_small$mean.fattening.nondieters.smallaccount,
+            df5_diet_large$mean.fattening.dieters.largeaccount, 
+            df5_nondiet_large$mean.fattening.nondieters.largeaccount)
+account_size <- c("small_account", 
+                  "small_account", 
+                  "large_account", 
+                  "large_account")
+CIs <- c(df5_diet_small$CI, 
+         df5_nondiet_small$CI, 
+         df5_diet_large$CI, 
+         df5_nondiet_large$CI)
+# Figure data frame
 fig5.table <- data.frame(title, values, account_size, CIs)
-#figure 5 data frame
-fig5.table$account_size <- factor(fig5.table$account_size, levels = c("small_account", "large_account"))
-#relevel figure 5 table
-
+# Change reference level
+fig5.table$account_size <- factor(fig5.table$account_size, 
+                                  levels = c("small_account", 
+                                             "large_account"))
 figure5 <- fig5.table %>%
-  ggplot(aes(x = title, y = values, fill = account_size)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Fattiness rating") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 5 - French Fry Fattiness rating for either\na small or large calorie account size for Study 5\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 5
+  ggplot(aes(x = title, 
+             y = values, 
+             fill = account_size)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(), 
+           colour = "black") + 
+  ylab("Fattiness rating") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs, 
+                    ymax = values + CIs), 
+                width = 0.2, 
+                position = position_dodge(0.9)) + 
+  ggtitle("Figure 5 - French Fry Fattiness rating for either\na small or large calorie account size for Study 5\n(error bars represent 95% confidence interval)") + 
+  theme_bw() + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# plot figure 4
 print(figure5)
-#displays figure 5
 ```
-
-
 
 "The interaction between dieting status and condition was significant, F(1, 230) = 4.40, p < .05, ηp2 = .02,"
 
@@ -1537,26 +1836,30 @@ print(figure5)
 # ANOVA : interaction effects
 # income treated as split : somewhat matches
 summary(aov(fattening ~ split * week, df5_spss))
-temp_eta2 <- etaSquared(aov(fattening ~ split * week, df5_spss)) %>%
-  .[3,2] %>%
-  round(digit=2)
-print(c("partial eta squared:", temp_eta2), quote=F)
+
+# Partial Eta Squared
+etaSquared(aov(fattening ~ split * week, df5_spss)) %>%
+  .["split:week","eta.sq.part"] %>%
+  round(digit=3) %>%
+  cat("Small-/Large-Account & Not-/Is-Dieting\nPartial eta squared:",.)
 ```
 
 "and the interaction was also found when dieting behavior was treated continuously, β = 0.43, t(230) = 2.11, p < .05."
 
 ```{r echo = FALSE}
-
-lm(scale(fattening) ~ scale(log) + scale(week) + scale(log * week), data = df5_spss) %>%
+# Regression
+lm(scale(fattening) ~ scale(log) + 
+     scale(week) + 
+     scale(log * week), 
+   data = df5_spss) %>%
   tidy() %>%
   filter(term == "scale(log * week)") %>%
   mutate(beta = round(estimate, digit = 2),
          p = round(p.value, digit = 4)) %>%
   select(term, beta, p)
-
 ```
 
----
+***
 
 ### Study 6
 
@@ -1605,92 +1908,128 @@ df6_spss %>%
 
 "Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]),"
 
-
 ```{r echo = FALSE}
-
 df6_spss %>%
   filter(slack == 1, large == 0) %>%
-  summarise(mean.expense.timerich.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
+  summarise(mean.expense.timerich.smallaccount = mean(expense), 
+            CI.low = mean(expense) - (1.96 * Sem(expense)), 
+            CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
 
 df6_spss %>%
   filter(slack == 1, large == 1) %>%
-  summarise(mean.expense.timerich.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
+  summarise(mean.expense.timerich.largeaccount = mean(expense), 
+            CI.low = mean(expense) - (1.96 * Sem(expense)), 
+            CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
 ```
 
 "whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69])."
 
 ```{r echo = FALSE}
-
 df6_spss %>%
   filter(slack == 0, large == 0) %>%
-  summarise(mean.expense.timepoor.smallaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
+  summarise(mean.expense.timepoor.smallaccount = mean(expense), 
+            CI.low = mean(expense) - (1.96 * Sem(expense)), 
+            CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
-
 
 df6_spss %>%
   filter(slack == 0, large == 1) %>%
-  summarise(mean.expense.timepoor.largeaccount = mean(expense), CI.low = mean(expense) - (1.96 * Sem(expense)), CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
+  summarise(mean.expense.timepoor.largeaccount = mean(expense), 
+            CI.low = mean(expense) - (1.96 * Sem(expense)), 
+            CI.high = mean(expense) + (1.96 * Sem(expense))) %>%
   round(digits = 2)
-
 ```
 
 ```{r echo = FALSE}
+# producing data.frames for new figure (6) - time rich
 df6_rich_small <- df6_spss %>%
   filter(slack == 1, large == 0) %>%
-  summarise(mean.expense.timerich.smallaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  summarise(mean.expense.timerich.smallaccount = mean(expense), 
+            CI = (1.96 * Sem(expense))) %>%
   round(digits = 2)
 
 df6_rich_large <- df6_spss %>%
   filter(slack == 1, large == 1) %>%
-  summarise(mean.expense.timerich.largeaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  summarise(mean.expense.timerich.largeaccount = mean(expense), 
+            CI = (1.96 * Sem(expense))) %>%
   round(digits = 2)
-#producing data.frames for new figure (6) - time rich
 ```
 
 ```{r echo = FALSE}
+# producing data.frames for new figure (6) - time poor:
 df6_poor_small <- df6_spss %>%
   filter(slack == 0, large == 0) %>%
-  summarise(mean.expense.timepoor.smallaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  summarise(mean.expense.timepoor.smallaccount = mean(expense), 
+            CI = (1.96 * Sem(expense))) %>%
   round(digits = 2)
 
 df6_poor_large <- df6_spss %>%
   filter(slack == 0, large == 1) %>%
-  summarise(mean.expense.timepoor.largeaccount = mean(expense), CI = (1.96 * Sem(expense))) %>%
+  summarise(mean.expense.timepoor.largeaccount = mean(expense), 
+            CI = (1.96 * Sem(expense))) %>%
   round(digits = 2)
-#producing data.frames for new figure (6) - time poor
 ```
 
 
 ```{r echo = FALSE}
-title <- factor(c("Time Poor", "Time Rich"), levels = c("Time Poor", "Time Rich"))
-values <- c(df6_poor_small$mean.expense.timepoor.smallaccount, df6_rich_small$mean.expense.timerich.smallaccount, df6_poor_large$mean.expense.timepoor.largeaccount, df6_rich_large$mean.expense.timerich.largeaccount)
-account_size <- c("small_account", "small_account", "large_account", "large_account")
-CIs <- c(df6_poor_small$CI, df6_rich_small$CI, df6_poor_large$CI, df6_rich_large$CI)
-
+# Plotting
+title <- factor(c("Time Poor", "Time Rich"), 
+                levels = c("Time Poor", "Time Rich"))
+values <- c(df6_poor_small$mean.expense.timepoor.smallaccount, 
+            df6_rich_small$mean.expense.timerich.smallaccount, 
+            df6_poor_large$mean.expense.timepoor.largeaccount, 
+            df6_rich_large$mean.expense.timerich.largeaccount)
+account_size <- c("small_account", 
+                  "small_account", 
+                  "large_account", 
+                  "large_account")
+CIs <- c(df6_poor_small$CI, 
+         df6_rich_small$CI, 
+         df6_poor_large$CI, 
+         df6_rich_large$CI)
+# figure 6 data frame:
 fig6.table <- data.frame(title, values, account_size, CIs)
-#figure 6 data frame
-fig6.table$account_size <- factor(fig6.table$account_size, levels = c("small_account", "large_account"))
-#relevel figure 6 table
-
+# Changing reference level : 
+fig6.table$account_size <- factor(fig6.table$account_size, 
+                                  levels = c("small_account", 
+                                             "large_account"))
 figure6 <- fig6.table %>%
-  ggplot(aes(x = title, y = values, fill = account_size)) + geom_bar(stat = "identity", position = position_dodge(), colour = "black") + ylab("Expense rating") + xlab(NULL) + geom_errorbar(aes(ymin = values - CIs, ymax = values + CIs), width = 0.2, position = position_dodge(0.9)) + ggtitle("Figure 6 - Time loss Expense rating for either\na small or large time account size for Study 6\n(error bars represent 95% confidence interval)") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-#produces figure 6
+  ggplot(aes(x = title, 
+             y = values, 
+             fill = account_size)) + 
+  geom_bar(stat = "identity", 
+           position = position_dodge(), 
+           colour = "black") + 
+  ylab("Expense rating") + 
+  xlab(NULL) + 
+  geom_errorbar(aes(ymin = values - CIs, 
+                    ymax = values + CIs), 
+                width = 0.2, 
+                position = position_dodge(0.9)) + 
+  ggtitle("Figure 6 - Time loss Expense rating for either\na small or large time account size for Study 6\n(error bars represent 95% confidence interval)") + 
+  theme_bw() + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
 
+# Plots figure 6
 print(figure6)
-#displays figure 6
 ```
 
 "A 2 (scarcity condition) × 2 (account condition) analysis of variance revealed a significant interaction, F(1, 69) = 5.16, p < .05, ηp2 = .07."
 
 ```{r echo = FALSE}
-
+# anova
 summary(aov(expense ~ large * slack, df6_spss))
-temp_eta2 <- etaSquared(aov(expense ~ large * slack, df6_spss)) %>%
-  .[3,2] %>%
-  round(digit=2)
-print(c("partial eta squared:", temp_eta2), quote=F)
+
+# partial eta squared
+etaSquared(aov(expense ~ large * slack, df6_spss)) %>%
+  .["large:slack","eta.sq.part"] %>%
+  round(digit=3) %>%
+  cat("Small-/Large-Account & Time-Poor/-Rich\nPartial eta squared:", .)
 ```
 
-> End of replication.
+End of replication.
